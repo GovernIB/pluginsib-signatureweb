@@ -20,6 +20,7 @@ import org.fundaciobit.pluginsib.core.v3.utils.FileUtils;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.IRubricGenerator;
 import org.fundaciobit.pluginsib.signature.api.PolicyInfoSignature;
+import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
@@ -103,6 +104,19 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         return "true".equalsIgnoreCase(getProperty(AUTOFIRMA_BASE_PROPERTIES + "headless"));
     }
 
+    protected String getNewCssUrl() {
+        String newCSS = getProperty(AUTOFIRMA_BASE_PROPERTIES + "newcssurl");
+        return newCSS;
+    }
+
+    protected String getNewJavascriptUrl() {
+        return getProperty(AUTOFIRMA_BASE_PROPERTIES + "newjavascripturl");
+    }
+
+    protected String getMissatgeEspera(Locale locale) {
+        return getProperty(AUTOFIRMA_BASE_PROPERTIES + "missatgeespera." + locale.getLanguage());
+    }
+
     protected Integer getTimeOutBase() {
         String timeoutbase = getProperty(AUTOFIRMA_BASE_PROPERTIES + "timeoutbase");
 
@@ -113,9 +127,69 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         try {
             return Integer.valueOf(timeoutbase);
         } catch (NumberFormatException e) {
-            e.printStackTrace();
+            log.error("Error llegint el valor de timeoutbase: " + e.getMessage(), e);
             return null;
         }
+    }
+
+    public static final String URL_PATTERN = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
+
+    @Override
+    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+        PropertyInfo debug = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "debug",
+                "Activa la depuració del PLugin", true, "false", new String[] { "false", "true" }, null);
+        PropertyInfo headless = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "headless",
+                "Per assegurar que Autofirma no mostri cap GUI", true, "false", new String[] { "false", "true" }, null);
+
+        PropertyInfo newcssurl = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "newcssurl",
+                "Url a un fitxer css per modificar l'aspecte de pàgina web", true, "null", URL_PATTERN, null);
+
+        PropertyInfo newjavascripturl = new PropertyInfo(
+                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "newjavascripturl",
+                "Url a un fitxer javascript per modificar el comportament de la pàgina web", true, "null", URL_PATTERN,
+                null);
+
+        PropertyInfo missatgeesperaES = new PropertyInfo(
+                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "missatgeespera.es",
+                "Missatge en castellà que es mostrarà mentre es realitza la firma", true,
+                "Espere a que se ejecute la aplicación<br/>@firma Autofirma o Cliente @firma Móvil ...");
+
+        PropertyInfo missatgeesperaCA = new PropertyInfo(
+                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "missatgeespera.ca",
+                "Missatge en català que es mostrarà mentre es realitza la firma", true,
+                "Esperi a que s´executi l´aplicació<br/>@firma Autofirma o Client @firma Mòbil ...");
+
+        PropertyInfo timeoutbase = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "timeoutbase",
+                "Defineix el temps en segons de timeout quan el client no accepta la\r\n"
+                        + " posada en marxa de Autofirma o quan aquesta no existeix. Unitats en segons. ",
+                true, "15");
+
+        PropertyInfo firefoxinwindowsuseoskeystore = new PropertyInfo(
+                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "firefoxinwindowsuseoskeystore",
+                "Si val true en en navegador Firefox enlloc de cercar certificats en el seu propi magatzem el cerca al magatzem del S.O.",
+                true, "false", new String[] { "true", "false" }, null);
+
+        PropertyInfo downloadforwindowsxp = new PropertyInfo(
+                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "downloadforwindowsxp",
+                "Si val true mostrarà en la llista de llocs on descarregar Autofirma "
+                        + " un nou item per descarregar Autofirma per Windows XP",
+                true, "false", new String[] { "false", "true" }, null);
+
+        List<PropertyInfo> list = new ArrayList<PropertyInfo>();
+        list.add(debug);
+        list.add(headless);
+        list.add(newcssurl);
+        list.add(newjavascripturl);
+        list.add(missatgeesperaES);
+        list.add(missatgeesperaCA);
+        list.add(timeoutbase);
+        list.add(firefoxinwindowsuseoskeystore);
+        list.add(downloadforwindowsxp);
+
+        // String key, String description, boolean optional, String defaultValue, String[] listOfAvailableValues, String[] examples
+        // PropertyInfo nom = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "nom", "description", optional, "defaultValue", listOfAvailableValues | pattern,  examples);
+
+        return null;
     }
 
     @Override
@@ -123,8 +197,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         return new String[] { FileInfoSignature.SIGN_TYPE_PADES, FileInfoSignature.SIGN_TYPE_XADES,
                 FileInfoSignature.SIGN_TYPE_CADES, FileInfoSignature.SIGN_TYPE_SMIME };
     }
-    
-    
+
     @Override
     public int[] getSupportedSignatureModes(String signType) {
 
@@ -142,7 +215,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                         FileInfoSignature.SIGN_MODE_DETACHED };
 
             case FileInfoSignature.SIGN_TYPE_XADES:
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING, FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED,
+                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
+                        FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED,
                         FileInfoSignature.SIGN_MODE_INTERNALLY_DETACHED };
 
             default:
@@ -151,7 +225,6 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                 return new int[0];
         }
     }
-    
 
     @Override
     public String[] getSupportedSignatureAlgorithms(String signType) {
@@ -552,13 +625,13 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
         super.getJavascriptCSS(request, absolutePluginRequestPath, relativePluginRequestPath, out, key, value);
 
-        String newJS = getProperty(AUTOFIRMA_BASE_PROPERTIES + "newjavascripturl");
+        String newJS = getNewJavascriptUrl();
 
         if (newJS != null && newJS.trim().length() != 0) {
             out.println("<script type=\"text/javascript\" src=\"" + newJS + "\"></script>");
         }
 
-        String newCSS = getProperty(AUTOFIRMA_BASE_PROPERTIES + "newcssurl");
+        String newCSS = getNewCssUrl();
 
         if (newCSS != null && newCSS.trim().length() != 0) {
             out.println("<link href=\"" + newCSS + "\" rel=\"stylesheet\" type=\"text/css\">");
@@ -678,8 +751,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         for (int i = 0; i < fisArray.length; i++) {
             final FileInfoSignature fis = fisArray[i];
             try {
-                configProperties[i] = generarPropertiesFirma(response, signaturesSet, signaturesSetID, baseSignaturesSet,
-                        callbackhost, i, fis, algorithm);
+                configProperties[i] = generarPropertiesFirma(response, signaturesSet, signaturesSetID,
+                        baseSignaturesSet, callbackhost, i, fis, algorithm);
             } catch (Exception e) {
                 String errorMsg = "Error generant les propietats per enviar a AutoFirma: " + e.getMessage();
                 finishWithError(response, signaturesSet, errorMsg, e);
@@ -966,12 +1039,16 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
                 locale.getLanguage(), sai, signaturesSet);
 
+        String missatgeEspera = getMissatgeEspera(locale);
+        if (missatgeEspera == null) {
+            missatgeEspera = getTraduccio("espera", locale);
+        }
+
         out.println("\n\n" + "<div id=\"ajaxloader\" style=\"width:100%;height:100%;\">\n"
                 + "  <table style=\"min-height:200px;width:100%;height:100%;\">\n" + "    <tr valign=\"middle\">\n"
                 + "    <td align=\"center\">\n" + "      <div id=\"msgNoAndroidChrome\">\n" + "         <h2>\n"
-                + getTraduccio("espera", locale) + "</h2><br/>"
-                + "         <img alt=\"Esperi\" style=\"z-index:200\" src=\"" + relativePluginRequestPath + "/"
-                + WEBRESOURCE + "/img/ajax-loader2.gif\">\n" + "      </div>\n"
+                + missatgeEspera + "</h2><br/>" + "         <img alt=\"Esperi\" style=\"z-index:200\" src=\""
+                + relativePluginRequestPath + "/" + WEBRESOURCE + "/img/ajax-loader2.gif\">\n" + "      </div>\n"
                 + "      <div id=\"msgAndroidChrome\">\n" + "         <h2>\n" + getTraduccio("iniciarfirma", locale)
                 + "</h2><br/>"
                 + "         <input type=\"button\" class=\"btn btn-large btn-success\" onclick=\"doSignAndroidChrome()\" value=\""
@@ -1041,8 +1118,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         for (int i = 0; i < fisArray.length; i++) {
             final FileInfoSignature fis = fisArray[i];
             try {
-                configProperties[i] = generarPropertiesFirma(response, signaturesSet, signaturesSetID, baseSignaturesSet,
-                    callbackhost, i, fis, null);
+                configProperties[i] = generarPropertiesFirma(response, signaturesSet, signaturesSetID,
+                        baseSignaturesSet, callbackhost, i, fis, null);
             } catch (Exception e) {
                 String errorMsg = "Error generant les propietats per enviar a Client-Mòbil: " + e.getMessage();
                 finishWithError(response, signaturesSet, errorMsg, e);
@@ -1205,6 +1282,11 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
                 locale.getLanguage(), sai, signaturesSet);
 
+        String missatgeEspera = getMissatgeEspera(locale);
+        if (missatgeEspera == null) {
+            missatgeEspera = getTraduccio("espera", locale);
+        }
+
         out.println("  <script type=\"text/javascript\">" + "\n" + "    MiniApplet.setForceWSMode(true);" + "\n"
                 + "    MiniApplet.cargarAppAfirma(\"" + HOST + request.getContextPath() + "\"); " + "\n"
                 + "    MiniApplet.setServlets(\"" + HOST + PATH + "/" + STORAGESERVICE + "\", \"" + HOST + PATH + "/"
@@ -1214,9 +1296,11 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                 + "    <td align=\"center\">\n" + "      <div id=\"progresFirma\" class=\"alert alert-success\" >\n"
                 + "          " + getTraduccio("realitzantfirma", locale, "1", String.valueOf(fisArray.length)) + "\n"
                 + "      </div>\n" + "      <div id=\"msgNoAndroidChrome\">\n" + "         <h2>\n"
-                + getTraduccio("espera", locale) + "</h2><br/>"
-                + "         <img alt=\"Esperi\" style=\"z-index:200\" src=\"" + relativePluginRequestPath + "/"
-                + WEBRESOURCE + "/img/ajax-loader2.gif\"><br/>\n" + "      </div>\n"
+
+                + missatgeEspera
+
+                + "</h2><br/>" + "         <img alt=\"Esperi\" style=\"z-index:200\" src=\"" + relativePluginRequestPath
+                + "/" + WEBRESOURCE + "/img/ajax-loader2.gif\"><br/>\n" + "      </div>\n"
                 + "      <div id=\"msgAndroidChrome\">\n"
                 + ((fisArray.length > 1)
                         ? "      <div id=\"avisNfirmes\" class=\"alert alert-error\">Hi ha " + fisArray.length
@@ -1234,7 +1318,6 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                     + "      <input type=\"button\" value=\"Firmar ORIG\" onclick=\"doSign();\">&nbsp;\n"
                     + "      <input type=\"button\" value=\"Mostrar Log ORIG\" onclick=\"showAppletLog();\">\n");
         }
-        ;
 
         out.println("    </td>\n" + "    </tr>\n" + "  </table>\n" + "</div>\n");
 
