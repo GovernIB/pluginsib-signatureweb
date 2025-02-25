@@ -1674,7 +1674,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             response.sendRedirect(signaturesSet.getUrlFinal());
 
         } catch (Exception e) {
-            String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma ("
+            String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma [Client Mòbil] ("
                     + signaturesSet.getSignaturesSetID() + "): " + e.getMessage();
             super.finishWithError(response, signaturesSet, errorMsg, e);
         }
@@ -1711,13 +1711,19 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             super.finishWithError(response, signaturesSet, errorMsg, null);
             return;
         }
+        
+        // Cas quan es cancel·la des d'Autofirm@. retorna "AA=="
+        if ("AA==".equals(resultXMLB64)) {
+            super.cancel(request, response, signaturesSet);
+            return;
+        }
 
         final boolean debug = isDebug();
 
         try {
 
             if (debug) {
-                log.info("resultXMLB64 = " + resultXMLB64);
+                log.info("resultXMLB64 (" + resultXMLB64.length() + ") = ]" + resultXMLB64 + "[");
             }
 
             String resultXML = new String(Base64.decode(resultXMLB64));
@@ -1839,7 +1845,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             response.sendRedirect(signaturesSet.getUrlFinal());
 
         } catch (Exception e) {
-            String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma ("
+            String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma [Autofirm@] ("
                     + signaturesSet.getSignaturesSetID() + "): " + e.getMessage();
             super.finishWithError(response, signaturesSet, errorMsg, e);
         }
