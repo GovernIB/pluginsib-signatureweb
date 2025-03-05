@@ -659,12 +659,12 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         UAgentInfo uai = new UAgentInfo(userAgent, accept);
 
         if (uai.detectAndroid() || uai.detectTierIphone() || uai.detectTierTablet()) {
-            log.info("AfirmaTriphaseSignatureWebPlugin =>> ES TABLET, ANDROID o IPHONE. ");
+            log.debug("AfirmaTriphaseSignatureWebPlugin =>> ES TABLET, ANDROID o IPHONE. ");
             // Tablets i mobils 
             indexPageClientMobil(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet,
                     signatureIndex, locale);
         } else {
-            log.info("AfirmaTriphaseSignatureWebPlugin =>> ES PC ");
+            log.debug("AfirmaTriphaseSignatureWebPlugin =>> ES PC ");
             indexPageAutofirma(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet,
                     signatureIndex, locale);
         }
@@ -782,10 +782,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             // ByteArrayOutputStream baos;
             // p.store(baos, "UTF-8");
 
-            // XYZ ZZZ ZZZ
-            //if (debug) 
-            {
-                log.info("\n\n XYZ ZZZ ZZZ ============ PROPERTIES @FIRMA AUTOFIRMA[" + i + "] ================\n"
+            if (debug) {
+                log.info("\n\n ============ PROPERTIES @FIRMA AUTOFIRMA[" + i + "] ================\n"
                         + configPropertiesStr[i] + "\n\n");
             }
         }
@@ -1502,21 +1500,25 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             return null;
         }
 
-        log.info("");
-        log.info(" XYZ ZZZ ZZZ formatMobile: " + formatMobile);
-        log.info(" XYZ ZZZ ZZZ formatBatch: " + formatBatch);
-        log.info(" XYZ ZZZ ZZZ formatSign: " + formatSign);
-        log.info("");
+        if (debug) {
+            log.info("");
+            log.info("formatMobile: " + formatMobile);
+            log.info("formatBatch: " + formatBatch);
+            log.info("formatSign: " + formatSign);
+            log.info("");
+        }
 
         configProperties.put(FORMAT_MOBILE, formatMobile);
         configProperties.put(FORMAT_BATCH, formatBatch);
         configProperties.put(FORMAT_SIGN, formatSign);
 
-        log.info("");
-        log.info(" XYZ ZZZ ZZZ FORMAT generat dins MINIAPPLET UTILS: " + configProperties.getProperty(FORMAT_SIGN));
-        log.info(" XYZ ZZZ ZZZ FORMAT generat dins FORMAT_BATCH: " + configProperties.getProperty(FORMAT_BATCH));
-        log.info(" XYZ ZZZ ZZZ FORMAT generat dins FORMAT_MOBILE: " + configProperties.getProperty(FORMAT_MOBILE));
-        log.info("");
+        if (debug) {
+            log.info("");
+            log.info("FORMAT generat dins MINIAPPLET UTILS: " + configProperties.getProperty(FORMAT_SIGN));
+            log.info("FORMAT generat dins FORMAT_BATCH: " + configProperties.getProperty(FORMAT_BATCH));
+            log.info("FORMAT generat dins FORMAT_MOBILE: " + configProperties.getProperty(FORMAT_MOBILE));
+            log.info("");
+        }
 
         // SIGNATURE ID
         configProperties.put(SIGNATUREID, encodeSignatureItemID(signaturesSetID, index));

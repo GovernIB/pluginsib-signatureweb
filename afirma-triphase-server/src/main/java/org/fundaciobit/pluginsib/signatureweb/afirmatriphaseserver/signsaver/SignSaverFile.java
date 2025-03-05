@@ -23,138 +23,132 @@ import es.gob.afirma.signers.batch.SingleSign;
  */
 public class SignSaverFile implements SignSaver {
 
-  public static final String PROP_FILENAME = "FileName";
-    
-  // KEY -> ID de firma || VALUE => Indica la data d'expiració
-  private static final Map<String, Long> processedFiles = new HashMap<String, Long>();
+    public static final String PROP_FILENAME = "FileName";
 
-  private Logger log = Logger.getLogger(SignSaverFile.class);
-  
-  private String filename;
-  
-  private boolean debug;
+    // KEY -> ID de firma || VALUE => Indica la data d'expiració
+    private static final Map<String, Long> processedFiles = new HashMap<String, Long>();
 
-  public SignSaverFile() {
-  }
+    private Logger log = Logger.getLogger(SignSaverFile.class);
 
-  @Override
-  public Properties getConfig() {
-    Properties p = new Properties();
-    p.put(PROP_FILENAME, this.filename);
-    p.put("debug", String.valueOf(this.debug));
-    return p;
-  }
+    private String filename;
 
-  @Override
-  public void saveSign(SingleSign sign, byte[] dataToSave) throws IOException {
+    private boolean debug;
 
-    FileOutputStream o = new FileOutputStream(this.filename);
-    o.write(dataToSave);
-    o.flush();
-    o.close();
-
-    if (this.debug) {
-      Item item = AfirmaTriphaseSignatureWebPlugin.decodeSignatureItemID(sign.getId());
-      log.info(
-       " ------- SignSaverFile::saveSign(" + sign.getId() + ") ---------\n"
-       + " FINAL SAVE IN this.filename =" + this.filename + "\n"
-       + " sign.getId() = " +  sign.getId() + "\n"
-       + " SignaturesSetID = " +  item.signaturesSetID + "\n"
-       + " index = " +  item.index + "\n"
-       + " sign.getSignFormat() = " + sign.getSignFormat() + "\n"
-       + " dataToSave.length = " +  dataToSave.length + "\n"
-       );
+    public SignSaverFile() {
     }
 
-    synchronized (PROP_FILENAME) {
-      processedFiles.put(sign.getId(), System.currentTimeMillis() + FIVE_MINUTES);
+    @Override
+    public Properties getConfig() {
+        Properties p = new Properties();
+        p.put(PROP_FILENAME, this.filename);
+        p.put("debug", String.valueOf(this.debug));
+        return p;
     }
 
-  }
+    @Override
+    public void saveSign(SingleSign sign, byte[] dataToSave) throws IOException {
 
-  @Override
-  public void init(Properties config) {
-    if (config == null) {
-      throw new IllegalArgumentException("La configuracion no puede ser nula");
-    }
-    String file = config.getProperty(PROP_FILENAME);
-    if (file == null) {
-      throw new IllegalArgumentException(
-          "Es obligarorio que la configuracion incluya un valor para la propiedad " + PROP_FILENAME);
-    }
+        FileOutputStream o = new FileOutputStream(this.filename);
+        o.write(dataToSave);
+        o.flush();
+        o.close();
 
-    this.filename = file;
-    this.debug = "true".equals(config.getProperty("debug"));
-    
-    if (debug) {
-      log.info("Inicialitzat SignSaverFile amb fitxer: " + this.filename);
-    }
-  }
-
-  @Override
-  public boolean isInitialized() {
-    return this.filename != null;
-  }
-
-  @Override
-  public void rollback(SingleSign sign) {
-
-    if (log.isDebugEnabled()) {
-      log.debug("ENTRA A ROLBACK:  sign.getId() = " +  sign.getId());
-    }
-    File file = new File(this.filename);
-    if (file.exists()) {
-      file.delete();
-    }
-  }
-  
-  
-  public static final long FIVE_MINUTES = 5 * 60 * 1000;
-  
-  private static long nextCheck = System.currentTimeMillis() + FIVE_MINUTES;
-  
-  public static List<String> checkProcessedFiles(List<String> ids) {
-    
-    List<String> pending = new ArrayList<String>();
-    
-    synchronized (PROP_FILENAME) {
-      
-      for (String id : ids) {
-         if (!processedFiles.containsKey(id)) {
-           pending.add(id);
-         }
-      }
-
-    }
-    
-    return pending;
-    
-  }
-  
-  
-  public static void removeProcessedFiles(List<String> ids) {
-    synchronized (PROP_FILENAME) {
-      for (String id : ids) {
-        processedFiles.remove(id);  
-      }
-      // Eliminar expirades
-      final long current = System.currentTimeMillis(); 
-      if (current > nextCheck) {
-        List<String> toRemove = new ArrayList<String>();
-
-        for(Map.Entry<String, Long> value : processedFiles.entrySet() ) {
-          if (current > value.getValue()) {
-            toRemove.add(value.getKey());
-          }
+        if (this.debug) {
+            Item item = AfirmaTriphaseSignatureWebPlugin.decodeSignatureItemID(sign.getId());
+            log.info(" ------- SignSaverFile::saveSign(" + sign.getId() + ") ---------\n"
+                    + " FINAL SAVE IN this.filename =" + this.filename + "\n" + " sign.getId() = " + sign.getId() + "\n"
+                    + " SignaturesSetID = " + item.signaturesSetID + "\n" + " index = " + item.index + "\n"
+                    + " sign.getSignFormat() = " + sign.getSignFormat() + "\n" + " dataToSave.length = "
+                    + dataToSave.length + "\n");
         }
 
-        for (String id : toRemove) {
-          processedFiles.remove(id);  
+        synchronized (PROP_FILENAME) {
+            processedFiles.put(sign.getId(), System.currentTimeMillis() + FIVE_MINUTES);
         }
 
-        nextCheck = System.currentTimeMillis() + FIVE_MINUTES;
-      }
     }
-  }
-  
+
+    @Override
+    public void init(Properties config) {
+        if (config == null) {
+            throw new IllegalArgumentException("La configuracion no puede ser nula");
+        }
+        String file = config.getProperty(PROP_FILENAME);
+        if (file == null) {
+            throw new IllegalArgumentException(
+                    "Es obligarorio que la configuracion incluya un valor para la propiedad " + PROP_FILENAME);
+        }
+
+        this.filename = file;
+        this.debug = "true".equals(config.getProperty("debug"));
+
+        if (debug) {
+            log.info("Inicialitzat SignSaverFile amb fitxer: " + this.filename);
+        }
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return this.filename != null;
+    }
+
+    @Override
+    public void rollback(SingleSign sign) {
+
+        if (log.isDebugEnabled()) {
+            log.debug("ENTRA A ROLBACK:  sign.getId() = " + sign.getId());
+        }
+        File file = new File(this.filename);
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    public static final long FIVE_MINUTES = 5 * 60 * 1000;
+
+    private static long nextCheck = System.currentTimeMillis() + FIVE_MINUTES;
+
+    public static List<String> checkProcessedFiles(List<String> ids) {
+
+        List<String> pending = new ArrayList<String>();
+
+        synchronized (PROP_FILENAME) {
+
+            for (String id : ids) {
+                if (!processedFiles.containsKey(id)) {
+                    pending.add(id);
+                }
+            }
+
+        }
+
+        return pending;
+
+    }
+
+    public static void removeProcessedFiles(List<String> ids) {
+        synchronized (PROP_FILENAME) {
+            for (String id : ids) {
+                processedFiles.remove(id);
+            }
+            // Eliminar expirades
+            final long current = System.currentTimeMillis();
+            if (current > nextCheck) {
+                List<String> toRemove = new ArrayList<String>();
+
+                for (Map.Entry<String, Long> value : processedFiles.entrySet()) {
+                    if (current > value.getValue()) {
+                        toRemove.add(value.getKey());
+                    }
+                }
+
+                for (String id : toRemove) {
+                    processedFiles.remove(id);
+                }
+
+                nextCheck = System.currentTimeMillis() + FIVE_MINUTES;
+            }
+        }
+    }
+
 }
