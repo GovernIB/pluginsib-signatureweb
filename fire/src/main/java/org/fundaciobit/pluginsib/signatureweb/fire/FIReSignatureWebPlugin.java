@@ -11,6 +11,7 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -26,6 +27,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.fundaciobit.pluginsib.core.v3.utils.FileUtils;
 import org.fundaciobit.pluginsib.signature.api.CommonInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
+import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
@@ -60,6 +62,24 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
 
     public static final String FIRE_BASE_PROPERTIES = SIGNATUREWEB_BASE_PROPERTY + "fire.";
 
+    private static final String PROPERTY_FIRE_URL = FIRE_BASE_PROPERTIES + "fireUrl";
+
+    private static final String PROPERTY_PROCEDURE = FIRE_BASE_PROPERTIES + "procedure";
+
+    public static final String PROPERTY_DEBUG = FIRE_BASE_PROPERTIES + "debug";
+
+    public static final String PROPERTY_MAPPING_USERS_PATH = FIRE_BASE_PROPERTIES + "mappingusers";
+
+    public static final String PROPERTY_USERS_PATTERN = FIRE_BASE_PROPERTIES + "userspattern";
+
+    public static final String PROPERTY_CALLBACK_HOST = FIRE_BASE_PROPERTIES + "callbackhost";
+
+    public static final String PROPERTY_APPID = FIRE_BASE_PROPERTIES + "appid";
+
+    public static final String PROPERTY_CERT_ORIGIN = FIRE_BASE_PROPERTIES + "certOrigin";
+
+    public static final String PROPERTY_APP_NAME = FIRE_BASE_PROPERTIES + "appName";
+
     // Firma
     public static final String OPERATION_SIGN = "sign";
 
@@ -68,12 +88,6 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
 
     // ContraFirma
     public static final String OPERATION_COUNTERSIGN = "countersign";
-
-    private static final String PROPERTY_MAPPING_USERS_PATH = FIRE_BASE_PROPERTIES + "mappingusers";
-
-    private static final String PROPERTY_USERS_PATTERN = FIRE_BASE_PROPERTIES + "userspattern";
-
-    private static final String PROPERTY_CALLBACK_HOST = FIRE_BASE_PROPERTIES + "callbackhost";
 
     protected Map<String, FIReSignaturesSet> transactions = new ConcurrentHashMap<String, FIReSignaturesSet>();
 
@@ -108,19 +122,19 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
     }
 
     protected boolean isDebug() {
-        return log.isDebugEnabled() || "true".equalsIgnoreCase(getProperty(FIRE_BASE_PROPERTIES + "debug"));
+        return log.isDebugEnabled() || "true".equalsIgnoreCase(getProperty(PROPERTY_DEBUG));
     }
 
     protected String getAppID() throws Exception {
-        return getPropertyRequired(FIRE_BASE_PROPERTIES + "appid");
+        return getPropertyRequired(PROPERTY_APPID);
     }
 
     protected String getCertOrigin() {
-        return getProperty(FIRE_BASE_PROPERTIES + "certOrigin");
+        return getProperty(PROPERTY_CERT_ORIGIN);
     }
 
     protected String getAppName() {
-        return getProperty(FIRE_BASE_PROPERTIES + "appName");
+        return getProperty(PROPERTY_APP_NAME);
     }
 
     @Override
@@ -175,17 +189,116 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                     // XYZ ZZZ TODO Traduir
                     String msg = "La signatura de la posició " + i
                             + " requereix taula de firmes però només es posible si la propietat "
-                            + getPropertyName(FIRE_BASE_PROPERTIES + "certOrigin") + " està en mode mixt o local";
-                    if (isDebug()) {
-                        log.warn(msg);
-                    }
+                            + getPropertyName(PROPERTY_CERT_ORIGIN) + " està en mode mixt o local";
+                    log.warn(msg);
                     return msg;
                 }
             }
 
         }
 
+        // -------------------------------------
+        // -- VALIDAR USER
+
+        String username = signaturesSet.getCommonInfoSignature().getUsername();
+        String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
+        String validateUser = this.validateUser(username, nif);
+        if (validateUser != null) {
+            return validateUser;
+        }
+
         return super.filter(request, signaturesSet, parameters);
+    }
+
+    protected String validateUser(String username, String nif) {
+
+        String claveFirmaUser;
+        try {
+            claveFirmaUser = getClaveFirmaUser(username, nif);
+        } catch (Exception e) {
+            final String msg = "El plugin " + this.getName(new Locale("ca")) + " no pot processar la Petició"
+                    + " ja que s'ha produit un error al consultar l'usuari a utilitzar per accedir a FIRe: "
+                    + e.getMessage();
+            log.warn(msg, e);
+            return msg;
+        }
+        if (claveFirmaUser != null && claveFirmaUser.trim().length() != 0) {
+            return null;
+        }
+
+        // No s'ha pogut obtenir l'usuari, revisam la raó ...
+
+        // (1) VALIDAM EL MAPPING
+
+        String mappingPath = getProperty(PROPERTY_MAPPING_USERS_PATH);
+        if (mappingPath != null && mappingPath.trim().length() != 0) {
+
+            File f = new File(mappingPath);
+            if (!f.exists()) {
+                final String msg = "El plugin " + this.getName(new Locale("ca"))
+                        + " no pot processar la Petició ja que la propietat " + PROPERTY_MAPPING_USERS_PATH
+                        + " apunta a un fitxer que no existeix (" + f.getAbsolutePath() + ")";
+                log.warn(msg);
+                return msg;
+            }
+            try {
+                readPropertiesFromFile(f);
+            } catch (Exception e) {
+                final String msg = "El plugin " + this.getName(new Locale("ca"))
+                        + " no pot processar la Petició ja que la propietat " + PROPERTY_MAPPING_USERS_PATH + " apunta "
+                        + f.getAbsolutePath() + " que no pot ser consultat: " + e.getMessage();
+                log.warn(msg, e);
+                return msg;
+            }
+
+        }
+
+        String pattern = getProperty(PROPERTY_USERS_PATTERN);
+        if (pattern != null && pattern.trim().length() != 0) {
+
+            if (pattern.indexOf("{0}") != -1) { // PATTERN CONTE USERNAME
+
+                // Si hem d'utilitzar patró de reemplaçament i aquest es d'username
+                // llavors necessitam username
+                // (1)  Validar Username
+
+                if (username == null || username.trim().length() == 0) {
+                    final String msg = "El plugin " + this.getName(new Locale("ca"))
+                            + " no pot processar una Petició si la propietat " + PROPERTY_USERS_PATTERN
+                            + " esta definida i el username és null o buit";
+                    log.warn(msg);
+                    return msg;
+                }
+
+            }
+            if (pattern.indexOf("{1}") != -1) { // PATTERN CONTE NIF
+
+                if (nif == null || nif.trim().length() == 0) {
+                    final String msg = "El plugin " + this.getName(new Locale("ca"))
+                            + " no pot processar una Petició si la propietat " + PROPERTY_USERS_PATTERN
+                            + " esta definida i el NIF és null o buit";
+                    log.warn(msg);
+                    return msg;
+                }
+            }
+        }
+
+        // Si no tenim ni patro ni mapping llavors utilitzam username o nif per aquest ordre
+        if (username == null || username.trim().length() == 0) {
+            final String msg = "El plugin " + this.getName(new Locale("ca"))
+                    + " no pot processar una Petició si username és null o buit";
+            log.warn(msg);
+            return msg;
+        }
+
+        if (nif == null || nif.trim().length() == 0) {
+            final String msg = "El plugin " + this.getName(new Locale("ca"))
+                    + " no pot processar una Petició si el NIF és null o buit";
+            log.warn(msg);
+            return msg;
+        }
+
+        return null;
     }
 
     @Override
@@ -430,8 +543,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
         commonRemoteConfProperties.setProperty("redirectErrorUrl", callBackURLError);
         // procedureName: Nombre del procedimiento que se ejecuta (previamente
         // dado de alta en la GISS).
-        commonRemoteConfProperties.setProperty("procedureName",
-                getPropertyRequired(FIRE_BASE_PROPERTIES + "procedure"));
+        commonRemoteConfProperties.setProperty("procedureName", getPropertyRequired(PROPERTY_PROCEDURE));
 
         // Configuramos si el certificado es local o de Cl@ve Firma (Opcional)
         if (certOrigin != null) {
@@ -757,6 +869,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                     msg = getTraduccio("codierror." + transactionResult.getErrorCode(), locale);
                 }
 
+                // Missatge estirà en castella
                 if (msg == null) {
                     msg = msgError;
                 }
@@ -1019,7 +1132,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
     protected Properties getFireProperties() throws Exception {
         Properties prop = new Properties();
 
-        final String fireUrl = getPropertyRequired(FIRE_BASE_PROPERTIES + "fireUrl");
+        final String fireUrl = getPropertyRequired(PROPERTY_FIRE_URL);
 
         // prop.setProperty("appId", appId);
 
@@ -1120,8 +1233,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
 
         };
     }
-    
-    
+
     @Override
     public int[] getSupportedSignatureModes(String signType) {
 
@@ -1148,8 +1260,6 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                 return new int[0];
         }
     }
-    
-    
 
     @Override
     public String[] getSupportedSignatureAlgorithms(String signType) {
@@ -1217,7 +1327,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
         boolean debug = isDebug();
 
         if (debug) {
-            log.info("getClaveFirmaUser => U: " + username + " | NIF: " + administrationID);
+            log.info("getClaveFirmaUser => U: ]" + username + "[ | NIF: ]" + administrationID + "[");
         }
 
         // Primer provam el mapping
@@ -1272,6 +1382,133 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
         transactions.clear();
         generateCertificateTransactions.clear();
         timeStampCache.clear();
+    }
+
+    @Override
+    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+
+        String b = propertyKeyBase + FIRE_BASE_PROPERTIES;
+
+        List<PropertyInfo> props = new ArrayList<PropertyInfo>();
+
+        PropertyInfo debug = new PropertyInfo(propertyKeyBase + PROPERTY_DEBUG,
+                "Per depuració durant el desenvolupament. Tipus booleà.", true, "false");
+
+        props.add(debug);
+
+        PropertyInfo appid = new PropertyInfo(propertyKeyBase + PROPERTY_APPID,
+                "Identificador de la aplicacion, necesario para autenticarse contra el componente central."
+                        + " Nos lo asigna el modulo de administracion al dar de alta la aplicacion",
+                false, null);
+        props.add(appid);
+
+        PropertyInfo procedure = new PropertyInfo(propertyKeyBase + PROPERTY_PROCEDURE,
+
+                " Nombre del procedimiento con el que quedaran registradas las peticiones"
+                        + " con objeto de obtener estadisticas. Solo se utiliza en produccion y nos"
+                        + " lo debe entregar el administrador del componente central al dar de alta"
+                        + " el procedimiento en los servicios de la GISS",
+                true, null);
+        props.add(procedure);
+
+        PropertyInfo certOrigin = new PropertyInfo(propertyKeyBase + PROPERTY_CERT_ORIGIN,
+
+                " Origen del certificado de firma. Puede ser “local” (para forzar el uso de certificados"
+                        + " que el usuario tenga en el almacén de su navegador o en dispositivo criptográfico)"
+                        + " o 'clavefirma' (para forzar el uso de los certificados de firma de Cl@ve Firma)."
+                        + " Este parámetro es opcional. Si no se especifica o se deja en blanco se permitirá al"
+                        + " usuario seleccionar el origen del certificado."
+                        + " IMPORTANT: La taula de firmes només serà possible si aquest valor val 'clavefirma'.",
+                true, null);
+        props.add(certOrigin);
+
+        PropertyInfo appName = new PropertyInfo(propertyKeyBase + PROPERTY_APP_NAME,
+
+                " Nombre de la aplicación. Este nombre se usará en las páginas del componente"
+                        + " central para informar al usuario de la aplicación que solicita la operación"
+                        + " de firma. Este parámetro es opcional.",
+                true, null);
+        props.add(appName);
+
+        PropertyInfo fireURL = new PropertyInfo(propertyKeyBase + PROPERTY_FIRE_URL,
+
+                "URL del servicio del componente central.", true, null);
+        fireURL.setExamples(new String[] { "https://localhost:28443/fire-signature/fireService" });
+        props.add(fireURL);
+
+        PropertyInfo keyStore = new PropertyInfo(b + "javax.net.ssl.keyStore",
+                "(Opcional) Ruta del almacén de claves para la autenticación mediante certificado"
+                        + " con el componente central. Este certificado debe estar dado de alta en la base de"
+                        + " datos del componente central, asignado al identificador de la aplicación cliente"
+                        + " en la que se esté integrando el componente distribuido. Si se omite este parámetro"
+                        + " se usará la configuración establecida a nivel global en la JRE.",
+                false, null);
+        keyStore.setExamples(new String[] { "D:\\pluginsib-signatureweb-4.1\\fire\\config\\fire.jks" });
+        props.add(keyStore);
+
+        PropertyInfo keyStorePassword = new PropertyInfo(b + "javax.net.ssl.keyStorePassword",
+                "(Opcional) Contraseña del almacén de claves de autenticación SSL.", false, null);
+        props.add(keyStorePassword);
+
+        PropertyInfo keyStoreType = new PropertyInfo(b + "javax.net.ssl.keyStoreType",
+
+                " (Opcional) Tipo del almacén de claves del certificado de autenticación SSL:"
+                        + "   “JKS” (almacén de Java) o “PKCS12” (almacén PKCS12/PFX). "
+                        + " Por defecto, se considera que el almacén es de tipo JKS.",
+                true, "JKS");
+        keyStoreType.setListOfAvailableValues(new String[] { "JKS", "PKCS12" });
+        props.add(keyStoreType);
+
+        PropertyInfo trustStore = new PropertyInfo(b + "javax.net.ssl.trustStore",
+                "(Opcional) Ruta del almacén de certificados de confianza SSL. Esto se usa cuando el "
+                        + " certificado con el que se ha montado el SSL del componente central no está en el"
+                        + " almacén de confianza de Java y se desea establecer un almacén de confianza alternativo."
+                        + " En caso de querer desactivar la comprobación del certificado SSL del servidor,"
+                        + " se puede configurar el valor “all”. Si se omite este parámetro se usará la"
+                        + " configuración establecida a nivel global en la JRE. Por defecto, se confiará en los"
+                        + " certificados dados de alta en el almacén “cacerts”.",
+                true, null);
+        keyStoreType.setListOfAvailableValues(new String[] { "[PATH]", "all" });
+        props.add(trustStore);
+
+        PropertyInfo trustStorePassword = new PropertyInfo(b + "javax.net.ssl.trustStorePassword",
+                "(Opcional) Contraseña del almacén de confianza.", true, null);
+        props.add(trustStorePassword);
+
+        PropertyInfo trustStoreType = new PropertyInfo(b + "javax.net.ssl.trustStoreType",
+                "(Opcional) Tipo del almacén de confianza: “JKS” (almacén de Java) o"
+                        + " “PKCS12” (almacén PKCS12/PFX).Por defecto, se considera que el almacén es de tipo JKS.",
+                true, null);
+        trustStoreType.setListOfAvailableValues(new String[] { "JKS", "PKCS12" });
+        props.add(trustStoreType);
+
+        PropertyInfo callbackhost = new PropertyInfo(b + "callbackhost", "CALLBAK HOST (opcional)", true, null);
+        callbackhost.setExamples(new String[] { "http://www.ibsalut.es/portafib" });
+        props.add(callbackhost);
+
+        PropertyInfo mappingusers = new PropertyInfo(propertyKeyBase + PROPERTY_MAPPING_USERS_PATH,
+                "(opcional) Fitxer de properties de Mapeig d'usuaris de l'appicació i usuaris de FIRe", true, null);
+        callbackhost.setExamples(
+                new String[] { "D:\\pluginsib-signatureweb-4.1\\fire\\doc\\fire_mapping_test.properties" });
+        props.add(mappingusers);
+
+        PropertyInfo users_pattern = new PropertyInfo(propertyKeyBase + PROPERTY_USERS_PATTERN,
+                "Patró de reemplaçament per convertir usurname i/o nif a usuari FIRe "
+                        + "(veure https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)."
+                        + " Les variables de substitució disponibles són: {0} == username o {1} == administrationID (NIF)",
+                true, null);
+        users_pattern.setExamples(new String[] { "IBSALUT_{1}" });
+        props.add(users_pattern);
+
+        PropertyInfo newjavascripturl = new PropertyInfo(b + "newjavascripturl",
+                "Opcional. Per afegir un nou fitxer de javascript (URL)", true, null);
+        props.add(newjavascripturl);
+
+        PropertyInfo newcssurl = new PropertyInfo(b + "newcssurl", "Opcional. Per afegir un nou fitxer de CSS (URL)",
+                true, null);
+        props.add(newcssurl);
+
+        return props;
     }
 
 }
