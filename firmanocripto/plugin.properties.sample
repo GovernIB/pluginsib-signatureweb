@@ -10,3 +10,8 @@ pluginsib.signatureweb.firmanocriptografica.evidencies.host=http://anadal:8888/e
 pluginsib.signatureweb.firmanocriptografica.evidencies.username=appusername
 pluginsib.signatureweb.firmanocriptografica.evidencies.password=apppassword
 
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.debug=true
+
+# Si s'usa dins d'un ifram llavors ha de valer false, si s'utilitza dins pantalla completa llavors ha de valer true
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.usesamewindow=false
+

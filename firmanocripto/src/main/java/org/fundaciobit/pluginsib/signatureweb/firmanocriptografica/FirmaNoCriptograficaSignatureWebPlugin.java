@@ -362,13 +362,27 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
         final String url;
         url = signaturesSet.getUrlFinal();
+        
+        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
 
         out.println("<script type=\"text/javascript\">" + "\n");
-        out.println("    window.opener.location.href='" + url + "';\n");
-        out.println("    setTimeout(() => { window.close(); }, 1000);" + "\n");
+        
+        
+        out.println("  function returnToMain() {\n");
+        if (usesamewindow) {
+            out.println("    document.location.href='" + url + "';\n");
+        } else {
+            out.println("    window.opener.location.href='" + url + "';\n");
+            out.println("    setTimeout(() => { window.close(); }, 1000);" + "\n");
+        }
+        //out.println("    window.opener.location.href='" + url + "';\n");
+        out.println("  }\n");
+        
+        out.println("  returnToMain();\n");
+
         out.println("</script>" + "\n");
         out.println("<center>" + "\n");
-        out.println("<img onClick='window.close();' src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE
+        out.println("<img onClick='returnToMain();' src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE
                 + "/img/ajax-loader2.gif\" />" + "\n");
         out.println("</center>\n");
 
@@ -394,6 +408,11 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
         PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
                 locale.getLanguage(), sai, signaturesSet);
+        
+        
+        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
+        
+        
 
         final String cancelURL = relativePluginRequestPath + "/" + CANCEL_PAGE;
 
@@ -403,7 +422,16 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
         out.println("    reintentar();");
         out.println("\n");
         out.println("    function reintentar() {");
-        out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
+
+        if (usesamewindow) {
+            out.println("      document.location.href = '" + sfnc.getUrlEvidencies() + "';");
+        } else {
+            out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
+        }
+
+        
+        //out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
+        
         out.println("    }");
         out.println("\n");
         out.println("    function cancelEvidencia() {");
