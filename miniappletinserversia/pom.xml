@@ -106,8 +106,8 @@
         </dependency>
 
         <dependency>
+            <artifactId>afirma-crypto-pdf-for-pluginsib</artifactId>
             <groupId>es.gob.afirma</groupId>
-            <artifactId>afirma-crypto-pdf</artifactId>
             <version>${afirma.version}</version>
         </dependency>
 

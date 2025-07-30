@@ -44,7 +44,19 @@
           <groupId>javax.xml.bind</groupId>
           <artifactId>jaxb-api</artifactId>
         </exclusion>
+        <!--  Necessitam llibreria especial de afirma-crypto-pdf per tema de taula de firmes 
+              anomenada afirma-crypto-pdf-for-pluginsib per això feim exclusion d'aquesta -->
+        <exclusion>
+            <artifactId>afirma-crypto-pdf</artifactId>
+            <groupId>es.gob.afirma</groupId>
+        </exclusion>
       </exclusions>
+    </dependency>
+
+    <dependency>
+        <artifactId>afirma-crypto-pdf-for-pluginsib</artifactId>
+        <groupId>es.gob.afirma</groupId>
+        <version>1.7.2</version>
     </dependency>
 
     <dependency>

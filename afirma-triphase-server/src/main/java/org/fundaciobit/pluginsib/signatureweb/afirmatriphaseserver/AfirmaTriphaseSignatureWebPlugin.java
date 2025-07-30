@@ -24,6 +24,7 @@ import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
+import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletConstants;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletUtils;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.SMIMEInputStream;
 import org.fundaciobit.pluginsib.signatureweb.afirmatriphaseserver.signresult.Signs;
@@ -469,9 +470,22 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
     public void rubricPageAutofirma(String relativePath, SignaturesSetWeb signaturesSet, int signatureIndex,
             HttpServletRequest request2, HttpServletResponse response) {
 
-        Map<String, FileItem> uploadedFiles = readFilesFromRequest(request2, response, null);
+        final boolean debug = isDebug();
+
+        if (debug) {
+            log.info("\n\n\n Entra a rubricPageAutofirma \n\n\n");
+        }
 
         try {
+
+            if (debug) {
+                log.info("\n\n\n Entra a rubricPageAutofirma PRE readFilesFromRequest ...\n\n\n");
+            }
+            Map<String, FileItem> uploadedFiles = readFilesFromRequest(request2, response, null);
+
+            if (debug) {
+                log.info("\n\n\n Entra a rubricPageAutofirma POST readFilesFromRequest ...\n\n\n");
+            }
 
             if (uploadedFiles.size() == 0) {
                 String msg = "MSG: No s´ha pujat cap arxiu (Es requereix un fitxer adjunt de tipus certificat)";
@@ -517,7 +531,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                     fos.flush();
                     fos.close();
 
-                    if (isDebug()) {
+                    if (debug) {
                         log.info("Temps en generar imatge " + signaturesSet.getSignaturesSetID() + "[" + signatureIndex
                                 + "] => " + (System.currentTimeMillis() - time) + ". Enviat a fitxer " + rubricFile);
                     }
@@ -556,9 +570,13 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                 break;
             }
 
-        } catch (Exception e) {
-            log.error("Error processant POST: " + e.getMessage(), e);
-            response.setStatus(404);
+        } catch (Throwable e) {
+            log.error("Error processant POST de rubricPageAutofirma: " + e.getMessage(), e);
+            try {
+                response.sendError(404, e.getMessage());
+            } catch (IOException e1) {
+                log.error("Error enviant sendError", e1 );
+            }
         }
     }
 
@@ -1416,6 +1434,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                     String errorMsg = getSimpleName() + "::Error configurant la Rubrica o PDFVisible: "
                             + e.getMessage();
 
+                    log.error(errorMsg, e);
+
                     StatusSignature status = getStatusSignature(signaturesSetID, index);
                     status.setStatus(StatusSignature.STATUS_FINAL_ERROR);
                     status.setErrorMsg(errorMsg);
@@ -1424,6 +1444,16 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
                     return null;
                 }
+                
+                
+                
+       
+                //String base64Rubric = "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////+v//////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wgARCABHAgADAREAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAECA//EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAABQAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//xAAUEAEAAAAAAAAAAAAAAAAAAACQ/9oACAEBAAEFAhA//8QAFBEBAAAAAAAAAAAAAAAAAAAAkP/aAAgBAwEBPwEQP//EABQRAQAAAAAAAAAAAAAAAAAAAJD/2gAIAQIBAT8BED//xAAUEAEAAAAAAAAAAAAAAAAAAACQ/9oACAEBAAY/AhA//8QAGRAAAgMBAAAAAAAAAAAAAAAAEWAAATFw/9oACAEBAAE/IeCXiBeIF4gXiBeIIgggggdv/9oADAMBAAIAAwAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAACSSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAACQ/9oACAEDAQE/EBA//8QAFBEBAAAAAAAAAAAAAAAAAAAAkP/aAAgBAgEBPxAQP//EACQQAAEBBwUBAQEAAAAAAAAAAAERADFQUYGRsSBhcaHRYCHw/9oACAEBAAE/EPhVExcMomLhlExcMomLhlExcMomLxp9TI1B45GY0+pkag8cjMafUyNQeORmNPqZGoPHIzGn1MjUHjkZjRChGTv14yd+vGTv14yd+vGTv14wEFf3+p9t/9k=";
+                //configProperties.setProperty(MiniAppletConstants.PROPERTY_SIGNATURE_RUBRIC_IMAGE, base64Rubric);
+                
+                
+                
+                
 
                 //        if (rubricUsingText()) {
                 //          // ========= IMATGE DE TEXT ===============
@@ -1713,7 +1743,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             super.finishWithError(response, signaturesSet, errorMsg, null);
             return;
         }
-        
+
         // Cas quan es cancel·la des d'Autofirm@. retorna "AA=="
         if ("AA==".equals(resultXMLB64)) {
             super.cancel(request, response, signaturesSet);

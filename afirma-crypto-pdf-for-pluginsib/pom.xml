@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>afirma-crypto-pdf-for-pluginsib</artifactId>
+    <groupId>es.gob.afirma</groupId>
+    <version>1.7.2</version>
+    <packaging>jar</packaging>
+
+	<name>afirma-crypto-pdf-for-pluginsib</name>
+	<description>Modulo para la generacion de firmas PDF/PAdES</description>
+<!--
+	<parent>
+		<groupId>es.gob.afirma</groupId>
+		<artifactId>afirma-client</artifactId>
+		<version>1.7.2</version>
+	</parent>
+ -->  
+    <properties>
+        <project.build.sourceEncoding>utf-8</project.build.sourceEncoding>
+		<jdk.version>1.7</jdk.version>
+<maven.compiler.target>1.7</maven.compiler.target>
+  <maven.compiler.source>1.7</maven.compiler.source>
+        <clienteafirma.version>1.7.2</clienteafirma.version>
+        <afirma.lib.itex.version>1.3</afirma.lib.itex.version>
+    </properties>
+
+	<dependencies>
+
+        <dependency>
+            <artifactId>afirma-crypto-pdf</artifactId>
+          <groupId>es.gob.afirma</groupId>
+          <version>${clienteafirma.version}</version>
+          <scope>provided</scope>
+        </dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-core</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-ui-core-jse</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-cades</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-pkcs7</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma</groupId>
+			<artifactId>afirma-crypto-core-pkcs7-tsp</artifactId>
+			<version>${clienteafirma.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>es.gob.afirma.lib</groupId>
+			<artifactId>afirma-lib-itext</artifactId>
+            <version>${afirma.lib.itex.version}</version>
+		</dependency>
+		
+	</dependencies>
+</project>
