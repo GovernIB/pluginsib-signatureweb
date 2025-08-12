@@ -63,12 +63,12 @@
         </dependency>
 
     </dependencies>
-
+<!--
     <repositories>
         <repository>
             <id>Viavansi</id>
-            <url>http://repositorio.viavansi.com/repo</url>
+            <url>https://repositorio.viavansi.com/repo</url>
         </repository>
     </repositories>
-
+-->
 </project>
