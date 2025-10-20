@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
@@ -19,11 +20,13 @@
 
     <dependencies>
 
+        <!-- Servlet API -->
         <dependency>
-            <groupId>javax</groupId>
-            <artifactId>javaee-api</artifactId>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_4.0_spec</artifactId>
             <scope>provided</scope>
         </dependency>
+
 
         <dependency>
             <groupId>javax.servlet</groupId>
@@ -93,6 +96,107 @@
         </dependency>
 
     </dependencies>
+
+
+
+
+
+
+
+    <profiles>
+    
+        <!-- Profile jboss72: actiu per defecte -->
+        <profile>
+            <id>jboss72_def</id>
+            <activation>
+                <property>
+                    <name>!jboss</name>
+                </property>
+            </activation>
+            <dependencies>
+                <!-- Dependències específiques per a JBoss 7.2 -->
+                <dependency>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                    <type>jar</type>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    
+    
+        <!-- Profile jboss72: actiu per propietat -->
+        <profile>
+            <id>jboss72_explicit</id>
+            <activation>
+                <property>
+                    <name>jboss</name>
+                    <value>7.2</value>
+                </property>
+            </activation>
+            <dependencies>
+                <!-- Dependències específiques per a JBoss 7.2 -->
+                <dependency>
+                    <groupId>javax.activation</groupId>
+                    <artifactId>activation</artifactId>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.inject</groupId>
+                    <artifactId>javax.inject</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>javax.enterprise</groupId>
+                    <artifactId>cdi-api</artifactId>
+                </dependency>
+
+            </dependencies>
+        </profile>
+
+        <!-- Profile jboss74: se activa manualmente -->
+        <profile>
+            <id>jboss74_explicit</id>
+            <activation>
+                <property>
+                    <name>jboss</name>
+                    <value>7.4</value>
+                </property>
+            </activation>
+            <dependencies>
+                <!-- Dependències específiques per a JBoss 7.4 -->
+                <dependency>
+                    <groupId>jakarta.activation</groupId>
+                    <artifactId>jakarta.activation-api</artifactId>
+                    <version>1.2.2.redhat-00001</version>
+                </dependency>
+
+                <dependency>
+                    <groupId>jakarta.inject</groupId>
+                    <artifactId>jakarta.inject-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>jakarta.enterprise</groupId>
+                    <artifactId>jakarta.enterprise.cdi-api</artifactId>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
 
     <build>
         <finalName>signaturewebtester</finalName>
