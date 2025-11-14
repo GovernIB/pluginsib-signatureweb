@@ -1,0 +1,1090 @@
+openapi: 3.0.1
+info:
+  description: API for managing digital certificates in nebulaSUITE
+  title: Certificates API
+  version: "2.0"
+servers:
+- description: Production server
+  url: https://api-ansmt01.nebulaservice.net/api
+tags:
+- description: Digital certificate management operations
+  name: Digital Certificate
+paths:
+  /api/v2/certificate/mycertificates:
+    get:
+      description: "Gets the user’s certificate list and returns its search result\
+        \ that fulfills the given input search criteria. The caller must have role\
+        \ admin, owner or signer."
+      operationId: getMyCertificates
+      parameters:
+      - explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          format: int32
+          type: integer
+        style: form
+      - description: ENABLED/DISABLED
+        explode: true
+        in: query
+        name: enableFilter
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: BOTH/EXPIRED/NOT_EXPIRED
+        explode: true
+        in: query
+        name: expireFilter
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: certType
+        required: false
+        schema:
+          type: string
+        style: form
+      - explode: true
+        in: query
+        name: isOrphan
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - explode: true
+        in: query
+        name: dateValidStart
+        required: false
+        schema:
+          format: date
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getMyCertificates_200_response'
+          description: List of certificates returned.
+        "400":
+          description: Invalid parameters.
+        "401":
+          description: Unauthorized.
+      security:
+      - Authorization: []
+      summary: Get User Certificates
+      tags:
+      - DigitalCertificate
+      x-accepts:
+      - application/json
+  /v2/certificate/request/{requestId}/issue:
+    put:
+      description: "Issues a requested certificate. This operation is asynchronous,\
+        \ in order to execute the Activate_Certificate operation we must wait until\
+        \ the issue status of the request is ENROLL (check Get Certificate Request\
+        \ operation)."
+      operationId: issueCertificate
+      parameters:
+      - description: The certificate request id
+        explode: false
+        in: path
+        name: requestId
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/issueCertificate_request'
+        required: true
+      responses:
+        "202":
+          description: Accepted
+      security:
+      - Authorization: []
+      summary: Issue Certificate
+      tags:
+      - Digital Certificate
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v2/certificate/request/{requestid}/activate:
+    put:
+      description: Activates an accepted and issued certificate request to be used
+        by the user
+      operationId: activateCertificate
+      parameters:
+      - description: The certificate request id
+        explode: false
+        in: path
+        name: requestid
+        required: true
+        schema:
+          type: string
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/activateCertificate_request'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/activateCertificate_200_response'
+          description: OK
+      security:
+      - Authorization: []
+      summary: Activate Certificate
+      tags:
+      - Digital Certificate
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+  /v2/certificate/policy/{certificateid}:
+    get:
+      description: Returns the policy linked to the given user and certificate id
+      operationId: getPolicy
+      parameters:
+      - description: The certificate id
+        explode: false
+        in: path
+        name: certificateid
+        required: true
+        schema:
+          type: string
+        style: simple
+      - description: "The user type, it can be USER or GROUP"
+        explode: true
+        in: query
+        name: userType
+        required: true
+        schema:
+          enum:
+          - USER
+          - GROUP
+          type: string
+        style: form
+      - description: "The UUID (User Unique Identifier) must be specified in case\
+          \ the userType is USER. Alternatively, if userType is GROUP, the GUID (Group\
+          \ Unique Identifier) shall be specified. In case userType is USER and this\
+          \ parameter is not specified, the system shall obtain the UUID of the user\
+          \ making the request."
+        explode: true
+        in: query
+        name: userId
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getPolicy_200_response'
+          description: OK
+      security:
+      - Authorization: []
+      summary: Get Policy
+      tags:
+      - Digital Certificate
+      x-accepts:
+      - application/json
+  /v2/certificate/mypolicies:
+    get:
+      description: Gets the user's policy list and returns its search result given
+        the input offset and limit parameters. The role of the user who executes this
+        operation must be owner or signer
+      operationId: getCertPolicies
+      parameters:
+      - description: Search offset
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Search limit 0 means no limit
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Filter to search between OWNED or DELEGATED policies
+        explode: true
+        in: query
+        name: querymode
+        required: false
+        schema:
+          enum:
+          - OWNED
+          - DELEGATED
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCertPolicies_200_response'
+          description: OK
+      security:
+      - Authorization: []
+      summary: Get Cert Policies
+      tags:
+      - Digital Certificate
+      x-accepts:
+      - application/json
+  /v2/certificate/{certificateid}:
+    get:
+      description: Returns the certificate data for the certificate identified by
+        the given input id
+      operationId: getCertificate
+      parameters:
+      - description: The certificate id
+        explode: false
+        in: path
+        name: certificateid
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Certificate'
+          description: OK
+      security:
+      - Authorization: []
+      summary: Get Certificate
+      tags:
+      - Digital Certificate
+      x-accepts:
+      - application/json
+  /v2/certificate/mycertificates:
+    get:
+      description: "Gets the user's certificate list and returns its search result\
+        \ that fulfills the given input search criteria. The role of the user who\
+        \ executes this operation must be admin, owner or signer"
+      operationId: getUserCertificates
+      parameters:
+      - description: Unique Owner identifier (uuid). The parameter is exclusive for
+          admin users
+        explode: true
+        in: query
+        name: ownerId
+        required: false
+        schema:
+          type: string
+        style: form
+      - description: Search offset
+        explode: true
+        in: query
+        name: offset
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Search limit 0 means no limit
+        explode: true
+        in: query
+        name: limit
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: If the certificate is usable
+        explode: true
+        in: query
+        name: enableFilter
+        required: false
+        schema:
+          enum:
+          - ENABLED
+          - DISABLED
+          - BOTH
+          type: string
+        style: form
+      - description: If the certificate is expired or expiring
+        explode: true
+        in: query
+        name: expireFilter
+        required: false
+        schema:
+          enum:
+          - EXPIRED
+          - EXPIRING
+          - BOTH
+          type: string
+        style: form
+      - description: Certificate type
+        explode: true
+        in: query
+        name: certType
+        required: false
+        schema:
+          enum:
+          - IMPORTED
+          - INTERMEDIATE
+          - QUALIFIED
+          - ALL
+          type: string
+        style: form
+      - description: True if the certificate is orphan (This parameter is exclusive
+          for the Admin role)
+        explode: true
+        in: query
+        name: isOrphan
+        required: false
+        schema:
+          type: boolean
+        style: form
+      - description: Start date for the certificate's valid period
+        explode: true
+        in: query
+        name: dateValidStart
+        required: false
+        schema:
+          type: string
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getUserCertificates_200_response'
+          description: OK
+      security:
+      - Authorization: []
+      summary: Get User Certificates
+      tags:
+      - Digital Certificate
+      x-accepts:
+      - application/json
+  /v4/certificates/available-for-signing:
+    get:
+      description: Gets the user's certificate list and returns its search result
+        that fulfills the given input search criteria. All returned certificates can
+        be used to perform a signature operation
+      operationId: findCertificatesToSign
+      parameters:
+      - description: "Input parameters must exactly match the certificate parameters.\
+          \ If not specified, the call will search for certificates in 'LIKE' mode"
+        explode: true
+        in: query
+        name: strictMatch
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: Includes the public part of the certificate in Base64 encoded
+          x509
+        explode: true
+        in: query
+        name: returnPublicKey
+        required: false
+        schema:
+          default: false
+          type: boolean
+        style: form
+      - description: "Search parameter: Common name of the certificate"
+        explode: true
+        in: query
+        name: commonName
+        required: false
+        schema:
+          default: ""
+          type: string
+        style: form
+      - description: "Search parameter: Alias of the certificate"
+        explode: true
+        in: query
+        name: alias
+        required: false
+        schema:
+          default: ""
+          type: string
+        style: form
+      - description: "Search parameter: Subject DN of the certificate"
+        explode: true
+        in: query
+        name: subject
+        required: false
+        schema:
+          default: ""
+          type: string
+        style: form
+      - description: "Search parameter: Issuer DN of the certificate"
+        explode: true
+        in: query
+        name: issuer
+        required: false
+        schema:
+          default: ""
+          type: string
+        style: form
+      - description: Expiration date range (Start)
+        explode: true
+        in: query
+        name: dateFrom
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Expiration date range (End)
+        explode: true
+        in: query
+        name: dateTo
+        required: false
+        schema:
+          type: integer
+        style: form
+      - description: Order
+        explode: true
+        in: query
+        name: order
+        required: false
+        schema:
+          default: commonName
+          enum:
+          - commonName
+          - alias
+          - subject
+          - issuer
+          - dateFrom
+          - dateTo
+          type: string
+        style: form
+      - description: Search direction
+        explode: true
+        in: query
+        name: direction
+        required: false
+        schema:
+          default: ASC
+          enum:
+          - ASC
+          - DESC
+          type: string
+        style: form
+      - description: Search offset
+        explode: true
+        in: query
+        name: currentPage
+        required: false
+        schema:
+          default: 0
+          type: integer
+        style: form
+      - description: Elements to return
+        explode: true
+        in: query
+        name: pageSize
+        required: false
+        schema:
+          default: 100
+          maximum: 100
+          minimum: 1
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/findCertificatesToSign_200_response'
+          description: OK
+        "400":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/findCertificatesToSign_400_response'
+          description: Bad Request
+        "401":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/findCertificatesToSign_400_response'
+          description: Unauthorized
+        "403":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/findCertificatesToSign_400_response'
+          description: Forbidden
+        "500":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/findCertificatesToSign_400_response'
+          description: Internal Server Error
+      security:
+      - Authorization: []
+      summary: Find Certificates to Sign
+      tags:
+      - Digital Certificate
+      x-accepts:
+      - application/json
+  /v1/certificate/changepin:
+    put:
+      description: Change certificate PIN
+      operationId: changeCertificatePin
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/changeCertificatePin_request'
+        required: true
+      responses:
+        "200":
+          description: OK
+      security:
+      - Authorization: []
+      summary: Change Certificate Pin
+      tags:
+      - Digital Certificate
+      x-content-type: application/json
+      x-accepts:
+      - application/json
+components:
+  schemas:
+    Policy:
+      example:
+        dateValidStart: 6
+        certType: certType
+        usePin: usePin
+        agentName: agentName
+        userId: userId
+        enabled: enabled
+        idCert: idCert
+        validIpSource: validIpSource
+        aclName: aclName
+        idAcl: idAcl
+        userType: userType
+        dateValidEnd: 1
+        idOwner: idOwner
+        status: status
+      properties:
+        userType:
+          description: "User type {USER or GROUP}"
+          type: string
+        userId:
+          description: UUID in case userType is USER or GUID in case userType is GROUP
+          type: string
+        idCert:
+          description: Certificate identifier
+          type: string
+        agentName:
+          description: User name in case userType is USER or group name in case userType
+            is GROUP
+          type: string
+        status:
+          description: Policy status
+          type: string
+        dateValidStart:
+          description: Valid start date
+          type: integer
+        dateValidEnd:
+          description: Valid end date
+          type: integer
+        validIpSource:
+          description: Valid IP source
+          type: string
+        idAcl:
+          description: ACL identifier
+          type: string
+        aclName:
+          description: ACL name
+          type: string
+        enabled:
+          description: True if the policy is enabled
+          type: string
+        certType:
+          description: Certificate type
+          type: string
+        idOwner:
+          description: Owner identifier
+          type: string
+        usePin:
+          description: True if the policy use pin
+          type: string
+      type: object
+    Certificate:
+      example:
+        dateValidStart: 0
+        certType: certType
+        serialNumber: serialNumber
+        isUsable: isUsable
+        subject: subject
+        certificateId: certificateId
+        certificate: certificate
+        alias: alias
+        signingId: signingId
+        dateValidEnd: 6
+        issuer: issuer
+        status: status
+      properties:
+        certificateId:
+          description: Certificate identifier
+          type: string
+        signingId:
+          description: Certificate identifier for signing operations To be used through
+            the API's Signature operations
+          type: string
+        dateValidStart:
+          description: Start date for the certificate's valid period
+          type: integer
+        dateValidEnd:
+          description: End date for the certificate's valid period
+          type: integer
+        issuer:
+          description: Name of the certificate's issuer
+          type: string
+        alias:
+          description: Name of the certificate's alias
+          type: string
+        serialNumber:
+          description: Certificate's serial number
+          type: string
+        subject:
+          description: Certificate's subject
+          type: string
+        certificate:
+          description: Certificate's public key
+          type: string
+        certType:
+          description: Certificate type
+          type: string
+        isUsable:
+          description: True if the certificate is usable
+          type: string
+        status:
+          description: Certificate status
+          type: string
+      type: object
+    SigningCertificate:
+      example:
+        ownerUuid: ownerUuid
+        serialNumber: serialNumber
+        subject: subject
+        certificateId: certificateId
+        alias: alias
+        signingId: 5
+        issuedAt: 2
+        publicKey: publicKey
+        issuer: issuer
+        expiresAt: 7
+      properties:
+        ownerUuid:
+          description: Owner UUID
+          type: string
+        alias:
+          description: Alias of the certificate
+          type: string
+        subject:
+          description: Subject DN of the certificate
+          type: string
+        issuer:
+          description: Issuer DN of the certificate
+          type: string
+        serialNumber:
+          description: Certificate Serial Number
+          type: string
+        signingId:
+          description: Slot or signingId
+          type: integer
+        certificateId:
+          description: Certificate unique identifier
+          type: string
+        issuedAt:
+          description: Creation date
+          type: integer
+        expiresAt:
+          description: Expiration date
+          type: integer
+        publicKey:
+          description: Certificate X509 in DER encoded if parameter 'returnPublicKey'
+            is specified
+          type: string
+      type: object
+    getMyCertificates_200_response_certificatesList_inner:
+      example:
+        dateValidStart: 2000-01-23T04:56:07.000+00:00
+        certType: certType
+        serialNumber: serialNumber
+        isUsable: isUsable
+        subject: subject
+        certificateId: certificateId
+        certificate: certificate
+        alias: alias
+        signingId: signingId
+        dateValidEnd: 2000-01-23T04:56:07.000+00:00
+        issuer: issuer
+        status: status
+      properties:
+        certificateId:
+          description: Unique certificate identifier.
+          type: string
+        signingId:
+          description: Signing identifier.
+          type: string
+        alias:
+          description: Certificate alias or friendly name.
+          type: string
+        subject:
+          description: "Subject name (CN, OU, O...)."
+          type: string
+        issuer:
+          description: Issuer of the certificate.
+          type: string
+        serialNumber:
+          description: Certificate serial number.
+          type: string
+        dateValidStart:
+          description: Start date of certificate validity.
+          format: date-time
+          type: string
+        dateValidEnd:
+          description: Expiration date of the certificate.
+          format: date-time
+          type: string
+        status:
+          description: "Current status (ISSUED, etc.)."
+          type: string
+        certificate:
+          description: Base64 encoded X.509 certificate.
+          type: string
+        certType:
+          description: "Type of certificate (IMPORTED, INTERMEDIATE, QUALIFIED)."
+          type: string
+        isUsable:
+          description: "Indicates if the certificate is usable (1 for yes, 0 for no)."
+          type: string
+      required:
+      - certificateId
+      - issuer
+      - serialNumber
+      - subject
+      type: object
+    getMyCertificates_200_response:
+      example:
+        totalCertificates: 0
+        certificatesList:
+        - dateValidStart: 2000-01-23T04:56:07.000+00:00
+          certType: certType
+          serialNumber: serialNumber
+          isUsable: isUsable
+          subject: subject
+          certificateId: certificateId
+          certificate: certificate
+          alias: alias
+          signingId: signingId
+          dateValidEnd: 2000-01-23T04:56:07.000+00:00
+          issuer: issuer
+          status: status
+        - dateValidStart: 2000-01-23T04:56:07.000+00:00
+          certType: certType
+          serialNumber: serialNumber
+          isUsable: isUsable
+          subject: subject
+          certificateId: certificateId
+          certificate: certificate
+          alias: alias
+          signingId: signingId
+          dateValidEnd: 2000-01-23T04:56:07.000+00:00
+          issuer: issuer
+          status: status
+      properties:
+        totalCertificates:
+          description: Total number of certificates found.
+          type: integer
+        certificatesList:
+          items:
+            $ref: '#/components/schemas/getMyCertificates_200_response_certificatesList_inner'
+          type: array
+      required:
+      - certificates
+      - total
+      type: object
+    issueCertificate_request:
+      properties:
+        pin:
+          description: Certificate's protection pin
+          type: string
+        publish:
+          description: Indicate if certificate will be published or not
+          type: boolean
+      required:
+      - pin
+      type: object
+    activateCertificate_request:
+      properties:
+        pin:
+          description: Certificate's protection pin
+          type: string
+      required:
+      - pin
+      type: object
+    activateCertificate_200_response:
+      example:
+        idCert: idCert
+        serialNumber: serialNumber
+      properties:
+        serialNumber:
+          description: Certificate fingerprint
+          type: string
+        idCert:
+          description: Internal identifier of the certificate in nebulaSUITE
+          type: string
+      type: object
+    getPolicy_200_response:
+      example:
+        dateValidStart: 0
+        certType: certType
+        usePin: usePin
+        agentName: agentName
+        userId: userId
+        enabled: enabled
+        idCert: idCert
+        validIpSource: validIpSource
+        aclName: aclName
+        idAcl: idAcl
+        userType: userType
+        dateValidEnd: 6
+        idOwner: idOwner
+        status: status
+      properties:
+        userType:
+          description: "User type {USER or GROUP}"
+          type: string
+        userId:
+          description: UUID in case userType is USER or GUID in case userType is GROUP
+          type: string
+        idCert:
+          description: Certificate identifier
+          type: string
+        agentName:
+          description: User name in case userType is USER or group name in case userType
+            is GROUP
+          type: string
+        status:
+          description: Policy status
+          type: string
+        dateValidStart:
+          description: Valid start date
+          type: integer
+        dateValidEnd:
+          description: Valid end date
+          type: integer
+        validIpSource:
+          description: Valid IP source
+          type: string
+        idAcl:
+          description: ACL identifier
+          type: string
+        aclName:
+          description: ACL name
+          type: string
+        enabled:
+          description: True if the policy is enabled
+          type: string
+        certType:
+          description: Certificate type
+          type: string
+        idOwner:
+          description: Owner identifier
+          type: string
+        usePin:
+          description: True if the policy use pin
+          type: string
+      type: object
+    getCertPolicies_200_response:
+      example:
+        policyList:
+        - dateValidStart: 6
+          certType: certType
+          usePin: usePin
+          agentName: agentName
+          userId: userId
+          enabled: enabled
+          idCert: idCert
+          validIpSource: validIpSource
+          aclName: aclName
+          idAcl: idAcl
+          userType: userType
+          dateValidEnd: 1
+          idOwner: idOwner
+          status: status
+        - dateValidStart: 6
+          certType: certType
+          usePin: usePin
+          agentName: agentName
+          userId: userId
+          enabled: enabled
+          idCert: idCert
+          validIpSource: validIpSource
+          aclName: aclName
+          idAcl: idAcl
+          userType: userType
+          dateValidEnd: 1
+          idOwner: idOwner
+          status: status
+        totalPolicies: 0
+      properties:
+        totalPolicies:
+          description: Total results for the search before applying offset and limit
+          type: integer
+        policyList:
+          items:
+            $ref: '#/components/schemas/Policy'
+          type: array
+      type: object
+    getUserCertificates_200_response:
+      example:
+        totalCertificates: 0
+        certificatesList:
+        - dateValidStart: 0
+          certType: certType
+          serialNumber: serialNumber
+          isUsable: isUsable
+          subject: subject
+          certificateId: certificateId
+          certificate: certificate
+          alias: alias
+          signingId: signingId
+          dateValidEnd: 6
+          issuer: issuer
+          status: status
+        - dateValidStart: 0
+          certType: certType
+          serialNumber: serialNumber
+          isUsable: isUsable
+          subject: subject
+          certificateId: certificateId
+          certificate: certificate
+          alias: alias
+          signingId: signingId
+          dateValidEnd: 6
+          issuer: issuer
+          status: status
+      properties:
+        totalCertificates:
+          description: Total results for the search before applying offset and limit
+          type: integer
+        certificatesList:
+          items:
+            $ref: '#/components/schemas/Certificate'
+          type: array
+      type: object
+    findCertificatesToSign_200_response_pagination:
+      example:
+        totalPages: 6
+        pageSize: 1
+        currentPage: 5
+        totalElements: 0
+      properties:
+        totalElements:
+          description: Total elements
+          type: integer
+        totalPages:
+          description: Total amount of pages
+          type: integer
+        pageSize:
+          description: Size of the page
+          type: integer
+        currentPage:
+          description: Current page
+          type: integer
+      type: object
+    findCertificatesToSign_200_response:
+      example:
+        pagination:
+          totalPages: 6
+          pageSize: 1
+          currentPage: 5
+          totalElements: 0
+        list:
+        - ownerUuid: ownerUuid
+          serialNumber: serialNumber
+          subject: subject
+          certificateId: certificateId
+          alias: alias
+          signingId: 5
+          issuedAt: 2
+          publicKey: publicKey
+          issuer: issuer
+          expiresAt: 7
+        - ownerUuid: ownerUuid
+          serialNumber: serialNumber
+          subject: subject
+          certificateId: certificateId
+          alias: alias
+          signingId: 5
+          issuedAt: 2
+          publicKey: publicKey
+          issuer: issuer
+          expiresAt: 7
+      properties:
+        pagination:
+          $ref: '#/components/schemas/findCertificatesToSign_200_response_pagination'
+        list:
+          items:
+            $ref: '#/components/schemas/SigningCertificate'
+          type: array
+      type: object
+    findCertificatesToSign_400_response:
+      example:
+        error_description: error_description
+        error: error
+      properties:
+        error:
+          type: string
+        error_description:
+          type: string
+      type: object
+    changeCertificatePin_request:
+      properties:
+        idcert:
+          description: The certificate
+          type: string
+        oldPin:
+          description: Old PIN
+          type: string
+        newPin:
+          description: New PIN
+          type: string
+      required:
+      - idcert
+      - newPin
+      - oldPin
+      type: object
+  securitySchemes:
+    Authorization:
+      bearerFormat: JWT
+      description: User access token required
+      scheme: bearer
+      type: http
+

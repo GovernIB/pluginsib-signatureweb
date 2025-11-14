@@ -1,0 +1,267 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <artifactId>caib-artifacts-jdk11-jboss72or74-with-github-governib-distribution</artifactId>
+        <groupId>es.caib.maven</groupId>
+        <version>1.0.1-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>vintegris-nebula-apis-generator</artifactId>
+    <groupId>org.fundaciobit.vintegris.nebula.apisgenerator</groupId>
+    <packaging>pom</packaging>
+    <name>Vintegris - Nebula - APIs Generator</name>
+    <properties>
+        <client.default.package>org.fundaciobit.vintegris.nebula.api.client</client.default.package>
+    </properties>
+
+    <dependencies>
+
+        <!-- Anotacions de documentació de openapi -->
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-annotations</artifactId>
+            <version>2.2.27</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.swagger.core.v3</groupId>
+            <artifactId>swagger-core</artifactId>
+            <version>2.2.27</version>
+        </dependency>
+
+
+    </dependencies>
+    <build>
+
+        <plugins>
+                     
+
+
+
+            <!--
+            ==================================================================  -->
+            <!-- Genera el Client Rest Java a partir del fitxers openapi_*.json -->
+            <!--
+            ==================================================================  -->
+            <plugin>
+                <!-- https://openapi-generator.tech/docs/generators/java/ -->
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>7.10.0</version>
+
+                <executions>
+                    <execution>
+                        <id>openapi1</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <inputSpec>
+                                ${project.basedir}/openapi/trusted-applications.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <library>resteasy</library>
+                            <!--    ** AMOLLA AJUDA D'AQUEST PLUGIN PER PANTALLA***  -->
+                            <!-- <configHelp>true</configHelp> -->
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                            <!-- NOU -->
+                            <output>
+                                ${project.basedir}/../vintegris-nebula-api-client-trusted-applications-v1</output>
+                            <apiPackage>
+                                ${client.default.package}.trustedapplications.v1.api</apiPackage>
+                            <modelPackage>
+                                ${client.default.package}.trustedapplications.v1.model</modelPackage>
+                            <invokerPackage>
+                                ${client.default.package}.trustedapplications.v1.services</invokerPackage>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <groupId>org.fundaciobit.vintegris.nebula.api.client.trustedapplications</groupId>
+                                <artifactId>vintegris-nebula-api-client-trusted-applications-v1</artifactId>
+                                <artifactVersion>1.0-SNAPSHOT</artifactVersion>
+                                <artifactDescription>Vintegris - Nebula - Api Client - Trusted Applications v1</artifactDescription>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <java11>true</java11>
+                                <useJakartaEe>false</useJakartaEe>
+                                <usePrimitives>true</usePrimitives>
+                                <useRuntimeException>true</useRuntimeException>
+                                <supportMultipart>true</supportMultipart>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+
+                    <execution>
+                        <id>openapi2</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <inputSpec>
+                                ${project.basedir}/openapi/digital-signature.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <library>resteasy</library>
+                            <!--    ** AMOLLA AJUDA D'AQUEST PLUGIN PER PANTALLA***  -->
+                            <!-- <configHelp>true</configHelp> -->
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                            <!-- NOU -->
+                            <output>
+                                ${project.basedir}/../vintegris-nebula-api-client-digital-signature-v1</output>
+                            <apiPackage>
+                                ${client.default.package}.digitalsignature.v1.api</apiPackage>
+                            <modelPackage>
+                                ${client.default.package}.digitalsignature.v1.model</modelPackage>
+                            <invokerPackage>
+                                ${client.default.package}.digitalsignature.v1.services</invokerPackage>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <groupId>org.fundaciobit.vintegris.nebula.api.client.digitalsignature</groupId>
+                                <artifactId>vintegris-nebula-api-client-digital-signature-v1</artifactId>
+                                <artifactVersion>1.0-SNAPSHOT</artifactVersion>
+                                <artifactDescription>Vintegris - Nebula - Api Client - Digital Signature v1</artifactDescription>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <java11>true</java11>
+                                <useJakartaEe>false</useJakartaEe>
+                                <usePrimitives>true</usePrimitives>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                    <execution>
+                        <id>openapi4</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <inputSpec>
+                                ${project.basedir}/openapi/digital-certificate.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <library>resteasy</library>
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                            <output>
+                                ${project.basedir}/../vintegris-nebula-api-client-digital-certificate-v1</output>
+                            <apiPackage>
+                                ${client.default.package}.digitalcertificate.v1.api</apiPackage>
+                            <modelPackage>
+                                ${client.default.package}.digitalcertificate.v1.model</modelPackage>
+                            <invokerPackage>
+                                ${client.default.package}.digitalcertificate.v1.services</invokerPackage>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <groupId>org.fundaciobit.vintegris.nebula.api.client.digitalcertificate</groupId>
+                                <artifactId>vintegris-nebula-api-client-digital-certificate-v1</artifactId>
+                                <artifactVersion>1.0-SNAPSHOT</artifactVersion>
+                                <artifactDescription>Vintegris - Nebula - Api Client - Digital Certificate v1</artifactDescription>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <java11>true</java11>
+                                <useJakartaEe>false</useJakartaEe>
+                                <usePrimitives>true</usePrimitives>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+
+                <!--
+                    <execution>
+                        <id>openapi5</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                             
+                            <inputSpec>
+                                ${project.basedir}/openapi/general-functions.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <library>resteasy</library>
+
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+
+                            <output>
+                                ${project.basedir}/../vintegris-nebula-api-client-general-functions-v1</output>
+                            <apiPackage>
+                                ${client.default.package}.generalfunctions.v1.api</apiPackage>
+                            <modelPackage>
+                                ${client.default.package}.generalfunctions.v1.model</modelPackage>
+                            <invokerPackage>
+                                ${client.default.package}.generalfunctions.v1.services</invokerPackage>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <groupId>org.fundaciobit.vintegris.nebula.api.client.generalfunctions</groupId>
+                                <artifactId>vintegris-nebula-api-client-general-functions-v1</artifactId>
+                                <artifactVersion>1.0-SNAPSHOT</artifactVersion>
+                                <artifactDescription>Vintegris - Nebula - Api Client - General Functions v1</artifactDescription>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <java11>true</java11>
+                                <useJakartaEe>false</useJakartaEe>
+                                <usePrimitives>true</usePrimitives>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                -->
+
+                </executions>
+
+            </plugin>
+
+            <!--NOU TODO -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <includeProjectDependencies>false</includeProjectDependencies>
+                    <includePluginDependencies>true</includePluginDependencies>
+                    <executableDependency>
+                        <artifactId>pluginsib-utils-rest</artifactId>
+                        <groupId>org.fundaciobit.pluginsib.utils</groupId>
+                    </executableDependency>
+                    <mainClass>
+                        org.fundaciobit.pluginsib.utils.rest.pomadaptertojboss72.AdaptApiClientPomToJboss72</mainClass>
+                    <arguments>
+                        <argument>${project.basedir}</argument>
+                    </arguments>
+
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <artifactId>pluginsib-utils-rest</artifactId>
+                        <groupId>org.fundaciobit.pluginsib.utils</groupId>
+                        <version>3.0.1-SNAPSHOT</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+
+        </plugins>
+
+    </build>
+
+</project>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+
+    <parent>
+        <artifactId>pluginsib-signatureweb</artifactId>
+        <groupId>org.fundaciobit.pluginsib.signatureweb</groupId>
+        <version>4.1.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>pluginsib-signatureweb-nebula</artifactId>
+    <name>FundacioBit - PluginsIB - SignatureWeb - Nebula (Vintegris)</name>
+    <packaging>jar</packaging>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        
+        <!--  Vintegris - Nebula - Api Client - Trusted Applications v1 -->
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.trustedapplications</groupId>
+            <artifactId>vintegris-nebula-api-client-trusted-applications-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.digitalsignature</groupId>
+            <artifactId>vintegris-nebula-api-client-digital-signature-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.digitalcertificate</groupId>
+            <artifactId>vintegris-nebula-api-client-digital-certificate-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+<!-- 
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.certificaterequest</groupId>
+            <artifactId>vintegris-nebula-api-client-certificate-request-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.xadessignatures</groupId>
+            <artifactId>vintegris-nebula-api-client-xades-signatures-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+ -->
+
+<!--  
+        <dependency>
+            <groupId>org.fundaciobit.vintegris.nebula.api.client.allsignatures</groupId>
+            <artifactId>vintegris-nebula-api-client-all-signatures-v1</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+-->
+
+
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+</project>

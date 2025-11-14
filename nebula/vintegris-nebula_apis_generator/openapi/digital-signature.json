@@ -1,0 +1,1076 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Digital signature API",
+        "version": "v4",
+        "description": "API for digital signatures in Nebula Suite"
+    },
+    "externalDocs": {
+        "description": "API Documentation",
+        "url": "https://portal.nebulaservice.net/docs/developer/en/HTML/digital-signature.html"
+    },
+    "servers": [{
+            "url": "https://api-ansmt01.nebulaservice.net",
+            "description": "Nebula production server"
+        }
+    ],
+    "tags": [{
+            "name": "PAdES Signature",
+            "description": "PAdES Signature"
+        }, {
+            "name": "XAdES Signature",
+            "description": "XAdES Signature"
+        }, {
+            "name": "CAdES Signature",
+            "description": "CAdES Signature"
+        }
+    ],
+    "paths": {
+        "/api/v1/cadessign/sign": {
+            "post": {
+                "tags": [
+                    "CAdES Signature"
+                ],
+                "summary": "Sign a document with CAdES",
+                "description": "Signs a document with the CAdES signature standard",
+                "operationId": "cadesSign",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "data"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "File to sign. Multipart File or fileHash parameter must be specified."
+                                    },
+                                    "data": {
+                                        "type": "string",
+                                        "description": "JSON containing the parameters needed to define how the signature will be made. See schema CadesSignatureRequest"
+                                    }
+                                }
+                            },
+                            "encoding": {
+                                "file": {
+                                    "contentType": "*/*"
+                                },
+                                "data": {
+                                    "contentType": "application/json"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Document signed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CadesSignatureResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature400Codes"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature500Codes"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature404Codes"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseOldAuthEnum"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/api/v2/xadessign/sign": {
+            "post": {
+                "tags": [
+                    "XAdES Signature"
+                ],
+                "summary": "Sign an XML file with XAdES",
+                "description": "Sign an XML file using XAdES signature standard",
+                "operationId": "xadesSign",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "data",
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "format": "binary",
+                                        "description": "XML file to sign"
+                                    },
+                                    "data": {
+                                        "type": "string",
+                                        "description": "JSON containing the parameters needed to define how the signature will be made. See schema XadesSignatureRequest"
+                                    }
+                                }
+                            },
+                            "encoding": {
+                                "file": {
+                                    "contentType": "application/xml"
+                                },
+                                "data": {
+                                    "contentType": "application/json"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "XML signed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/XadesSignatureResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature400Codes"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature500Codes"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature404Codes"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseOldAuthEnum"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/signature/pades/v1/sign": {
+            "post": {
+                "tags": [
+                    "PAdES Signature"
+                ],
+                "summary": "Sign a PDF file",
+                "operationId": "signDocumentV1",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "data",
+                                    "file"
+                                ],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "description": "PDF file to sign",
+                                        "format": "binary"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "description": "List of images that will be used in the visible signature",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "data": {
+                                        "type": "string",
+                                        "description": "JSON containing the parameters needed to define how the signature will be made. See schema PadesSignatureRequest"
+                                    }
+                                }
+                            },
+                            "encoding": {
+                                "file": {
+                                    "contentType": "application/pdf"
+                                },
+                                "data": {
+                                    "contentType": "application/json"
+                                },
+                                "images": {
+                                    "contentType": "image/*"
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature400Codes"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature500Codes"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignature404Codes"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseOldAuthEnum"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Signed PDF file",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/PadesSignatureOperationResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+
+        "schemas": {
+            "XadesSignatureResponse": {
+                "type": "object",
+                "properties": {
+                    "responseCode": {
+                        "description": "Response code of signing process.",
+                        "example": "0000",
+                        "type": "string"
+                    },
+                    "responseMessage": {
+                        "description": "Response message.",
+                        "example": "SIGN_OK",
+                        "type": "string"
+                    },
+                    "signedFile": {
+                        "description": "Data signed in Base64.",
+                        "type": "string"
+                    }
+                },
+                "required": ["responseCode", "responseMessage"],
+                "example": {
+                    "signedFile": "signedFile",
+                    "responseMessage": "SIGN_OK",
+                    "responseCode": "0000"
+                }
+            },
+            "XadesSignatureRequest": {
+                "type": "object",
+                "properties": {
+                    "certId": {
+                        "description": "This parameter is linked with the signingId response parameter of the get user certificates operation",
+                        "example": "1",
+                        "type": "string"
+                    },
+                    "certPin": {
+                        "description": "PIN of the selected certificate",
+                        "example": "1234",
+                        "type": "string"
+                    },
+                    "certTicket": {
+                        "type": "string"
+                    },
+                    "commitmentTypes": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "company": {
+                        "type": "string"
+                    },
+                    "digestAlgorithm": {
+                        "default": "SHA256",
+                        "description": "Algorithm used to obtain the digest of the document to sign",
+                        "enum": ["SHA1", "SHA256", "SHA384", "SHA512"],
+                        "example": "SHA256",
+                        "type": "string"
+                    },
+                    "fileHash": {
+                        "type": "string"
+                    },
+                    "fileHashDigestAlgorithm": {
+                        "type": "string"
+                    },
+                    "fileHashName": {
+                        "type": "string"
+                    },
+                    "policyDigestAlgorithm": {
+                        "type": "string"
+                    },
+                    "policyHash": {
+                        "type": "string"
+                    },
+                    "policyId": {
+                        "type": "string"
+                    },
+                    "policyQualifier": {
+                        "type": "string"
+                    },
+                    "signContainer": {
+                        "type": "string"
+                    },
+                    "signLevel": {
+                        "default": "B",
+                        "description": "Signature level",
+                        "enum": ["B", "T", "LT", "LTA"],
+                        "example": "B",
+                        "type": "string"
+                    },
+                    "signLocation": {
+                        "$ref": "#/definitions/XadesSignLocation"
+                    },
+                    "signPackage": {
+                        "description": "Signature Mode",
+                        "enum": ["DETACHED", "ENVELOPED", "ENVELOPING"],
+                        "example": "ENVELOPING",
+                        "type": "string"
+                    },
+                    "signerRoles": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "tsaURL": {
+                        "description": "URL of a Timestamping authority to be used in T, LT or LTA signature levels",
+                        "type": "string"
+                    },
+                    "tsaUSR": {
+                        "description": "User of the credentials of the Timestamping authority, if authentication is required",
+                        "type": "string"
+                    },
+                    "tsaPWD": {
+                        "description": "Password of the credentials of the Timestamping authority, if authentication is required",
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "userUuid": {
+                        "type": "string"
+                    }
+                },
+                "title": "XadesSignatureRequest"
+            },
+            "XadesSignLocation": {
+                "type": "object",
+                "properties": {
+                    "country": {
+                        "type": "string"
+                    },
+                    "locality": {
+                        "type": "string"
+                    },
+                    "postalAddress": {
+                        "items": {
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "postalCode": {
+                        "type": "string"
+                    },
+                    "stateOrProvince": {
+                        "type": "string"
+                    },
+                    "street": {
+                        "type": "string"
+                    }
+                },
+                "title": "XadesSignLocation"
+            },
+            "ErrorResponseSignature400Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": [
+                            "SERVICE_ERROR",
+                            "INVALID_FILE",
+                            "INVALID_DATA",
+                            "INVALID_IMAGE",
+                            "INVALID_CERT",
+                            "INVALID_CERT_ID",
+                            "INVALID_PIN_SIZE",
+                            "INVALID_PIN_1",
+                            "INVALID_PIN_2",
+                            "PIN_BLOCKED",
+                            "PIN_REQUIRED",
+                            "CERTIFICATE_NOT_YET_VALID",
+                            "CERTIFICATE_EXPIRED",
+                            "ACL_BLOCK",
+                            "TSA_NOT_ENABLED"
+                        ],
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "SERVICE_ERROR",
+                    "message": "message"
+                }
+            },
+            "ErrorResponseSignature500Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": [
+                            "INTERNAL_ERROR",
+                            "INCORRECT_CONFIG_TSA",
+                            "INCORRECT_URL_TSA",
+                            "INVALID_PKCS11_RESPONSE"
+                        ],
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "INTERNAL_ERROR",
+                    "message": "message"
+                }
+            },
+            "ErrorResponseSignature404Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": [
+                            "SERVICE_ERROR",
+                            "INVALID_SIGNATURE_FIELD",
+                            "VERIFICATION_FAIL",
+                            "ISSUER_NOT_FOUND"
+                        ],
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "SERVICE_ERROR",
+                    "message": "message"
+                }
+            },
+            "ErrorResponseOldAuthEnum": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "enum": ["INVALID_TOKEN", "EXPIRED_TOKEN", "INVALID_LVL"],
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "error": "INVALID_TOKEN",
+                    "message": "message"
+                }
+            },
+            "PadesSignatureOperationResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "enum": ["OK"],
+                        "type": "string"
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/PadesSignatureResponse"
+                    }
+                },
+                "example": {
+                    "code": "OK",
+                    "message": "message",
+                    "content": {
+                        "cnCertificate": "cnCertificate",
+                        "signedFile": "signedFile",
+                        "messageEmbedded": "messageEmbedded"
+                    }
+                }
+            },
+            "PadesSignatureResponse": {
+                "type": "object",
+                "properties": {
+                    "signedFile": {
+                        "type": "string"
+                    },
+                    "messageEmbedded": {
+                        "type": "string"
+                    },
+                    "cnCertificate": {
+                        "type": "string"
+                    }
+                },
+                "example": {
+                    "cnCertificate": "cnCertificate",
+                    "signedFile": "signedFile",
+                    "messageEmbedded": "messageEmbedded"
+                }
+            },
+            "PadesSignatureRequest": {
+                "type": "object",
+                "properties": {
+                    "signLevel": {
+                        "default": "B",
+                        "description": "Signature level",
+                        "enum": ["B", "T", "LT", "LTA"],
+                        "example": "B",
+                        "type": "string"
+                    },
+                    "digestAlgorithm": {
+                        "default": "SHA256",
+                        "description": "Algorithm used to obtain the digest of the document to sign",
+                        "enum": ["SHA1", "SHA256", "SHA384", "SHA512"],
+                        "example": "SHA256",
+                        "type": "string"
+                    },
+                    "certId": {
+                        "description": "This parameter is linked with the signingId response parameter of the get user certificates operation",
+                        "example": "1",
+                        "type": "string"
+                    },
+                    "certPin": {
+                        "description": "PIN of the selected certificate",
+                        "example": "1234",
+                        "type": "string"
+                    },
+                    "location": {
+                        "description": "The CPU host name or physical location of the signing",
+                        "type": "string"
+                    },
+                    "signerRoles": {
+                        "description": "List of roles of signer",
+                        "items": {
+                            "description": "List of roles of signer",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "commitmentTypes": {
+                        "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
+                        "example": ["ProofOfOrigin", "ProofOfReceipt"],
+                        "items": {
+                            "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
+                            "enum": [
+                                "ProofOfOrigin",
+                                "ProofOfReceipt",
+                                "ProofOfDelivery",
+                                "ProofOfSender",
+                                "ProofOfApproval",
+                                "ProofOfCreation"
+                            ],
+                            "example": "[\"ProofOfOrigin\",\"ProofOfReceipt\"]",
+                            "type": "string"
+                        },
+                        "type": "array"
+                    },
+                    "tsaURL": {
+                        "description": "URL of a Timestamping authority to be used in T, LT or LTA signature levels",
+                        "type": "string"
+                    },
+                    "tsaUSR": {
+                        "description": "User of the credentials of the Timestamping authority, if authentication is required",
+                        "type": "string"
+                    },
+                    "tsaPWD": {
+                        "description": "Password of the credentials of the Timestamping authority, if authentication is required",
+                        "type": "string"
+                    },
+                    "signatureSize": {
+                        "description": "Signature size",
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "visualSignature": {
+                        "$ref": "#/components/schemas/PadesVisualSignature"
+                    },
+                    "dateFormat": {
+                        "default": "dd/MM/yyyy",
+                        "description": "A date format pattern, based on Java's SimpleDateFormat specification, used for the %DATE% tag in the visual signature.",
+                        "example": "dd-MM-yyyy HH:mm:ss Z",
+                        "type": "string"
+                    },
+                    "timeZone": {
+                        "default": "UTC",
+                        "description": "The value must be a string corresponding to a valid IANA Time Zone Database name.",
+                        "example": "Europe/London",
+                        "type": "string"
+                    },
+                    "certificationPermission": {
+                        "description": "File permissions after signature",
+                        "enum": ["NO_CHANGE_PERMITTED", "MINIMAL_CHANGES_PERMITTED", "CHANGES_PERMITTED"],
+                        "example": "NO_CHANGE_PERMITTED",
+                        "type": "string"
+                    },
+                    "application": {
+                        "description": "Application token that grants some permissions",
+                        "example": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjgyNDI2NDQsImp0aSI6IlVVSUQiLCJ0dWlkIjoidGVuYW50SWQiLCJpc3MiOiJJc3N1ZXIgYXBwIiwiYXV0aE9yaWdpbiI6ImF1dGhPcmlnaW4iLCJwZXJtaXNzaW9ucyI6WyJESVNBQkxFX1BJTl9QT0xJQ1kiXX0.hlT0Tv7btldV4UqMlfi6U4M54nolkUvrBi-S3PLOkgk",
+                        "type": "string"
+                    },
+                    "reason": {
+                        "description": "Reason for signature",
+                        "type": "string"
+                    },
+                    "signerName": {
+                        "description": "Signer name",
+                        "type": "string"
+                    }
+                },
+                "required": ["certId"]
+            },
+            "PadesVisualSignature": {
+                "description": "Required parameters in case that a visual signature is desired in the PDF file",
+                "type": "object",
+                "properties": {
+                    "xAxis": {
+                        "default": 75,
+                        "description": "Horizontal position of the visible signature in pixels",
+                        "example": 75,
+                        "format": "float",
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "yAxis": {
+                        "default": 85,
+                        "description": "Vertical position of the visible signature in pixels",
+                        "example": 85,
+                        "format": "float",
+                        "minimum": 0,
+                        "type": "number"
+                    },
+                    "width": {
+                        "default": 170,
+                        "description": "Width of the visible signature in pixels. By default, the value will be the width of the image, images and/or the text defined",
+                        "example": 170,
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "height": {
+                        "default": 55,
+                        "description": "Height of the visible signature in pixels. By default, the value will be the height of the image, images and/or the text defined",
+                        "example": 55,
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "page": {
+                        "default": 1,
+                        "description": "Page where the visible signature will be inserted",
+                        "example": 1,
+                        "format": "int32",
+                        "minimum": 1,
+                        "type": "integer"
+                    },
+                    "positionInPercentage": {
+                        "default": true,
+                        "description": "When true, xAxis and yAxis will be interpreted as percentages",
+                        "example": true,
+                        "type": "boolean"
+                    },
+                    "multiImageBuild": {
+                        "default": "HORIZONTAL",
+                        "description": "If there is more than one image for the visual signature, this parameter will define how this images will be merged into one image",
+                        "enum": ["HORIZONTAL", "VERTICAL"],
+                        "example": "HORIZONTAL",
+                        "type": "string"
+                    },
+                    "backgroundColor": {
+                        "description": "The background color for the signature field in RGBA [0..255, 0..255, 0..255, 0..255]. By default, the color will be white with transparency",
+                        "items": {
+                            "description": "The background color for the signature field in RGBA [0..255, 0..255, 0..255, 0..255]. By default, the color will be white with transparency",
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "type": "array"
+                    },
+                    "imageVerticalAlignment": {
+                        "default": "NONE",
+                        "description": "Vertical position of the visual signature in the page. In the case where the value is different than NONE and the parameter yAxis has a value different than the default one, the value defined by the parameter imageVerticalAlignment will prevail",
+                        "enum": ["NONE", "TOP", "MIDDLE", "BOTTOM"],
+                        "example": "NONE",
+                        "type": "string"
+                    },
+                    "fontName": {
+                        "default": "COURIER",
+                        "description": "Name of the font that will be used for the text",
+                        "enum": [
+                            "TIMES_ROMAN",
+                            "TIMES_BOLD",
+                            "TIMES_ITALIC",
+                            "TIMES_BOLD_ITALIC",
+                            "HELVETICA",
+                            "HELVETICA_BOLD",
+                            "HELVETICA_OBLIQUE",
+                            "HELVETICA_BOLD_OBLIQUE",
+                            "COURIER",
+                            "COURIER_BOLD",
+                            "COURIER_OBLIQUE",
+                            "COURIER_BOLD_OBLIQUE"
+                        ],
+                        "example": "COURIER",
+                        "type": "string"
+                    },
+                    "fontSize": {
+                        "default": 12,
+                        "description": "Letter size",
+                        "example": 12,
+                        "format": "int32",
+                        "minimum": 2,
+                        "type": "integer"
+                    },
+                    "textColor": {
+                        "description": "Text color in RGBA [0..255, 0..255, 0..255, 0..255]. The default text color is black without transparency",
+                        "items": {
+                            "description": "Text color in RGBA [0..255, 0..255, 0..255, 0..255]. The default text color is black without transparency",
+                            "format": "int32",
+                            "type": "integer"
+                        },
+                        "type": "array"
+                    },
+                    "text": {
+                        "default": "Digitally signed by\n%CN%\n%DATE% %DATE_TIME%",
+                        "description": "Text of the visual signature. It can contain the following macros for dynamic replacement: %CN% - Certificate Common Name, %DATE% - Signature date, %DATE_TIME% - Signature time",
+                        "example": "Signed by John Doe",
+                        "type": "string"
+                    },
+                    "textSignerPosition": {
+                        "default": "RIGHT",
+                        "description": "In case there is an image and text defined for the visual signature, this parameter will define the position between these two elements in the visual signature. The default value implies that the image will be at the left part of the visible signature while the text will be at the right part",
+                        "enum": ["TOP", "BOTTOM", "RIGHT", "LEFT"],
+                        "example": "LEFT",
+                        "type": "string"
+                    },
+                    "textHorizontalAlignment": {
+                        "default": "LEFT",
+                        "description": "Text alignment",
+                        "enum": ["LEFT", "CENTER", "RIGHT"],
+                        "example": "LEFT",
+                        "type": "string"
+                    },
+                    "textImageVerticalAlignment": {
+                        "default": "MIDDLE",
+                        "description": "In case there is more than one image with the parameter multiImageBuild with a value of HORIZONTAL and/or an image and text where the parameter textSignerPosition with values LEFT or RIGHT, this parameter defines the vertical alignment between those elements",
+                        "enum": ["TOP", "MIDDLE", "BOTTOM"],
+                        "example": "MIDDLE",
+                        "type": "string"
+                    },
+                    "signLastPage": {
+                        "default": false,
+                        "description": "Flag to perform the signature on the last page, ignoring the value defined in the page attribute",
+                        "example": false,
+                        "type": "boolean"
+                    },
+                    "signatureField": {
+                        "description": "Indicates the name of the signature field in which the signature will be made. The field must previously exist in the PDF",
+                        "type": "string"
+                    }
+                }
+            },
+
+            "CadesSignatureResponse": {
+                "type": "object",
+                "properties": {
+                    "responseCode": {
+                        "type": "string",
+                        "description": "Response code of signing process.",
+                        "example": "0000"
+                    },
+                    "responseMessage": {
+                        "type": "string",
+                        "description": "Response message.",
+                        "example": "SIGN_OK"
+                    },
+                    "signedFile": {
+                        "type": "string",
+                        "description": "Data signed in Base64."
+                    }
+                },
+                "required": [
+                    "responseCode",
+                    "responseMessage"
+                ]
+            },
+            "CadesSignatureRequest": {
+                "type": "object",
+                "properties": {
+                    "signLevel": {
+                        "type": "string",
+                        "description": "Signature level",
+                        "example": "B",
+                        "enum": [
+                            "B",
+                            "T",
+                            "LT",
+                            "LTA"
+                        ],
+                        "default": "B"
+                    },
+                    "signPackage": {
+                        "type": "string",
+                        "description": "Signature package",
+                        "example": "DETACHED",
+                        "enum": [
+                            "DETACHED",
+                            "ENVELOPING"
+                        ],
+                        "default": "DETACHED"
+                    },
+                    "digestAlgorithm": {
+                        "type": "string",
+                        "description": "Algorithm used to obtain the digest of the document to sign",
+                        "example": "SHA256",
+                        "enum": [
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "SHA512"
+                        ],
+                        "default": "SHA256"
+                    },
+                    "certId": {
+                        "type": "integer",
+                        "description": "This parameter is linked with the signingId response parameter of the get user certificates operation",
+                        "example": 1,
+                        "format": "int32"
+                    },
+                    "certPin": {
+                        "type": "string",
+                        "description": "PIN of the selected certificate, if needed",
+                        "example": "1234"
+                    },
+                    "policyId": {
+                        "type": "string",
+                        "description": "Identifier of the policy. The value is the OID. Can only be used if the signature level is B"
+                    },
+                    "policyHash": {
+                        "type": "string",
+                        "description": "Hash of the policy to be used. Hexadecimal in Base64. Can only be used if the signature level is B"
+                    },
+                    "policyDigestAlgorithm": {
+                        "type": "string",
+                        "description": "Digest algorithm with which the policyHash was made. Can only be used if the signature level is B",
+                        "enum": [
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "SHA512"
+                        ]
+                    },
+                    "policyQualifier": {
+                        "type": "string",
+                        "description": "Defines a policy identifier qualifier. Can only be used if the signature level is B"
+                    },
+                    "fileHash": {
+                        "type": "string",
+                        "description": "Defines a hash to be signed. Only used if Multipart File is not specified"
+                    },
+                    "fileHashDigestAlgorithm": {
+                        "type": "string",
+                        "description": "Algorithm used to generate fileHash. This parameter must have the same value as the 'digestAlgorithm' parameter",
+                        "enum": [
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "SHA512"
+                        ]
+                    },
+                    "fileHashName": {
+                        "type": "string",
+                        "description": "Name of specified hash in data.fileHash"
+                    },
+                    "tsaURL": {
+                        "type": "string",
+                        "description": "URL of a Timestamping authority to be used in T, LT or LTA signature levels"
+                    },
+                    "tsaUSR": {
+                        "type": "string",
+                        "description": "User of the credentials of the Timestamping authority, if authentication is required"
+                    },
+                    "tsaPWD": {
+                        "type": "string",
+                        "description": "Password of the credentials of the Timestamping authority, if authentication is required"
+                    },
+                    "signLocation": {
+                        "$ref": "#/components/schemas/CadesSignLocation"
+                    },
+                    "signerRoles": {
+                        "type": "array",
+                        "description": "List of roles of signer",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "commitmentTypes": {
+                        "type": "array",
+                        "description": "List of compromises of the signed document",
+                        "items": {
+                            "type": "string",
+                            "enum": [
+                                "ProofOfOrigin",
+                                "ProofOfReceipt",
+                                "ProofOfDelivery",
+                                "ProofOfSender",
+                                "ProofOfApproval",
+                                "ProofOfCreation"
+                            ]
+                        }
+                    },
+                    "company": {
+                        "type": "string"
+                    },
+                    "userUuid": {
+                        "type": "string"
+                    },
+                    "userId": {
+                        "type": "string"
+                    },
+                    "signContainer": {
+                        "type": "string"
+                    },
+                    "certTicket": {
+                        "type": "string"
+                    }
+                },
+                "title": "CadesSignatureRequest"
+            },
+            "CadesSignLocation": {
+                "type": "object",
+                "properties": {
+                    "country": {
+                        "type": "string",
+                        "description": "Country where the signature is made"
+                    },
+                    "locality": {
+                        "type": "string",
+                        "description": "Locality where the signature is made"
+                    },
+                    "postalAddress": {
+                        "type": "array",
+                        "description": "List of postal addresses where the signature is made",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                },
+                "title": "CadesSignLocation"
+            }
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "User access token required"
+            }
+        }
+    }
+}

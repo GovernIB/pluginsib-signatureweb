@@ -1,0 +1,1044 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Certificates API",
+        "description": "API for managing digital certificates in nebulaSUITE",
+        "version": "2.0"
+    },
+    "servers": [{
+            "url": "https://api-ansmt01.nebulaservice.net/api",
+            "description": "Production server"
+        }
+    ],
+    "tags": [{
+            "name": "Digital Certificate",
+            "description": "Digital certificate management operations"
+        }
+    ],
+    "paths": {
+
+        "/api/v2/certificate/mycertificates": {
+            "get": {
+                "tags": ["DigitalCertificate"],
+                "summary": "Get User Certificates",
+                "description": "Gets the user’s certificate list and returns its search result that fulfills the given input search criteria. The caller must have role admin, owner or signer.",
+                "operationId": "getMyCertificates",
+                "parameters": [{
+                        "name": "offset",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "required": false
+                    }, {
+                        "name": "limit",
+                        "in": "query",
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        },
+                        "required": false
+                    }, {
+                        "name": "enableFilter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "ENABLED/DISABLED",
+                        "required": false
+                    }, {
+                        "name": "expireFilter",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "BOTH/EXPIRED/NOT_EXPIRED",
+                        "required": false
+                    }, {
+                        "name": "certType",
+                        "in": "query",
+                        "schema": {
+                            "type": "string"
+                        },
+                        "required": false
+                    }, {
+                        "name": "isOrphan",
+                        "in": "query",
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "required": false
+                    }, {
+                        "name": "dateValidStart",
+                        "in": "query",
+                        "schema": {
+                            "type": "string",
+                            "format": "date"
+                        },
+                        "required": false
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "List of certificates returned.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totalCertificates": {
+                                            "type": "integer",
+                                            "description": "Total number of certificates found."
+                                        },
+                                        "certificatesList": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "certificateId": {
+                                                        "type": "string",
+                                                        "description": "Unique certificate identifier."
+                                                    },
+                                                    "signingId": {
+                                                        "type": "string",
+                                                        "description": "Signing identifier."
+                                                    },
+                                                    "alias": {
+                                                        "type": "string",
+                                                        "description": "Certificate alias or friendly name."
+                                                    },
+                                                    "subject": {
+                                                        "type": "string",
+                                                        "description": "Subject name (CN, OU, O...)."
+                                                    },
+                                                    "issuer": {
+                                                        "type": "string",
+                                                        "description": "Issuer of the certificate."
+                                                    },
+                                                    "serialNumber": {
+                                                        "type": "string",
+                                                        "description": "Certificate serial number."
+                                                    },
+                                                    "dateValidStart": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "description": "Start date of certificate validity."
+                                                    },
+                                                    "dateValidEnd": {
+                                                        "type": "string",
+                                                        "format": "date-time",
+                                                        "description": "Expiration date of the certificate."
+                                                    },
+                                                    "status": {
+                                                        "type": "string",
+                                                        "description": "Current status (ISSUED, etc.)."
+                                                    },
+                                                    "certificate": {
+                                                        "type": "string",
+                                                        "description": "Base64 encoded X.509 certificate."
+                                                    },
+                                                    "certType": {
+                                                        "type": "string",
+                                                        "description": "Type of certificate (IMPORTED, INTERMEDIATE, QUALIFIED)."
+                                                    },
+                                                    "isUsable": {
+                                                        "type": "string",
+                                                        "description": "Indicates if the certificate is usable (1 for yes, 0 for no)."
+                                                    }
+                                                },
+                                                "required": ["certificateId", "subject", "issuer", "serialNumber"]
+                                            }
+                                        }
+                                    },
+                                    "required": ["total", "certificates"]
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Invalid parameters."
+                    },
+                    "401": {
+                        "description": "Unauthorized."
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+
+        "/v2/certificate/request/{requestId}/issue": {
+            "put": {
+                "tags": ["Digital Certificate"],
+                "summary": "Issue Certificate",
+                "description": "Issues a requested certificate. This operation is asynchronous, in order to execute the Activate_Certificate operation we must wait until the issue status of the request is ENROLL (check Get Certificate Request operation).",
+                "operationId": "issueCertificate",
+                "parameters": [{
+                        "name": "requestId",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The certificate request id"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["pin"],
+                                "properties": {
+                                    "pin": {
+                                        "type": "string",
+                                        "description": "Certificate's protection pin"
+                                    },
+                                    "publish": {
+                                        "type": "boolean",
+                                        "description": "Indicate if certificate will be published or not"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "202": {
+                        "description": "Accepted"
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v2/certificate/request/{requestid}/activate": {
+            "put": {
+                "tags": ["Digital Certificate"],
+                "summary": "Activate Certificate",
+                "description": "Activates an accepted and issued certificate request to be used by the user",
+                "operationId": "activateCertificate",
+                "parameters": [{
+                        "name": "requestid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The certificate request id"
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["pin"],
+                                "properties": {
+                                    "pin": {
+                                        "type": "string",
+                                        "description": "Certificate's protection pin"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "serialNumber": {
+                                            "type": "string",
+                                            "description": "Certificate fingerprint"
+                                        },
+                                        "idCert": {
+                                            "type": "string",
+                                            "description": "Internal identifier of the certificate in nebulaSUITE"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v2/certificate/policy/{certificateid}": {
+            "get": {
+                "tags": ["Digital Certificate"],
+                "summary": "Get Policy",
+                "description": "Returns the policy linked to the given user and certificate id",
+                "operationId": "getPolicy",
+                "parameters": [{
+                        "name": "certificateid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The certificate id"
+                    }, {
+                        "name": "userType",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["USER", "GROUP"]
+                        },
+                        "description": "The user type, it can be USER or GROUP"
+                    }, {
+                        "name": "userId",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The UUID (User Unique Identifier) must be specified in case the userType is USER. Alternatively, if userType is GROUP, the GUID (Group Unique Identifier) shall be specified. In case userType is USER and this parameter is not specified, the system shall obtain the UUID of the user making the request."
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "userType": {
+                                            "type": "string",
+                                            "description": "User type {USER or GROUP}"
+                                        },
+                                        "userId": {
+                                            "type": "string",
+                                            "description": "UUID in case userType is USER or GUID in case userType is GROUP"
+                                        },
+                                        "idCert": {
+                                            "type": "string",
+                                            "description": "Certificate identifier"
+                                        },
+                                        "agentName": {
+                                            "type": "string",
+                                            "description": "User name in case userType is USER or group name in case userType is GROUP"
+                                        },
+                                        "status": {
+                                            "type": "string",
+                                            "description": "Policy status"
+                                        },
+                                        "dateValidStart": {
+                                            "type": "integer",
+                                            "description": "Valid start date"
+                                        },
+                                        "dateValidEnd": {
+                                            "type": "integer",
+                                            "description": "Valid end date"
+                                        },
+                                        "validIpSource": {
+                                            "type": "string",
+                                            "description": "Valid IP source"
+                                        },
+                                        "idAcl": {
+                                            "type": "string",
+                                            "description": "ACL identifier"
+                                        },
+                                        "aclName": {
+                                            "type": "string",
+                                            "description": "ACL name"
+                                        },
+                                        "enabled": {
+                                            "type": "string",
+                                            "description": "True if the policy is enabled"
+                                        },
+                                        "certType": {
+                                            "type": "string",
+                                            "description": "Certificate type"
+                                        },
+                                        "idOwner": {
+                                            "type": "string",
+                                            "description": "Owner identifier"
+                                        },
+                                        "usePin": {
+                                            "type": "string",
+                                            "description": "True if the policy use pin"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v2/certificate/mypolicies": {
+            "get": {
+                "tags": ["Digital Certificate"],
+                "summary": "Get Cert Policies",
+                "description": "Gets the user's policy list and returns its search result given the input offset and limit parameters. The role of the user who executes this operation must be owner or signer",
+                "operationId": "getCertPolicies",
+                "parameters": [{
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Search offset"
+                    }, {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Search limit 0 means no limit"
+                    }, {
+                        "name": "querymode",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["OWNED", "DELEGATED"]
+                        },
+                        "description": "Filter to search between OWNED or DELEGATED policies"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totalPolicies": {
+                                            "type": "integer",
+                                            "description": "Total results for the search before applying offset and limit"
+                                        },
+                                        "policyList": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Policy"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v2/certificate/{certificateid}": {
+            "get": {
+                "tags": ["Digital Certificate"],
+                "summary": "Get Certificate",
+                "description": "Returns the certificate data for the certificate identified by the given input id",
+                "operationId": "getCertificate",
+                "parameters": [{
+                        "name": "certificateid",
+                        "in": "path",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "The certificate id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Certificate"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v2/certificate/mycertificates": {
+            "get": {
+                "tags": ["Digital Certificate"],
+                "summary": "Get User Certificates",
+                "description": "Gets the user's certificate list and returns its search result that fulfills the given input search criteria. The role of the user who executes this operation must be admin, owner or signer",
+                "operationId": "getUserCertificates",
+                "parameters": [{
+                        "name": "ownerId",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Unique Owner identifier (uuid). The parameter is exclusive for admin users"
+                    }, {
+                        "name": "offset",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Search offset"
+                    }, {
+                        "name": "limit",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Search limit 0 means no limit"
+                    }, {
+                        "name": "enableFilter",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["ENABLED", "DISABLED", "BOTH"]
+                        },
+                        "description": "If the certificate is usable"
+                    }, {
+                        "name": "expireFilter",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["EXPIRED", "EXPIRING", "BOTH"]
+                        },
+                        "description": "If the certificate is expired or expiring"
+                    }, {
+                        "name": "certType",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "enum": ["IMPORTED", "INTERMEDIATE", "QUALIFIED", "ALL"]
+                        },
+                        "description": "Certificate type"
+                    }, {
+                        "name": "isOrphan",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean"
+                        },
+                        "description": "True if the certificate is orphan (This parameter is exclusive for the Admin role)"
+                    }, {
+                        "name": "dateValidStart",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "description": "Start date for the certificate's valid period"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "totalCertificates": {
+                                            "type": "integer",
+                                            "description": "Total results for the search before applying offset and limit"
+                                        },
+                                        "certificatesList": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Certificate"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v4/certificates/available-for-signing": {
+            "get": {
+                "tags": ["Digital Certificate"],
+                "summary": "Find Certificates to Sign",
+                "description": "Gets the user's certificate list and returns its search result that fulfills the given input search criteria. All returned certificates can be used to perform a signature operation",
+                "operationId": "findCertificatesToSign",
+                "parameters": [{
+                        "name": "strictMatch",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "description": "Input parameters must exactly match the certificate parameters. If not specified, the call will search for certificates in 'LIKE' mode"
+                    }, {
+                        "name": "returnPublicKey",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "boolean",
+                            "default": false
+                        },
+                        "description": "Includes the public part of the certificate in Base64 encoded x509"
+                    }, {
+                        "name": "commonName",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "description": "Search parameter: Common name of the certificate"
+                    }, {
+                        "name": "alias",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "description": "Search parameter: Alias of the certificate"
+                    }, {
+                        "name": "subject",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "description": "Search parameter: Subject DN of the certificate"
+                    }, {
+                        "name": "issuer",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": ""
+                        },
+                        "description": "Search parameter: Issuer DN of the certificate"
+                    }, {
+                        "name": "dateFrom",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Expiration date range (Start)"
+                    }, {
+                        "name": "dateTo",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer"
+                        },
+                        "description": "Expiration date range (End)"
+                    }, {
+                        "name": "order",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "commonName",
+                            "enum": ["commonName", "alias", "subject", "issuer", "dateFrom", "dateTo"]
+                        },
+                        "description": "Order"
+                    }, {
+                        "name": "direction",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "default": "ASC",
+                            "enum": ["ASC", "DESC"]
+                        },
+                        "description": "Search direction"
+                    }, {
+                        "name": "currentPage",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 0
+                        },
+                        "description": "Search offset"
+                    }, {
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 100,
+                            "minimum": 1,
+                            "maximum": 100
+                        },
+                        "description": "Elements to return"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "pagination": {
+                                            "type": "object",
+                                            "properties": {
+                                                "totalElements": {
+                                                    "type": "integer",
+                                                    "description": "Total elements"
+                                                },
+                                                "totalPages": {
+                                                    "type": "integer",
+                                                    "description": "Total amount of pages"
+                                                },
+                                                "pageSize": {
+                                                    "type": "integer",
+                                                    "description": "Size of the page"
+                                                },
+                                                "currentPage": {
+                                                    "type": "integer",
+                                                    "description": "Current page"
+                                                }
+                                            }
+                                        },
+                                        "list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/SigningCertificate"
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "error_description": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "error_description": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "error_description": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "object",
+                                    "properties": {
+                                        "error": {
+                                            "type": "string"
+                                        },
+                                        "error_description": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/v1/certificate/changepin": {
+            "put": {
+                "tags": ["Digital Certificate"],
+                "summary": "Change Certificate Pin",
+                "description": "Change certificate PIN",
+                "operationId": "changeCertificatePin",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "type": "object",
+                                "required": ["idcert", "oldPin", "newPin"],
+                                "properties": {
+                                    "idcert": {
+                                        "type": "string",
+                                        "description": "The certificate"
+                                    },
+                                    "oldPin": {
+                                        "type": "string",
+                                        "description": "Old PIN"
+                                    },
+                                    "newPin": {
+                                        "type": "string",
+                                        "description": "New PIN"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK"
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Policy": {
+                "type": "object",
+                "properties": {
+                    "userType": {
+                        "type": "string",
+                        "description": "User type {USER or GROUP}"
+                    },
+                    "userId": {
+                        "type": "string",
+                        "description": "UUID in case userType is USER or GUID in case userType is GROUP"
+                    },
+                    "idCert": {
+                        "type": "string",
+                        "description": "Certificate identifier"
+                    },
+                    "agentName": {
+                        "type": "string",
+                        "description": "User name in case userType is USER or group name in case userType is GROUP"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Policy status"
+                    },
+                    "dateValidStart": {
+                        "type": "integer",
+                        "description": "Valid start date"
+                    },
+                    "dateValidEnd": {
+                        "type": "integer",
+                        "description": "Valid end date"
+                    },
+                    "validIpSource": {
+                        "type": "string",
+                        "description": "Valid IP source"
+                    },
+                    "idAcl": {
+                        "type": "string",
+                        "description": "ACL identifier"
+                    },
+                    "aclName": {
+                        "type": "string",
+                        "description": "ACL name"
+                    },
+                    "enabled": {
+                        "type": "string",
+                        "description": "True if the policy is enabled"
+                    },
+                    "certType": {
+                        "type": "string",
+                        "description": "Certificate type"
+                    },
+                    "idOwner": {
+                        "type": "string",
+                        "description": "Owner identifier"
+                    },
+                    "usePin": {
+                        "type": "string",
+                        "description": "True if the policy use pin"
+                    }
+                }
+            },
+            "Certificate": {
+                "type": "object",
+                "properties": {
+                    "certificateId": {
+                        "type": "string",
+                        "description": "Certificate identifier"
+                    },
+                    "signingId": {
+                        "type": "string",
+                        "description": "Certificate identifier for signing operations To be used through the API's Signature operations"
+                    },
+                    "dateValidStart": {
+                        "type": "integer",
+                        "description": "Start date for the certificate's valid period"
+                    },
+                    "dateValidEnd": {
+                        "type": "integer",
+                        "description": "End date for the certificate's valid period"
+                    },
+                    "issuer": {
+                        "type": "string",
+                        "description": "Name of the certificate's issuer"
+                    },
+                    "alias": {
+                        "type": "string",
+                        "description": "Name of the certificate's alias"
+                    },
+                    "serialNumber": {
+                        "type": "string",
+                        "description": "Certificate's serial number"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "description": "Certificate's subject"
+                    },
+                    "certificate": {
+                        "type": "string",
+                        "description": "Certificate's public key"
+                    },
+                    "certType": {
+                        "type": "string",
+                        "description": "Certificate type"
+                    },
+                    "isUsable": {
+                        "type": "string",
+                        "description": "True if the certificate is usable"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Certificate status"
+                    }
+                }
+            },
+            "SigningCertificate": {
+                "type": "object",
+                "properties": {
+                    "ownerUuid": {
+                        "type": "string",
+                        "description": "Owner UUID"
+                    },
+                    "alias": {
+                        "type": "string",
+                        "description": "Alias of the certificate"
+                    },
+                    "subject": {
+                        "type": "string",
+                        "description": "Subject DN of the certificate"
+                    },
+                    "issuer": {
+                        "type": "string",
+                        "description": "Issuer DN of the certificate"
+                    },
+                    "serialNumber": {
+                        "type": "string",
+                        "description": "Certificate Serial Number"
+                    },
+                    "signingId": {
+                        "type": "integer",
+                        "description": "Slot or signingId"
+                    },
+                    "certificateId": {
+                        "type": "string",
+                        "description": "Certificate unique identifier"
+                    },
+                    "issuedAt": {
+                        "type": "integer",
+                        "description": "Creation date"
+                    },
+                    "expiresAt": {
+                        "type": "integer",
+                        "description": "Expiration date"
+                    },
+                    "publicKey": {
+                        "type": "string",
+                        "description": "Certificate X509 in DER encoded if parameter 'returnPublicKey' is specified"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "User access token required"
+            }
+        }
+    }
+}

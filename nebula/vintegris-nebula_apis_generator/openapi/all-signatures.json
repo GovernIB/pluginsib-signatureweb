@@ -1,0 +1,5120 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "title": "General functions API",
+        "version": "v3"
+    },
+    "externalDocs": {
+        "description": "API Documentation",
+        "url": "https://portal.nebulaservice.net/docs/developer/en/HTML/nebulasuite-api-overview.html"
+    },
+    "host": "api-ansmt01.nebulaservice.net",
+    "basePath": "/api",
+    "tags": [{
+            "name": "cades-sign-controller",
+            "description": "Cades Sign Controller"
+        }, {
+            "name": "ooxml-sign-controller",
+            "description": "Ooxml Sign Controller"
+        }, {
+            "name": "pades-sign-controller",
+            "description": "Pades Sign Controller"
+        }, {
+            "name": "pades-sign-controller-v-2",
+            "description": "Pades Sign Controller V 2"
+        }, {
+            "name": "process-controller",
+            "description": "Process Controller"
+        }, {
+            "name": "sign-process-controller",
+            "description": "Sign Process Controller"
+        }, {
+            "name": "signature-controller",
+            "description": "Signature Controller"
+        }, {
+            "name": "signature-controller-v-2",
+            "description": "Signature Controller V 2"
+        }, {
+            "name": "xades-sign-controller",
+            "description": "Xades Sign Controller"
+        }
+    ],
+    "paths": {
+        "/api/v1/cadessign/sign": {
+            "post": {
+                "tags": ["cades-sign-controller"],
+                "summary": "cadesSignature",
+                "operationId": "cadesSignatureUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "cadesSignatureReqDTO",
+                        "description": "cadesSignatureReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CadesSignatureReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            },
+                            "security": [{
+                                    "Authorization": []
+                                }
+                            ]
+        },
+        "/api/v1/cadessign/validate": {
+            "post": {
+                "tags": ["cades-sign-controller"],
+                "summary": "cadesValidate",
+                "operationId": "cadesValidateUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "signedFile",
+                        "in": "formData",
+                        "description": "signedFile",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "name": "originalFile",
+                        "in": "formData",
+                        "description": "originalFile",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "cadesValidationDTO",
+                        "description": "cadesValidationDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/CadesValidationDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        
+        "/api/v1/ooxml/sign": {
+            "post": {
+                "tags": ["ooxml-sign-controller"],
+                "summary": "ooxmlSignature",
+                "operationId": "ooxmlSignatureUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "request",
+                        "description": "request",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/OoxmlSignatureRequestVM"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/OoxmlSignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/padessign/sign": {
+            "post": {
+                "tags": ["pades-sign-controller"],
+                "summary": "padesSignature",
+                "operationId": "padesSignatureUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "name": "images",
+                        "in": "formData",
+                        "description": "images",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "multi"
+                    }, {
+                        "in": "formData",
+                        "name": "padesSignatureReqDTO",
+                        "description": "padesSignatureReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PadesSignatureDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/padessign/timestamp": {
+            "post": {
+                "tags": ["pades-sign-controller"],
+                "summary": "padesTimestamp",
+                "operationId": "padesTimestampUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "padesTimestampVM",
+                        "description": "padesTimestampVM",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PadesTimestampVM"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/padessign/validate": {
+            "post": {
+                "tags": ["pades-sign-controller"],
+                "summary": "Execute validation of a document",
+                "operationId": "padesValidateUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "signedFile",
+                        "in": "formData",
+                        "description": "File to be validated",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "padesValidationReqDTO",
+                        "description": "Parameters needed to execute the validation",
+                        "required": false,
+                        "schema": {
+                            "$ref": "#/definitions/PadesValidationDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/padessign/visual": {
+            "post": {
+                "tags": ["pades-sign-controller"],
+                "summary": "padesVisual",
+                "operationId": "padesVisualUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "name": "images",
+                        "in": "formData",
+                        "description": "images",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "multi"
+                    }, {
+                        "in": "formData",
+                        "name": "padesVisualReqDTO",
+                        "description": "padesVisualReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PadesVisualDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v1/xadessign/validate": {
+            "post": {
+                "tags": ["xades-sign-controller"],
+                "summary": "xadesValidate",
+                "operationId": "xadesValidateUsingPOST",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [ {
+                        "name": "signedFile",
+                        "in": "formData",
+                        "description": "signedFile",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "name": "originalFile",
+                        "in": "formData",
+                        "description": "originalFile",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "xadesValidationDTO",
+                        "description": "xadesValidationDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/XadesValidationDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+                ,
+                                "security": [{
+                                        "Authorization": []
+                                    }
+                                ]
+            }
+        },
+        "/api/v2/padessign/sign": {
+            "post": {
+                "tags": ["pades-sign-controller-v-2"],
+                "summary": "padesSignature",
+                "operationId": "padesSignatureUsingPOST_1",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "name": "images",
+                        "in": "formData",
+                        "description": "images",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "multi"
+                    }, {
+                        "in": "formData",
+                        "name": "padesSignatureReqDTO",
+                        "description": "padesSignatureReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PadesSignatureDTOV2"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+            }
+        },
+        "/api/v2/padessign/visual": {
+            "post": {
+                "tags": ["pades-sign-controller-v-2"],
+                "summary": "padesVisual",
+                "operationId": "padesVisualUsingPOST_1",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Authorization token",
+                        "required": false,
+                        "type": "string"
+                    }, {
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": true,
+                        "type": "file"
+                    }, {
+                        "name": "images",
+                        "in": "formData",
+                        "description": "images",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "file"
+                        },
+                        "collectionFormat": "multi"
+                    }, {
+                        "in": "formData",
+                        "name": "padesVisualReqDTO",
+                        "description": "padesVisualReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/PadesVisualDTOV2"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                }
+                ,
+                                "security": [{
+                                        "Authorization": []
+                                    }
+                                ]
+            }
+        },
+        "/api/v2/xadessign/sign": {
+            "post": {
+                "tags": ["xades-sign-controller"],
+                "summary": "xadesSignature",
+                "operationId": "xadesSignatureUsingPOST_1",
+                "consumes": ["multipart/form-data"],
+                "produces": ["*/*"],
+                "parameters": [{
+                        "name": "file",
+                        "in": "formData",
+                        "description": "file",
+                        "required": false,
+                        "type": "file"
+                    }, {
+                        "in": "formData",
+                        "name": "xadesSignatureReqDTO",
+                        "description": "xadesSignatureReqDTO",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/XadesSignatureReqDTO"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/SignatureResponseDTO"
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        }
+    },
+    "definitions": {
+        "AcceptDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "idcert": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "AcceptDelegationDTO"
+        },
+        "ActivateCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "ActivateCertificateDTO"
+        },
+        "AssignTokenDTO": {
+            "type": "object",
+            "properties": {
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "AssignTokenDTO"
+        },
+        "AuthTypeDTO": {
+            "type": "object",
+            "properties": {
+                "authType": {
+                    "type": "string"
+                }
+            },
+            "title": "AuthTypeDTO"
+        },
+        "AuthTypeListDTO": {
+            "type": "object",
+            "properties": {
+                "authTypeList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "challenge": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "tokenLevel": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "AuthTypeListDTO"
+        },
+        "BasicGroupDTO": {
+            "type": "object",
+            "properties": {
+                "groupid": {
+                    "type": "string"
+                }
+            },
+            "title": "BasicGroupDTO"
+        },
+        "BasicGroupV2DTO": {
+            "type": "object",
+            "properties": {
+                "groupid": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "BasicGroupV2DTO"
+        },
+        "CAInfoDTO": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "caId": {
+                    "type": "string"
+                },
+                "caName": {
+                    "type": "string"
+                },
+                "keyLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "policyParams": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            },
+            "title": "CAInfoDTO"
+        },
+        "CAInfoDTOV2": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "caId": {
+                    "type": "string"
+                },
+                "caName": {
+                    "type": "string"
+                },
+                "documents": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "keyLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "policyParams": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                }
+            },
+            "title": "CAInfoDTOV2"
+        },
+        "CAInfoDTOV3": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "caId": {
+                    "type": "string"
+                },
+                "caName": {
+                    "type": "string"
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CAInfoDTOV3Document"
+                    }
+                },
+                "keyLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CAInfoDTOV3Parameter"
+                    }
+                }
+            },
+            "title": "CAInfoDTOV3"
+        },
+        "CAInfoDTOV3Document": {
+            "type": "object",
+            "properties": {
+                "documentId": {
+                    "type": "string"
+                },
+                "mandatory": {
+                    "type": "boolean"
+                }
+            },
+            "title": "CAInfoDTOV3Document"
+        },
+        "CAInfoDTOV3Parameter": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "mandatory": {
+                    "type": "boolean"
+                },
+                "validValues": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "CAInfoDTOV3Parameter"
+        },
+        "CAInfoDTOV4": {
+            "type": "object",
+            "properties": {
+                "algorithm": {
+                    "type": "string"
+                },
+                "caId": {
+                    "type": "string"
+                },
+                "caName": {
+                    "type": "string"
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CAInfoDTOV3Document"
+                    }
+                },
+                "issueType": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["SOFTWARE", "KEYSTORE", "CENTRALIZED", "P12ISSUANCE"]
+                    }
+                },
+                "keyLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CAInfoDTOV3Parameter"
+                    }
+                },
+                "remoteVideoIdentificationAllowed": {
+                    "type": "boolean"
+                }
+            },
+            "title": "CAInfoDTOV4"
+        },
+        "CFullySignReqDTO": {
+            "type": "object",
+            "properties": {
+                "mechanism": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                },
+                "signdata": {
+                    "type": "string"
+                },
+                "signingId": {
+                    "type": "string"
+                }
+            },
+            "title": "CFullySignReqDTO"
+        },
+        "CLoginRequestDTO": {
+            "type": "object",
+            "properties": {
+                "pin": {
+                    "type": "string"
+                },
+                "signingId": {
+                    "type": "string"
+                }
+            },
+            "title": "CLoginRequestDTO"
+        },
+        "CSessionDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "rcSign": {
+                    "type": "string"
+                }
+            },
+            "title": "CSessionDTO"
+        },
+        "CSessionDTOV2": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "rcSign": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                }
+            },
+            "title": "CSessionDTOV2"
+        },
+        "CSessionDTOV3": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "objId": {
+                    "type": "string"
+                },
+                "rcSign": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                }
+            },
+            "title": "CSessionDTOV3"
+        },
+        "CSignCloseDTO": {
+            "type": "object",
+            "properties": {
+                "session": {
+                    "type": "string"
+                }
+            },
+            "title": "CSignCloseDTO"
+        },
+        "CSignDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "rcSign": {
+                    "type": "string"
+                },
+                "signedData": {
+                    "type": "string"
+                }
+            },
+            "title": "CSignDTO"
+        },
+        "CSignReqDTO": {
+            "type": "object",
+            "properties": {
+                "mechanism": {
+                    "type": "string"
+                },
+                "signdata": {
+                    "type": "string"
+                }
+            },
+            "title": "CSignReqDTO"
+        },
+        "CSignReqDTOV2": {
+            "type": "object",
+            "properties": {
+                "mechanism": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                },
+                "signdata": {
+                    "type": "string"
+                }
+            },
+            "title": "CSignReqDTOV2"
+        },
+        "CSignReqDTOV3": {
+            "type": "object",
+            "properties": {
+                "mechanism": {
+                    "type": "string"
+                },
+                "objId": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                },
+                "signdata": {
+                    "type": "string"
+                }
+            },
+            "title": "CSignReqDTOV3"
+        },
+        "CadesSignatureReqDTO": {
+            "type": "object",
+            "properties": {
+                "certId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "certPin": {
+                    "type": "string"
+                },
+                "certTicket": {
+                    "type": "string"
+                },
+                "commitmentTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "company": {
+                    "type": "string"
+                },
+                "digestAlgorithm": {
+                    "type": "string"
+                },
+                "fileHash": {
+                    "type": "string"
+                },
+                "fileHashDigestAlgorithm": {
+                    "type": "string"
+                },
+                "fileHashName": {
+                    "type": "string"
+                },
+                "policyDigestAlgorithm": {
+                    "type": "string"
+                },
+                "policyHash": {
+                    "type": "string"
+                },
+                "policyId": {
+                    "type": "string"
+                },
+                "policyQualifier": {
+                    "type": "string"
+                },
+                "signContainer": {
+                    "type": "string"
+                },
+                "signLevel": {
+                    "type": "string"
+                },
+                "signLocation": {
+                    "$ref": "#/definitions/SignLocation"
+                },
+                "signPackage": {
+                    "type": "string"
+                },
+                "signerRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tsaPWD": {
+                    "type": "string"
+                },
+                "tsaURL": {
+                    "type": "string"
+                },
+                "tsaUSR": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                }
+            },
+            "title": "CadesSignatureReqDTO"
+        },
+        "CadesValidationDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "fileHash": {
+                    "type": "string"
+                },
+                "fileHashDigestAlgorithm": {
+                    "type": "string"
+                },
+                "originalFileB64": {
+                    "type": "string"
+                },
+                "reportFormat": {
+                    "type": "string"
+                },
+                "signedFileB64": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                },
+                "validationLevel": {
+                    "type": "string"
+                }
+            },
+            "title": "CadesValidationDTO"
+        },
+        "CertIdDTO": {
+            "type": "object",
+            "properties": {
+                "certificateId": {
+                    "type": "string"
+                }
+            },
+            "title": "CertIdDTO"
+        },
+        "CertificateDTO": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "certificateId": {
+                    "type": "string"
+                },
+                "dateValidEnd": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "dateValidStart": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "pap": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "serialNumber": {
+                    "type": "string"
+                },
+                "signingId": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificateDTO"
+        },
+        "CertificateDTOV2": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "certType": {
+                    "type": "string"
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "certificateId": {
+                    "type": "string"
+                },
+                "dateValidEnd": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "dateValidStart": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "isUsable": {
+                    "type": "string"
+                },
+                "issuer": {
+                    "type": "string"
+                },
+                "serialNumber": {
+                    "type": "string"
+                },
+                "signingId": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificateDTOV2"
+        },
+        "CertificateListDTO": {
+            "type": "object",
+            "properties": {
+                "certificatesList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CertificateDTO"
+                    }
+                },
+                "totalCertificates": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "CertificateListDTO"
+        },
+        "CertificateListDTOV2": {
+            "type": "object",
+            "properties": {
+                "certificatesList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CertificateDTOV2"
+                    }
+                },
+                "totalCertificates": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "CertificateListDTOV2"
+        },
+        "CertificatePinDTO": {
+            "type": "object",
+            "properties": {
+                "idCert": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificatePinDTO"
+        },
+        "CertificateRequestDTOV1": {
+            "type": "object",
+            "properties": {
+                "caId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "fileList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FileIdDTO"
+                    }
+                },
+                "policyParams": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NameValueParam"
+                    }
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificateRequestDTOV1"
+        },
+        "CertificateRequestDTOV2": {
+            "type": "object",
+            "properties": {
+                "caId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "certificateType": {
+                    "type": "string",
+                    "enum": ["CENTRALIZED", "KEYSTORE", "SOFTWARE", "P12ISSUANCE"]
+                },
+                "description": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fileList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NebulaIdDocument"
+                    }
+                },
+                "identificationType": {
+                    "type": "string",
+                    "enum": ["REMOTE_UNASSISTED", "FACE_TO_FACE"]
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "policyParams": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "prefix": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificateRequestDTOV2"
+        },
+        "CertificateRequestIdDTO": {
+            "type": "object",
+            "properties": {
+                "certificateRequestId": {
+                    "type": "string"
+                }
+            },
+            "title": "CertificateRequestIdDTO"
+        },
+        "CertificateRequestInfoDTO": {
+            "type": "object",
+            "properties": {
+                "acceptanceComment": {
+                    "type": "string"
+                },
+                "acceptanceFile": {
+                    "$ref": "#/definitions/FileDao"
+                },
+                "acceptanceProcessStatus": {
+                    "type": "string",
+                    "enum": ["PENDING", "PROCESSING", "DENIED", "ACCEPTED", "ERROR", "NONE", "COMPLETED"]
+                },
+                "acceptanceType": {
+                    "type": "string",
+                    "enum": ["ALMACENAMIENTO_DIGITALIZADO", "FIRMA_DIGITAL_TITULAR", "FIRMA_DIGITAL_DELEGADA"]
+                },
+                "algorithm": {
+                    "type": "string"
+                },
+                "caId": {
+                    "type": "string"
+                },
+                "caName": {
+                    "type": "string"
+                },
+                "certificateRequestId": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "$ref": "#/definitions/Timestamp"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FileDao"
+                    }
+                },
+                "idSignProcess": {
+                    "type": "string"
+                },
+                "identificationId": {
+                    "type": "string"
+                },
+                "issueStatus": {
+                    "type": "string",
+                    "enum": ["REQUEST", "ENROLL", "ISSUED", "ERROR", "PENDING"]
+                },
+                "keyLength": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "keystore": {
+                    "type": "boolean"
+                },
+                "keystoreIssued": {
+                    "type": "boolean"
+                },
+                "ownerId": {
+                    "type": "string"
+                },
+                "policyParameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NameValueParam"
+                    }
+                },
+                "raOwnerId": {
+                    "type": "string"
+                },
+                "raRegistratorId": {
+                    "type": "string"
+                },
+                "raRequesterId": {
+                    "type": "string"
+                },
+                "requestStatus": {
+                    "type": "string",
+                    "enum": ["PENDINGAPPROVAL", "APPROVED", "REJECTED", "CANCELLED", "PENDINGIDENTITY"]
+                },
+                "requestType": {
+                    "type": "string",
+                    "enum": ["NEWCERTIFICATE", "RENEWAL"]
+                },
+                "serial": {
+                    "type": "string"
+                },
+                "software": {
+                    "type": "boolean"
+                },
+                "softwareIssued": {
+                    "type": "boolean"
+                },
+                "statusCert": {
+                    "type": "string",
+                    "enum": ["ISSUED", "REVOKED", "SUSPENDED", "NOTFOUND", "UNKNOWN"]
+                }
+            },
+            "title": "CertificateRequestInfoDTO"
+        },
+        "CertificateRequestInfoListDTO": {
+            "type": "object",
+            "properties": {
+                "requestsList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CertificateRequestInfoDTO"
+                    }
+                },
+                "totalRequests": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "CertificateRequestInfoListDTO"
+        },
+        "ChallengeDTO": {
+            "type": "object",
+            "properties": {
+                "challenge": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "tokenLevel": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "ChallengeDTO"
+        },
+        "ChallengeVM": {
+            "type": "object",
+            "required": ["challenge"],
+            "properties": {
+                "challenge": {
+                    "type": "string",
+                    "example": "In September",
+                    "description": "The challenge response",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "ChallengeVM"
+        },
+        "ChangeCertDescriptionUsageDTO": {
+            "type": "object",
+            "properties": {
+                "alias": {
+                    "type": "string"
+                },
+                "idcert": {
+                    "type": "string"
+                }
+            },
+            "title": "ChangeCertDescriptionUsageDTO"
+        },
+        "ChangeCertificatePinDTO": {
+            "type": "object",
+            "properties": {
+                "idcert": {
+                    "type": "string"
+                },
+                "oldPin": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "ChangeCertificatePinDTO"
+        },
+        "ChangeUserPasswordDTO": {
+            "type": "object",
+            "properties": {
+                "newPassword": {
+                    "type": "string"
+                }
+            },
+            "title": "ChangeUserPasswordDTO"
+        },
+        "CorePolicyDTO": {
+            "type": "object",
+            "properties": {
+                "aclName": {
+                    "type": "string"
+                },
+                "agentName": {
+                    "type": "string"
+                },
+                "certType": {
+                    "type": "string"
+                },
+                "dateValidEnd": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "dateValidStart": {
+                    "type": "string",
+                    "format": "date-time"
+                },
+                "enabled": {
+                    "type": "string"
+                },
+                "idAcl": {
+                    "type": "string"
+                },
+                "idCert": {
+                    "type": "string"
+                },
+                "idOwner": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "usePin": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userType": {
+                    "type": "string"
+                },
+                "validIpSource": {
+                    "type": "string"
+                }
+            },
+            "title": "CorePolicyDTO"
+        },
+        "CorePolicyListDTO": {
+            "type": "object",
+            "properties": {
+                "policyList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/CorePolicyDTO"
+                    }
+                },
+                "totalPolicies": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "CorePolicyListDTO"
+        },
+        "CreateGroupDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "gid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "title": "CreateGroupDTO"
+        },
+        "CreateProcessVM": {
+            "type": "object",
+            "properties": {
+                "expirationDate": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562075281,
+                    "description": "Expiration date of the process",
+                    "allowEmptyValue": false
+                },
+                "group": {
+                    "type": "string",
+                    "example": "Group name",
+                    "description": "Name of the process group to which the process to be created is to be added",
+                    "allowEmptyValue": false
+                },
+                "metas": {
+                    "type": "array",
+                    "description": "List of attachments of the selected workflow",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                },
+                "startDate": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562032281,
+                    "description": "Date on which the process can be started",
+                    "allowEmptyValue": false
+                },
+                "workflowId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Workflow identifier",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "CreateProcessVM"
+        },
+        "CreateTokenRequestDTO": {
+            "type": "object",
+            "properties": {
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VinAccessTokenParameterDTO"
+                    }
+                },
+                "tokenType": {
+                    "type": "string"
+                }
+            },
+            "title": "CreateTokenRequestDTO"
+        },
+        "CreateTokenResponseDTO": {
+            "type": "object",
+            "properties": {
+                "tokenid": {
+                    "type": "string"
+                }
+            },
+            "title": "CreateTokenResponseDTO"
+        },
+        "CreateUserDTO": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "CreateUserDTO"
+        },
+        "CreationResponse": {
+            "type": "object",
+            "properties": {
+                "group": {
+                    "type": "string",
+                    "example": 42,
+                    "description": "Process group to which you belong",
+                    "allowEmptyValue": false
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Identifier",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "CreationResponse"
+        },
+        "DelegateCertToGroupDTO": {
+            "type": "object",
+            "properties": {
+                "dateValidEnd": {
+                    "type": "string"
+                },
+                "dateValidStart": {
+                    "type": "string"
+                },
+                "idACL": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "idcert": {
+                    "type": "string"
+                },
+                "idgroup": {
+                    "type": "string"
+                },
+                "validIpSource": {
+                    "type": "string"
+                },
+                "validPeriodTime": {
+                    "type": "string"
+                }
+            },
+            "title": "DelegateCertToGroupDTO"
+        },
+        "DelegateCertToUserDTO": {
+            "type": "object",
+            "properties": {
+                "dateValidEnd": {
+                    "type": "string"
+                },
+                "dateValidStart": {
+                    "type": "string"
+                },
+                "idACL": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "idcert": {
+                    "type": "string"
+                },
+                "iduser": {
+                    "type": "string"
+                },
+                "lightpin": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                },
+                "usepin": {
+                    "type": "boolean"
+                },
+                "validIpSource": {
+                    "type": "string"
+                },
+                "validPeriodTime": {
+                    "type": "string"
+                }
+            },
+            "title": "DelegateCertToUserDTO"
+        },
+        "DelegationDTO": {
+            "type": "object",
+            "properties": {
+                "agentName": {
+                    "type": "string"
+                },
+                "certType": {
+                    "type": "string"
+                },
+                "dateValidEnd": {
+                    "type": "string"
+                },
+                "dateValidStart": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "idACL": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "idAgent": {
+                    "type": "string"
+                },
+                "idcert": {
+                    "type": "string"
+                },
+                "idowner": {
+                    "type": "string"
+                },
+                "nameACL": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "typeAgent": {
+                    "type": "string"
+                },
+                "usepin": {
+                    "type": "boolean"
+                },
+                "validIpSource": {
+                    "type": "string"
+                }
+            },
+            "title": "DelegationDTO"
+        },
+        "DeleteGroupDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "idcert": {
+                    "type": "string"
+                },
+                "idgroup": {
+                    "type": "string"
+                }
+            },
+            "title": "DeleteGroupDelegationDTO"
+        },
+        "DeleteUserDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "idcert": {
+                    "type": "string"
+                },
+                "iduser": {
+                    "type": "string"
+                }
+            },
+            "title": "DeleteUserDelegationDTO"
+        },
+        "DeviceRegistrationDTO": {
+            "type": "object",
+            "properties": {
+                "idDevice": {
+                    "type": "string"
+                },
+                "userAgentHeader": {
+                    "type": "string"
+                }
+            },
+            "title": "DeviceRegistrationDTO"
+        },
+        "DeviceVM": {
+            "type": "object",
+            "properties": {
+                "idDevice": {
+                    "type": "string",
+                    "example": "55513602-d948-11e9-8a34-2a2ae2dbcce4",
+                    "description": "Device identifier",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "DeviceVM"
+        },
+        "DocumentDTO": {
+            "type": "object",
+            "properties": {
+                "document": {
+                    "type": "string"
+                },
+                "idDocument": {
+                    "type": "string"
+                }
+            },
+            "title": "DocumentDTO"
+        },
+        "DocumentInfoDTO": {
+            "type": "object",
+            "properties": {
+                "filename": {
+                    "type": "string"
+                },
+                "idDoc": {
+                    "type": "string"
+                },
+                "revision": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int64"
+                }
+            },
+            "title": "DocumentInfoDTO"
+        },
+        "DocumentToModifyDto": {
+            "type": "object",
+            "properties": {
+                "profileField": {
+                    "type": "string"
+                },
+                "uploadId": {
+                    "type": "string"
+                }
+            },
+            "title": "DocumentToModifyDto"
+        },
+        "EditGroupDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "gid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "title": "EditGroupDTO"
+        },
+        "EditGroupDTOV2": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "title": "EditGroupDTOV2"
+        },
+        "EditUserDTO": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "EditUserDTO"
+        },
+        "EditUserViewModel": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "surname": {
+                    "type": "string"
+                }
+            },
+            "title": "EditUserViewModel"
+        },
+        "ExecuteStepDTO": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "OK",
+                    "description": "Action to be taken",
+                    "allowEmptyValue": false,
+                    "enum": ["OK", "DENY"]
+                },
+                "certificates": {
+                    "type": "array",
+                    "description": "Certificates identifiers and pins list (only in the multi cert sign step)",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/CertificatePinDTO"
+                    }
+                },
+                "comment": {
+                    "type": "string",
+                    "example": "comment",
+                    "description": "Comment added when executing the step (optional)",
+                    "allowEmptyValue": false
+                },
+                "consentChecked": {
+                    "type": "boolean",
+                    "example": false,
+                    "description": "Signature consent flag with nebulaSIGN",
+                    "allowEmptyValue": false
+                },
+                "delegatedUser": {
+                    "type": "string",
+                    "example": "delegatedUser",
+                    "description": "The user whose signature is delegated",
+                    "allowEmptyValue": false
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "name.pdf",
+                    "description": "File name (only for the upload step)",
+                    "allowEmptyValue": false
+                },
+                "idProcess": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Process identifier to be executed",
+                    "allowEmptyValue": false
+                },
+                "idProcesses": {
+                    "type": "array",
+                    "example": [25, 30],
+                    "description": "Processes identifiers to be executed",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "metas": {
+                    "type": "array",
+                    "description": "Changed attachment (only for the modify meta step)",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                },
+                "otp": {
+                    "type": "string",
+                    "example": "response challenge",
+                    "description": "Challenge response (only in OTP sign step)",
+                    "allowEmptyValue": false
+                },
+                "positions": {
+                    "type": "string",
+                    "description": "Signature positions in the document",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "ExecuteStepDTO"
+        },
+        "ExecuteStepVM": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "OK",
+                    "description": "Action to be taken",
+                    "allowEmptyValue": false,
+                    "enum": ["OK", "DENY"]
+                },
+                "comment": {
+                    "type": "string",
+                    "example": "comment",
+                    "description": "Comment added when executing the step (optional)",
+                    "allowEmptyValue": false
+                },
+                "consentChecked": {
+                    "type": "boolean",
+                    "example": false,
+                    "description": "Signature consent flag with nebulaSIGN",
+                    "allowEmptyValue": false
+                },
+                "delegatedUser": {
+                    "type": "string",
+                    "example": "delegatedUser",
+                    "description": "The user whose signature is delegated",
+                    "allowEmptyValue": false
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "name.pdf",
+                    "description": "File name (only for the upload step)",
+                    "allowEmptyValue": false
+                },
+                "idCert": {
+                    "type": "string",
+                    "example": 3,
+                    "description": "Certificate signing identifier (only in the sign step)",
+                    "allowEmptyValue": false
+                },
+                "idProcess": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Process identifier to be executed",
+                    "allowEmptyValue": false
+                },
+                "idProcesses": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int64"
+                    }
+                },
+                "metas": {
+                    "type": "array",
+                    "description": "Changed attachment (only for the modify meta step)",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                },
+                "otp": {
+                    "type": "string",
+                    "example": "response challenge",
+                    "description": "Challenge response (only in OTP sign step)",
+                    "allowEmptyValue": false
+                },
+                "pin": {
+                    "type": "string",
+                    "example": 1234,
+                    "description": "Certificate PIN (only in the signature step and if the certificate needs it)",
+                    "allowEmptyValue": false
+                },
+                "positions": {
+                    "type": "string",
+                    "description": "Signature positions in the document",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "ExecuteStepVM"
+        },
+        "ExportCertRequestDTO": {
+            "type": "object",
+            "properties": {
+                "passPhrase": {
+                    "type": "string"
+                }
+            },
+            "title": "ExportCertRequestDTO"
+        },
+        "ExportedCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "derEncodedPkcs12": {
+                    "type": "string"
+                }
+            },
+            "title": "ExportedCertificateDTO"
+        },
+        "File": {
+            "type": "object",
+            "properties": {
+                "absolute": {
+                    "type": "boolean"
+                },
+                "absoluteFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "absolutePath": {
+                    "type": "string"
+                },
+                "canonicalFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "canonicalPath": {
+                    "type": "string"
+                },
+                "directory": {
+                    "type": "boolean"
+                },
+                "executable": {
+                    "type": "boolean"
+                },
+                "file": {
+                    "type": "boolean"
+                },
+                "freeSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "hidden": {
+                    "type": "boolean"
+                },
+                "lastModified": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "parent": {
+                    "type": "string"
+                },
+                "parentFile": {
+                    "$ref": "#/definitions/File"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "readable": {
+                    "type": "boolean"
+                },
+                "totalSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "usableSpace": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "writable": {
+                    "type": "boolean"
+                }
+            },
+            "title": "File"
+        },
+        "FileDao": {
+            "type": "object",
+            "properties": {
+                "documentId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "profileField": {
+                    "type": "string"
+                }
+            },
+            "title": "FileDao"
+        },
+        "FileIdDTO": {
+            "type": "object",
+            "properties": {
+                "fileId": {
+                    "type": "string"
+                }
+            },
+            "title": "FileIdDTO"
+        },
+        "FirstFactorDTO": {
+            "type": "object",
+            "properties": {
+                "clientid": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "FirstFactorDTO"
+        },
+        "GetChallengeResponse": {
+            "type": "object",
+            "properties": {
+                "challenge": {
+                    "type": "string"
+                },
+                "lvl": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            },
+            "title": "GetChallengeResponse"
+        },
+        "GetKeyStoreRequestsDTO": {
+            "type": "object",
+            "properties": {
+                "limit": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "offset": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "policyName": {
+                    "type": "string"
+                },
+                "requestStatus": {
+                    "type": "string",
+                    "enum": ["PENDINGAPPROVAL", "APPROVED", "REJECTED", "CANCELLED", "PENDINGIDENTITY"]
+                },
+                "statusFilter": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": ["PENDING", "REQUEST", "ENROLL", "ISSUED"]
+                    }
+                }
+            },
+            "title": "GetKeyStoreRequestsDTO"
+        },
+        "GroupDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "gid": {
+                    "type": "string"
+                },
+                "guid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": ["REMOTE", "CLOUD"]
+                }
+            },
+            "title": "GroupDTO"
+        },
+        "HttpHeaderDTO": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "HttpHeaderDTO"
+        },
+        "IdentityInfoDTO": {
+            "type": "object",
+            "properties": {
+                "companyName": {
+                    "type": "string"
+                },
+                "creationDate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "identityValidationMethod": {
+                    "type": "string"
+                },
+                "identityValidationOperator": {
+                    "$ref": "#/definitions/ValidationOperatorDTO"
+                },
+                "identityValidationProvider": {
+                    "type": "string"
+                },
+                "identityValidationProviderData": {
+                    "type": "string"
+                },
+                "opIdentityValidationProviderData": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "tenantId": {
+                    "type": "string"
+                }
+            },
+            "title": "IdentityInfoDTO"
+        },
+        "IdentityInfoResponseDTO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "content": {
+                    "$ref": "#/definitions/IdentityInfoDTO"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "title": "IdentityInfoResponseDTO"
+        },
+        "ImportCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "pfxInBase64": {
+                    "type": "string"
+                },
+                "pfxPassword": {
+                    "type": "string"
+                }
+            },
+            "title": "ImportCertificateDTO"
+        },
+        "InfoGroupDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "gid": {
+                    "type": "string"
+                },
+                "guid": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": ["REMOTE", "CLOUD"]
+                },
+                "usersOfGroup": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "InfoGroupDTO"
+        },
+        "InputStream": {
+            "type": "object",
+            "title": "InputStream"
+        },
+        "InvolvedUser": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string",
+                    "example": "OK",
+                    "description": "Accept or Reject the step. Can be: OK | DENY",
+                    "allowEmptyValue": false,
+                    "enum": ["OK", "DENY"]
+                },
+                "comment": {
+                    "type": "string",
+                    "example": "Comment regarding the step",
+                    "description": "The message introduced by the user if any",
+                    "allowEmptyValue": false
+                },
+                "timestamp": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1568360797902,
+                    "description": "Time that the user executed the step",
+                    "allowEmptyValue": false
+                },
+                "userId": {
+                    "type": "string",
+                    "example": "owner",
+                    "description": "The user that performed the operation",
+                    "allowEmptyValue": false
+                },
+                "userType": {
+                    "type": "string",
+                    "example": "SIGNER",
+                    "description": "type of the user. Can be: SIGNER",
+                    "allowEmptyValue": false,
+                    "enum": ["SIGNER", "EXTERNAL"]
+                }
+            },
+            "title": "InvolvedUser"
+        },
+        "IssueSoftCertificateViewModel": {
+            "type": "object",
+            "properties": {
+                "csr": {
+                    "type": "string"
+                }
+            },
+            "title": "IssueSoftCertificateViewModel"
+        },
+        "IssueViewModel": {
+            "type": "object",
+            "properties": {
+                "pin": {
+                    "type": "string"
+                },
+                "publish": {
+                    "type": "boolean"
+                }
+            },
+            "title": "IssueViewModel"
+        },
+        "KeystoreRequestsDaoV1": {
+            "type": "object",
+            "properties": {
+                "acctanceFilename": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "authority": {
+                    "type": "string"
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "coreStatus": {
+                    "type": "string",
+                    "enum": ["REQUEST", "ENROLL", "ISSUED", "ERROR", "PENDING"]
+                },
+                "csrParameters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "dateCreation": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "filenames": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Map«string,string»"
+                    }
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "idAcceptanceFile": {
+                    "type": "string"
+                },
+                "idCompany": {
+                    "type": "string"
+                },
+                "idSignProcess": {
+                    "type": "string"
+                },
+                "idUserCertificateOwner": {
+                    "type": "string"
+                },
+                "idUserRaRegistrator": {
+                    "type": "string"
+                },
+                "idUserRaRequestor": {
+                    "type": "string"
+                },
+                "keyAlgorithm": {
+                    "type": "string"
+                },
+                "keyLen": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "keyStore": {
+                    "type": "boolean"
+                },
+                "keyStoreEmail": {
+                    "type": "string"
+                },
+                "keyStoreIssued": {
+                    "type": "boolean"
+                },
+                "keyStoreUser": {
+                    "type": "string"
+                },
+                "policyName": {
+                    "type": "string"
+                },
+                "policyParameters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "registratorComment": {
+                    "type": "string"
+                },
+                "serial": {
+                    "type": "string"
+                },
+                "signStatus": {
+                    "type": "string",
+                    "enum": ["PENDING", "PROCESSING", "DENIED", "ACCEPTED", "ERROR", "NONE", "COMPLETED"]
+                },
+                "signType": {
+                    "type": "string",
+                    "enum": ["ALMACENAMIENTO_DIGITALIZADO", "FIRMA_DIGITAL_TITULAR", "FIRMA_DIGITAL_DELEGADA"]
+                },
+                "signatureAlgorithm": {
+                    "type": "string"
+                },
+                "software": {
+                    "type": "boolean"
+                },
+                "softwareIssued": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["PENDINGAPPROVAL", "APPROVED", "REJECTED", "CANCELLED", "PENDINGIDENTITY"]
+                },
+                "statusCert": {
+                    "type": "string",
+                    "enum": ["ISSUED", "REVOKED", "UNKNOWN"]
+                },
+                "timestampStatusCert": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["NEWCERTIFICATE", "RENEWAL"]
+                },
+                "uuidOwner": {
+                    "type": "string"
+                }
+            },
+            "title": "KeystoreRequestsDaoV1"
+        },
+        "KeystoreRequestsDaoV2": {
+            "type": "object",
+            "properties": {
+                "acceptanceFile": {
+                    "$ref": "#/definitions/FileDao"
+                },
+                "authority": {
+                    "type": "string"
+                },
+                "certificate": {
+                    "type": "string"
+                },
+                "dateCreation": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FileDao"
+                    }
+                },
+                "id": {
+                    "type": "string"
+                },
+                "idCompany": {
+                    "type": "string"
+                },
+                "idSignProcess": {
+                    "type": "string"
+                },
+                "idUserCertificateOwner": {
+                    "type": "string"
+                },
+                "idUserRaRegistrator": {
+                    "type": "string"
+                },
+                "idUserRaRequestor": {
+                    "type": "string"
+                },
+                "keyAlgorithm": {
+                    "type": "string"
+                },
+                "keyLen": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "keyStoreEmail": {
+                    "type": "string"
+                },
+                "keyStoreIssued": {
+                    "type": "boolean"
+                },
+                "keyStoreUser": {
+                    "type": "string"
+                },
+                "policyName": {
+                    "type": "string"
+                },
+                "policyParameters": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "registratorComment": {
+                    "type": "string"
+                },
+                "serial": {
+                    "type": "string"
+                },
+                "signStatus": {
+                    "type": "string",
+                    "enum": ["PENDING", "PROCESSING", "DENIED", "ACCEPTED", "ERROR", "NONE", "COMPLETED"]
+                },
+                "signType": {
+                    "type": "string",
+                    "enum": ["ALMACENAMIENTO_DIGITALIZADO", "FIRMA_DIGITAL_TITULAR", "FIRMA_DIGITAL_DELEGADA"]
+                },
+                "signatureAlgorithm": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["PENDINGAPPROVAL", "APPROVED", "REJECTED", "CANCELLED", "PENDINGIDENTITY"]
+                },
+                "statusCert": {
+                    "type": "string",
+                    "enum": ["ISSUED", "REVOKED", "UNKNOWN"]
+                },
+                "type": {
+                    "type": "string",
+                    "enum": ["NEWCERTIFICATE", "RENEWAL"]
+                },
+                "uuidOwner": {
+                    "type": "string"
+                }
+            },
+            "title": "KeystoreRequestsDaoV2"
+        },
+        "KeystoreRequestsListDaoV1": {
+            "type": "object",
+            "properties": {
+                "certificates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KeystoreRequestsDaoV1"
+                    }
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "KeystoreRequestsListDaoV1"
+        },
+        "KeystoreRequestsListDaoV2": {
+            "type": "object",
+            "properties": {
+                "certificates": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/KeystoreRequestsDaoV2"
+                    }
+                },
+                "size": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "KeystoreRequestsListDaoV2"
+        },
+        "ListGroupDTO": {
+            "type": "object",
+            "properties": {
+                "groupList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/GroupDTO"
+                    }
+                },
+                "totalGroups": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "ListGroupDTO"
+        },
+        "ListUserDTO": {
+            "type": "object",
+            "properties": {
+                "totalUsers": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "userList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UserDTO"
+                    }
+                }
+            },
+            "title": "ListUserDTO"
+        },
+        "LoginCompanyInfo": {
+            "type": "object",
+            "properties": {
+                "client": {
+                    "type": "string"
+                },
+                "serviceProviderEnabled": {
+                    "type": "boolean"
+                }
+            },
+            "title": "LoginCompanyInfo"
+        },
+        "Map«string,string»": {
+            "type": "object",
+            "title": "Map«string,string»",
+            "additionalProperties": {
+                "type": "string"
+            }
+        },
+        "Meta": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1,
+                    "description": "Attached data identifier",
+                    "allowEmptyValue": false
+                },
+                "name": {
+                    "type": "string",
+                    "example": "name demo",
+                    "description": "Attached data name",
+                    "allowEmptyValue": false
+                },
+                "required": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Flag to indicate if mandatory",
+                    "allowEmptyValue": false
+                },
+                "type": {
+                    "type": "string",
+                    "example": "TEXT",
+                    "description": "Attached data type",
+                    "allowEmptyValue": false,
+                    "enum": ["TEXT", "FILE", "LINK"]
+                },
+                "validValues": {
+                    "type": "array",
+                    "example": ["a", "b", "c"],
+                    "description": "List of possible values (optional)",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "value": {
+                    "type": "string",
+                    "example": "b",
+                    "description": "Attached data value",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "Meta"
+        },
+        "MetaInfoDTO": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "hint": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "required": {
+                    "type": "boolean"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "validValues": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "MetaInfoDTO"
+        },
+        "ModelAndView": {
+            "type": "object",
+            "properties": {
+                "empty": {
+                    "type": "boolean"
+                },
+                "model": {
+                    "type": "object"
+                },
+                "modelMap": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "reference": {
+                    "type": "boolean"
+                },
+                "status": {
+                    "type": "string",
+                    "enum": ["100 CONTINUE", "101 SWITCHING_PROTOCOLS", "102 PROCESSING", "103 CHECKPOINT", "200 OK", "201 CREATED", "202 ACCEPTED", "203 NON_AUTHORITATIVE_INFORMATION", "204 NO_CONTENT", "205 RESET_CONTENT", "206 PARTIAL_CONTENT", "207 MULTI_STATUS", "208 ALREADY_REPORTED", "226 IM_USED", "300 MULTIPLE_CHOICES", "301 MOVED_PERMANENTLY", "302 FOUND", "302 MOVED_TEMPORARILY", "303 SEE_OTHER", "304 NOT_MODIFIED", "305 USE_PROXY", "307 TEMPORARY_REDIRECT", "308 PERMANENT_REDIRECT", "400 BAD_REQUEST", "401 UNAUTHORIZED", "402 PAYMENT_REQUIRED", "403 FORBIDDEN", "404 NOT_FOUND", "405 METHOD_NOT_ALLOWED", "406 NOT_ACCEPTABLE", "407 PROXY_AUTHENTICATION_REQUIRED", "408 REQUEST_TIMEOUT", "409 CONFLICT", "410 GONE", "411 LENGTH_REQUIRED", "412 PRECONDITION_FAILED", "413 PAYLOAD_TOO_LARGE", "413 REQUEST_ENTITY_TOO_LARGE", "414 URI_TOO_LONG", "414 REQUEST_URI_TOO_LONG", "415 UNSUPPORTED_MEDIA_TYPE", "416 REQUESTED_RANGE_NOT_SATISFIABLE", "417 EXPECTATION_FAILED", "418 I_AM_A_TEAPOT", "419 INSUFFICIENT_SPACE_ON_RESOURCE", "420 METHOD_FAILURE", "421 DESTINATION_LOCKED", "422 UNPROCESSABLE_ENTITY", "423 LOCKED", "424 FAILED_DEPENDENCY", "425 TOO_EARLY", "426 UPGRADE_REQUIRED", "428 PRECONDITION_REQUIRED", "429 TOO_MANY_REQUESTS", "431 REQUEST_HEADER_FIELDS_TOO_LARGE", "451 UNAVAILABLE_FOR_LEGAL_REASONS", "500 INTERNAL_SERVER_ERROR", "501 NOT_IMPLEMENTED", "502 BAD_GATEWAY", "503 SERVICE_UNAVAILABLE", "504 GATEWAY_TIMEOUT", "505 HTTP_VERSION_NOT_SUPPORTED", "506 VARIANT_ALSO_NEGOTIATES", "507 INSUFFICIENT_STORAGE", "508 LOOP_DETECTED", "509 BANDWIDTH_LIMIT_EXCEEDED", "510 NOT_EXTENDED", "511 NETWORK_AUTHENTICATION_REQUIRED"]
+                },
+                "view": {
+                    "$ref": "#/definitions/View"
+                },
+                "viewName": {
+                    "type": "string"
+                }
+            },
+            "title": "ModelAndView"
+        },
+        "ModifyGroupDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "dateValidEnd": {
+                    "type": "string"
+                },
+                "dateValidStart": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "idACL": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "idcert": {
+                    "type": "string"
+                },
+                "idgroup": {
+                    "type": "string"
+                },
+                "validIpSource": {
+                    "type": "string"
+                },
+                "validPeriodTime": {
+                    "type": "string"
+                }
+            },
+            "title": "ModifyGroupDelegationDTO"
+        },
+        "ModifyMetaVM": {
+            "type": "object",
+            "properties": {
+                "meta": {
+                    "type": "array",
+                    "description": "List of changed attachments",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                }
+            },
+            "title": "ModifyMetaVM"
+        },
+        "ModifyRequestViewModel": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentToModifyDto"
+                    }
+                },
+                "parameters": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ParameterToModifyViewModel"
+                    }
+                }
+            },
+            "title": "ModifyRequestViewModel"
+        },
+        "ModifyUserDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "dateValidEnd": {
+                    "type": "string"
+                },
+                "dateValidStart": {
+                    "type": "string"
+                },
+                "enabled": {
+                    "type": "boolean"
+                },
+                "idACL": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "idcert": {
+                    "type": "string"
+                },
+                "iduser": {
+                    "type": "string"
+                },
+                "validIpSource": {
+                    "type": "string"
+                },
+                "validPeriodTime": {
+                    "type": "string"
+                }
+            },
+            "title": "ModifyUserDelegationDTO"
+        },
+        "NameValueParam": {
+            "type": "object",
+            "properties": {
+                "NAME": {
+                    "type": "string"
+                },
+                "VALUE": {
+                    "type": "string"
+                }
+            },
+            "title": "NameValueParam"
+        },
+        "NebulaIdDocument": {
+            "type": "object",
+            "properties": {
+                "profileField": {
+                    "type": "string"
+                },
+                "uploadId": {
+                    "type": "string"
+                }
+            },
+            "title": "NebulaIdDocument"
+        },
+        "NebulaPaginationDTO": {
+            "type": "object",
+            "properties": {
+                "totalElements": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "NebulaPaginationDTO"
+        },
+        "NebulaResponseDTO": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "object"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pagination": {
+                    "$ref": "#/definitions/NebulaPaginationDTO"
+                }
+            },
+            "title": "NebulaResponseDTO"
+        },
+        "OoxmlSignatureRequestVM": {
+            "type": "object",
+            "properties": {
+                "certificateSigningId": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "OoxmlSignatureRequestVM"
+        },
+        "OoxmlSignatureResponseDTO": {
+            "type": "object",
+            "properties": {
+                "signedDocumentB64": {
+                    "type": "string"
+                }
+            },
+            "title": "OoxmlSignatureResponseDTO"
+        },
+        "OtpValidationDTO": {
+            "type": "object",
+            "properties": {
+                "otp": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            },
+            "title": "OtpValidationDTO"
+        },
+        "PadesSignatureDTO": {
+            "type": "object",
+            "properties": {
+                "certId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "certPin": {
+                    "type": "string"
+                },
+                "certificationPermission": {
+                    "type": "string"
+                },
+                "commitmentTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "digestAlgorithm": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "signLevel": {
+                    "type": "string"
+                },
+                "signatureSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "signerRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tsaPWD": {
+                    "type": "string"
+                },
+                "tsaURL": {
+                    "type": "string"
+                },
+                "tsaUSR": {
+                    "type": "string"
+                },
+                "visualSignature": {
+                    "$ref": "#/definitions/PadesVisibleSignature"
+                }
+            },
+            "title": "PadesSignatureDTO"
+        },
+        "PadesSignatureDTOV2": {
+            "type": "object",
+            "properties": {
+                "certId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "certPin": {
+                    "type": "string"
+                },
+                "certificationPermission": {
+                    "type": "string"
+                },
+                "commitmentTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "digestAlgorithm": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "signLevel": {
+                    "type": "string"
+                },
+                "signatureSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "signerRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tsaPWD": {
+                    "type": "string"
+                },
+                "tsaURL": {
+                    "type": "string"
+                },
+                "tsaUSR": {
+                    "type": "string"
+                },
+                "visualSignature": {
+                    "$ref": "#/definitions/PadesVisibleSignatureV2"
+                }
+            },
+            "title": "PadesSignatureDTOV2"
+        },
+        "PadesTimestampVM": {
+            "type": "object",
+            "properties": {
+                "tsaPWD": {
+                    "type": "string"
+                },
+                "tsaURL": {
+                    "type": "string"
+                },
+                "tsaUSR": {
+                    "type": "string"
+                }
+            },
+            "title": "PadesTimestampVM"
+        },
+        "PadesValidationDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "reportFormat": {
+                    "type": "string",
+                    "example": "SIMPLE",
+                    "description": "Report format. Can be \"SIMPLE\", \"DETAILED\", \"DIAGNOSTIC\" or \"ALL\". Default is \"SIMPLE\" ",
+                    "allowEmptyValue": false
+                },
+                "signedFileB64": {
+                    "type": "string",
+                    "example": "JVBERi0xLjUNCiW1tbW1DQoxIDAgb...",
+                    "description": "Signed file to be validated in Base64",
+                    "allowEmptyValue": false
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                },
+                "validationLevel": {
+                    "type": "string",
+                    "example": "B",
+                    "description": "Validation level. Can be \"B\", \"LT\" or \"A\". Default is \"B\". Level \"A\" is for \"LTA\" signatures only",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "PadesValidationDTO"
+        },
+        "PadesVisibleSignature": {
+            "type": "object",
+            "properties": {
+                "allPages": {
+                    "type": "boolean"
+                },
+                "dpi": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "fontName": {
+                    "type": "string"
+                },
+                "fontSimple": {
+                    "type": "string"
+                },
+                "fontSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "fontStyle": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "ignorePage": {
+                    "type": "string"
+                },
+                "imageBackgroundColor": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "imageHorizontalAlignment": {
+                    "type": "string"
+                },
+                "imageVerticalAlignment": {
+                    "type": "string"
+                },
+                "multiImageBuild": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "positionInPercentage": {
+                    "type": "boolean"
+                },
+                "signLastPage": {
+                    "type": "boolean"
+                },
+                "signatureField": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "textColor": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "textHorizontalAlignment": {
+                    "type": "string"
+                },
+                "textImageVerticalAlignment": {
+                    "type": "string"
+                },
+                "textOverImage": {
+                    "type": "boolean"
+                },
+                "textSignerPosition": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "xAxis": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "yAxis": {
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "title": "PadesVisibleSignature"
+        },
+        "PadesVisibleSignatureV2": {
+            "type": "object",
+            "properties": {
+                "allPages": {
+                    "type": "boolean"
+                },
+                "fontName": {
+                    "type": "string"
+                },
+                "fontSize": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "height": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "ignorePage": {
+                    "type": "string"
+                },
+                "imageBackgroundColor": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "imageHorizontalAlignment": {
+                    "type": "string"
+                },
+                "imageVerticalAlignment": {
+                    "type": "string"
+                },
+                "multiImageBuild": {
+                    "type": "string"
+                },
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "positionInPercentage": {
+                    "type": "boolean"
+                },
+                "signLastPage": {
+                    "type": "boolean"
+                },
+                "signatureField": {
+                    "type": "string"
+                },
+                "text": {
+                    "type": "string"
+                },
+                "textColor": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                },
+                "textHorizontalAlignment": {
+                    "type": "string"
+                },
+                "textImageVerticalAlignment": {
+                    "type": "string"
+                },
+                "textOverImage": {
+                    "type": "boolean"
+                },
+                "textSignerPosition": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "xAxis": {
+                    "type": "number",
+                    "format": "float"
+                },
+                "yAxis": {
+                    "type": "number",
+                    "format": "float"
+                }
+            },
+            "title": "PadesVisibleSignatureV2"
+        },
+        "PadesVisualDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                },
+                "visualSignatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PadesVisibleSignature"
+                    }
+                }
+            },
+            "title": "PadesVisualDTO"
+        },
+        "PadesVisualDTOV2": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                },
+                "visualSignatures": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PadesVisibleSignatureV2"
+                    }
+                }
+            },
+            "title": "PadesVisualDTOV2"
+        },
+        "PaginationResponse": {
+            "type": "object",
+            "properties": {
+                "actualPage": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 5,
+                    "description": "Current page",
+                    "allowEmptyValue": false
+                },
+                "content": {
+                    "type": "array",
+                    "description": "Page content",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Process"
+                    }
+                },
+                "totalElements": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 100,
+                    "description": "Number of items found",
+                    "allowEmptyValue": false
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 20,
+                    "description": "Total number of pages",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "PaginationResponse"
+        },        
+        "ParameterToModifyViewModel": {
+            "type": "object",
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "ParameterToModifyViewModel"
+        },
+        "Process": {
+            "type": "object",
+            "properties": {
+                "actualStep": {
+                    "description": "Current step to be executed",
+                    "allowEmptyValue": false,
+                    "$ref": "#/definitions/Step"
+                },
+                "company": {
+                    "type": "string",
+                    "example": "2aaa05f1-ad15-32f4-a16b-96773f60e043",
+                    "description": "Company identifier",
+                    "allowEmptyValue": false
+                },
+                "dateCreation": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562076476,
+                    "description": "Creation date of the process",
+                    "allowEmptyValue": false
+                },
+                "dateLastUpdate": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562077566,
+                    "description": "Date of last process update",
+                    "allowEmptyValue": false
+                },
+                "designLogo": {
+                    "type": "string"
+                },
+                "designType": {
+                    "type": "string",
+                    "enum": ["NO_LOGO", "ONLY_LOGO", "LOGO_LEFT", "LOGO_RIGHT"]
+                },
+                "error": {
+                    "type": "string",
+                    "example": "Incorrect PIN",
+                    "description": "Error if an execution fails",
+                    "allowEmptyValue": false
+                },
+                "expirationDate": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1563076476,
+                    "description": "Date on which the process expires",
+                    "allowEmptyValue": false
+                },
+                "filename": {
+                    "type": "string",
+                    "example": "name.pdf",
+                    "description": "Name of the file to be used in the process",
+                    "allowEmptyValue": false
+                },
+                "hash": {
+                    "type": "string",
+                    "example": "a533830f873ec05d48350383c681dadd20d94a0a9ecb018d433d92d4578d7ede",
+                    "description": "Hash of the file to be used in the process",
+                    "allowEmptyValue": false
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Process identifier",
+                    "allowEmptyValue": false
+                },
+                "metas": {
+                    "type": "array",
+                    "description": "List of the attached data in the process",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "echogolf",
+                    "description": "Process owner",
+                    "allowEmptyValue": false
+                },
+                "processGroup": {
+                    "description": "Information on the process group to which the process belongs",
+                    "allowEmptyValue": false,
+                    "$ref": "#/definitions/ProcessGroup"
+                },
+                "startDate": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562076476,
+                    "description": "Date from which the process is available",
+                    "allowEmptyValue": false
+                },
+                "status": {
+                    "type": "string",
+                    "example": "PENDING",
+                    "description": "General state of the process",
+                    "allowEmptyValue": false,
+                    "enum": ["PENDING", "COMPLETED", "DENIED"]
+                },
+                "steps": {
+                    "type": "array",
+                    "description": "List of steps in the process",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Step"
+                    }
+                },
+                "workflow": {
+                    "type": "string",
+                    "example": "Workflow name",
+                    "description": "Name of the workflow on which the process is based",
+                    "allowEmptyValue": false
+                },
+                "workflowId": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 12,
+                    "description": "Identifier of the workflow used",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "Process"
+        },
+        "ProcessDTO": {
+            "type": "object",
+            "properties": {
+                "expirationDate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "notification": {
+                    "type": "boolean"
+                },
+                "processGroupID": {
+                    "type": "string"
+                },
+                "signers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SignerId"
+                    }
+                },
+                "startDate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "workflowId": {
+                    "type": "string"
+                }
+            },
+            "title": "ProcessDTO"
+        },
+        "ProcessGroup": {
+            "type": "object",
+            "properties": {
+                "creation": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562076476,
+                    "description": "Date the group was created",
+                    "allowEmptyValue": false
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Title group",
+                    "description": "Title of the process group",
+                    "allowEmptyValue": false
+                },
+                "update": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562076476,
+                    "description": "Date of last group update",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "ProcessGroup"
+        },
+        "ProcessInfoDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "documents": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DocumentInfoDTO"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "error": {
+                    "type": "string"
+                },
+                "expirationDate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "idProcess": {
+                    "type": "string"
+                },
+                "lastUpdate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "meta": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/MetaInfoDTO"
+                    }
+                },
+                "processGroupID": {
+                    "type": "string"
+                },
+                "startDate": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "steps": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProcessStepInfoDTO"
+                    }
+                },
+                "title": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                },
+                "workflow": {
+                    "type": "string"
+                }
+            },
+            "title": "ProcessInfoDTO"
+        },
+        "ProcessListDTO": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "processesList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ProcessInfoDTO"
+                    }
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalProcesses": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "ProcessListDTO"
+        },
+        "ProcessStepInfoDTO": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "attachMetaDocs": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "attachSignedDoc": {
+                    "type": "boolean"
+                },
+                "cert": {
+                    "type": "string"
+                },
+                "certLevel": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "commentary": {
+                    "type": "string"
+                },
+                "date": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "editableMeta": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "email": {
+                    "type": "string"
+                },
+                "forceMobileDevice": {
+                    "type": "boolean"
+                },
+                "fullname": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                },
+                "hidden": {
+                    "type": "boolean"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "location": {
+                    "type": "string"
+                },
+                "mandatory": {
+                    "type": "boolean"
+                },
+                "metaField": {
+                    "type": "string"
+                },
+                "metaFile": {
+                    "type": "string"
+                },
+                "notificationMessage": {
+                    "type": "string"
+                },
+                "processType": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "pushEndpoint": {
+                    "type": "string"
+                },
+                "pushHeaders": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/HttpHeaderDTO"
+                    }
+                },
+                "pushMetas": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "remainingUsers": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "requiresPIN": {
+                    "type": "boolean"
+                },
+                "requiresRead": {
+                    "type": "boolean"
+                },
+                "showMeta": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "signConfig": {
+                    "$ref": "#/definitions/SignInfoDTO"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "typeOfSign": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "title": "ProcessStepInfoDTO"
+        },
+        "RemoveCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "certId": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "RemoveCertificateDTO"
+        },
+        "RemoveCertificateListDTO": {
+            "type": "object",
+            "properties": {
+                "certIdsList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "RemoveCertificateListDTO"
+        },
+        "RenewCertificateViewModel": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "files": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/NebulaIdDocument"
+                    }
+                }
+            },
+            "title": "RenewCertificateViewModel"
+        },
+        "RequestCertificatesReportDTO": {
+            "type": "object",
+            "properties": {
+                "emailsList": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            },
+            "title": "RequestCertificatesReportDTO"
+        },
+        "RequestKeystoreCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "idRequest": {
+                    "type": "string"
+                },
+                "publish": {
+                    "type": "boolean"
+                },
+                "user": {
+                    "type": "string"
+                }
+            },
+            "title": "RequestKeystoreCertificateDTO"
+        },
+        "ResolveCertificateRequestViewModel": {
+            "type": "object",
+            "properties": {
+                "acceptanceFileId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "acceptanceFileType": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "resolveAction": {
+                    "type": "string",
+                    "enum": ["APPROVED", "REJECTED"]
+                }
+            },
+            "title": "ResolveCertificateRequestViewModel"
+        },
+        "Resource": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string"
+                },
+                "file": {
+                    "$ref": "#/definitions/File"
+                },
+                "filename": {
+                    "type": "string"
+                },
+                "inputStream": {
+                    "$ref": "#/definitions/InputStream"
+                },
+                "open": {
+                    "type": "boolean"
+                },
+                "readable": {
+                    "type": "boolean"
+                },
+                "uri": {
+                    "$ref": "#/definitions/URI"
+                },
+                "url": {
+                    "$ref": "#/definitions/URL"
+                }
+            },
+            "title": "Resource"
+        },
+        "ResponsibleStep": {
+            "type": "object",
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "example": 2,
+                    "description": "Email of the external user who must execute the step",
+                    "allowEmptyValue": false
+                },
+                "externalUser": {
+                    "type": "boolean",
+                    "example": false,
+                    "description": "Flag to indicate if the user is external",
+                    "allowEmptyValue": false
+                },
+                "groups": {
+                    "type": "array",
+                    "example": ["groupA", "groupB"],
+                    "description": "List of groups of users who can execute the step",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 4,
+                    "description": "Responsible step identifier",
+                    "allowEmptyValue": false
+                },
+                "involvedUsers": {
+                    "type": "array",
+                    "description": "Information on who has executed a step as a group member",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/InvolvedUser"
+                    }
+                },
+                "remainingUsers": {
+                    "type": "integer",
+                    "format": "int32",
+                    "example": 2,
+                    "description": "Numbers of users who must perform the step (if groups are defined)",
+                    "allowEmptyValue": false
+                },
+                "username": {
+                    "type": "string",
+                    "example": "echogolf",
+                    "description": "User in charge of executing the step",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "ResponsibleStep"
+        },
+        "RevokeCertificateV1DTO": {
+            "type": "object",
+            "properties": {
+                "revokeReason": {
+                    "type": "string"
+                },
+                "serial": {
+                    "type": "string"
+                }
+            },
+            "title": "RevokeCertificateV1DTO"
+        },
+        "RevokeCertificateV2DTO": {
+            "type": "object",
+            "properties": {
+                "idRequest": {
+                    "type": "string"
+                },
+                "revokeReason": {
+                    "type": "string"
+                }
+            },
+            "title": "RevokeCertificateV2DTO"
+        },
+        "SearchDelegationDTO": {
+            "type": "object",
+            "properties": {
+                "delegationList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DelegationDTO"
+                    }
+                },
+                "totalDelegations": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "SearchDelegationDTO"
+        },
+        "SearchTokensResponseDTO": {
+            "type": "object",
+            "properties": {
+                "tokenList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/VinAccessToken"
+                    }
+                },
+                "totalTokens": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "SearchTokensResponseDTO"
+        },
+        "SecondFactorDTO": {
+            "type": "object",
+            "properties": {
+                "otp": {
+                    "type": "string"
+                }
+            },
+            "title": "SecondFactorDTO"
+        },
+        "SerialAndIdCertDTO": {
+            "type": "object",
+            "properties": {
+                "idCert": {
+                    "type": "string"
+                },
+                "serialNumber": {
+                    "type": "string"
+                }
+            },
+            "title": "SerialAndIdCertDTO"
+        },
+        "SerialDTO": {
+            "type": "object",
+            "properties": {
+                "serialNumber": {
+                    "type": "string"
+                }
+            },
+            "title": "SerialDTO"
+        },
+        "SessionAndChallengeVM": {
+            "type": "object",
+            "properties": {
+                "challenge": {
+                    "type": "string"
+                },
+                "session": {
+                    "type": "string"
+                }
+            },
+            "title": "SessionAndChallengeVM"
+        },
+        "SignInfoDTO": {
+            "type": "object",
+            "properties": {
+                "allowDelegation": {
+                    "type": "boolean"
+                },
+                "allowMultiPosition": {
+                    "type": "boolean"
+                },
+                "bitmap": {
+                    "type": "string"
+                },
+                "defaultPosition": {
+                    "$ref": "#/definitions/SignPositionInfoDTO"
+                },
+                "delegatedUser": {
+                    "type": "string"
+                },
+                "maxNumberOfSigns": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "minNumberOfSigns": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "otpType": {
+                    "type": "string"
+                }
+            },
+            "title": "SignInfoDTO"
+        },
+        "SignLocation": {
+            "type": "object",
+            "properties": {
+                "country": {
+                    "type": "string"
+                },
+                "locality": {
+                    "type": "string"
+                },
+                "postalAddress": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "postalCode": {
+                    "type": "string"
+                },
+                "stateOrProvince": {
+                    "type": "string"
+                },
+                "street": {
+                    "type": "string"
+                }
+            },
+            "title": "SignLocation"
+        },
+        "SignPositionInfoDTO": {
+            "type": "object",
+            "properties": {
+                "height": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "page": {
+                    "type": "string"
+                },
+                "width": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "x": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "y": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "SignPositionInfoDTO"
+        },
+        "SignatureResponseDTO": {
+            "type": "object",
+            "properties": {
+                "responseCode": {
+                    "type": "string"
+                },
+                "responseMessage": {
+                    "type": "string"
+                },
+                "signedFile": {
+                    "type": "string"
+                }
+            },
+            "title": "SignatureResponseDTO"
+        },
+        "SignerId": {
+            "type": "object",
+            "properties": {
+                "signerId": {
+                    "type": "string"
+                }
+            },
+            "title": "SignerId"
+        },
+        "StartAcceptanceProcessDTO": {
+            "type": "object",
+            "properties": {
+                "acceptanceFileId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "acceptanceFileType": {
+                    "type": "string",
+                    "enum": ["FIRMA_DIGITAL_TITULAR", "FIRMA_DIGITAL_DELEGADA"]
+                }
+            },
+            "title": "StartAcceptanceProcessDTO"
+        },
+        "Step": {
+            "type": "object",
+            "properties": {
+                "actualStep": {
+                    "type": "boolean",
+                    "example": true,
+                    "description": "Flag indicating if it is the current step",
+                    "allowEmptyValue": false
+                },
+                "commentary": {
+                    "type": "string",
+                    "example": "Comment",
+                    "description": "Comment added when executing the step",
+                    "allowEmptyValue": false
+                },
+                "date": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562064508,
+                    "description": "Date of execution of step",
+                    "allowEmptyValue": false
+                },
+                "editableMeta": {
+                    "type": "array",
+                    "example": ["a", "c"],
+                    "description": "List of modifiable attachments in this step",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 2,
+                    "description": "Step identifier",
+                    "allowEmptyValue": false
+                },
+                "responsibleStep": {
+                    "description": "Information on who should execute or has executed the step",
+                    "allowEmptyValue": false,
+                    "$ref": "#/definitions/ResponsibleStep"
+                },
+                "showMeta": {
+                    "type": "array",
+                    "example": ["b"],
+                    "description": "List of attachments visible in this step",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "status": {
+                    "type": "string",
+                    "example": "PENDING",
+                    "description": "Step status",
+                    "allowEmptyValue": false,
+                    "enum": ["PENDING", "WORKING", "OK", "DENY", "ABORTED", "ENQUEUED", "SKIPPED"]
+                },
+                "type": {
+                    "type": "string",
+                    "example": "SIGN",
+                    "description": "Step type",
+                    "allowEmptyValue": false,
+                    "enum": ["EXTERNAL_SIGN", "MODIFY_META", "NOTIFICATION", "OTP_SIGN", "PUSH", "REVIEW", "SIGN", "UPLOAD", "NEW_PROCESS_FROM_META", "WATERMARK", "TIMESTAMP", "MULTI_CERT_SIGN"]
+                }
+            },
+            "title": "Step"
+        },
+        "StepChallengeDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "otpSession": {
+                    "type": "string"
+                }
+            },
+            "title": "StepChallengeDTO"
+        },
+        "StepDTO": {
+            "type": "object",
+            "properties": {
+                "action": {
+                    "type": "string"
+                },
+                "certificateSigningId": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "otp": {
+                    "type": "string"
+                },
+                "otpSession": {
+                    "type": "string"
+                },
+                "pin": {
+                    "type": "string"
+                }
+            },
+            "title": "StepDTO"
+        },
+        "Timestamp": {
+            "type": "object",
+            "properties": {
+                "date": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "day": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "hours": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "minutes": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "month": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "nanos": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "seconds": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "time": {
+                    "type": "integer",
+                    "format": "int64"
+                },
+                "timezoneOffset": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "year": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "Timestamp"
+        },
+        "TokenDTO": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
+                },
+                "tokenLevel": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "TokenDTO"
+        },
+        "TokenWithAuthenticators": {
+            "type": "object",
+            "properties": {
+                "authenticators": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "token": {
+                    "type": "string"
+                }
+            },
+            "title": "TokenWithAuthenticators"
+        },
+        "TokenWithLevel": {
+            "type": "object",
+            "properties": {
+                "lvl": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                }
+            },
+            "title": "TokenWithLevel"
+        },
+        "URI": {
+            "type": "object",
+            "properties": {
+                "absolute": {
+                    "type": "boolean"
+                },
+                "authority": {
+                    "type": "string"
+                },
+                "fragment": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "opaque": {
+                    "type": "boolean"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "rawAuthority": {
+                    "type": "string"
+                },
+                "rawFragment": {
+                    "type": "string"
+                },
+                "rawPath": {
+                    "type": "string"
+                },
+                "rawQuery": {
+                    "type": "string"
+                },
+                "rawSchemeSpecificPart": {
+                    "type": "string"
+                },
+                "rawUserInfo": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "type": "string"
+                },
+                "schemeSpecificPart": {
+                    "type": "string"
+                },
+                "userInfo": {
+                    "type": "string"
+                }
+            },
+            "title": "URI"
+        },
+        "URL": {
+            "type": "object",
+            "properties": {
+                "authority": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "object"
+                },
+                "defaultPort": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "deserializedFields": {
+                    "$ref": "#/definitions/URLStreamHandler"
+                },
+                "file": {
+                    "type": "string"
+                },
+                "host": {
+                    "type": "string"
+                },
+                "path": {
+                    "type": "string"
+                },
+                "port": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "protocol": {
+                    "type": "string"
+                },
+                "query": {
+                    "type": "string"
+                },
+                "ref": {
+                    "type": "string"
+                },
+                "serializedHashCode": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "userInfo": {
+                    "type": "string"
+                }
+            },
+            "title": "URL"
+        },
+        "URLStreamHandler": {
+            "type": "object",
+            "title": "URLStreamHandler"
+        },
+        "UserDTO": {
+            "type": "object",
+            "properties": {
+                "mail": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string",
+                    "enum": ["REMOTE", "CLOUD"]
+                },
+                "surname": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                },
+                "uuid": {
+                    "type": "string"
+                }
+            },
+            "title": "UserDTO"
+        },
+        "UsernamePasswordVM": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "tuid": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "title": "UsernamePasswordVM"
+        },
+        "ValidationOperatorDTO": {
+            "type": "object",
+            "properties": {
+                "companyName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "fullName": {
+                    "type": "string"
+                },
+                "uid": {
+                    "type": "string"
+                }
+            },
+            "title": "ValidationOperatorDTO"
+        },
+        "VerificationDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "verified": {
+                    "type": "boolean"
+                }
+            },
+            "title": "VerificationDTO"
+        },
+        "View": {
+            "type": "object",
+            "properties": {
+                "contentType": {
+                    "type": "string"
+                }
+            },
+            "title": "View"
+        },
+        "VinAccessToken": {
+            "type": "object",
+            "properties": {
+                "status": {
+                    "type": "string"
+                },
+                "tokenid": {
+                    "type": "string"
+                },
+                "tokentype": {
+                    "type": "string"
+                },
+                "userid": {
+                    "type": "string"
+                }
+            },
+            "title": "VinAccessToken"
+        },
+        "VinAccessTokenParameterDTO": {
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "title": "VinAccessTokenParameterDTO"
+        },
+        "Workflow": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "type": "string",
+                    "example": "Description of workflow",
+                    "description": "Workflow description",
+                    "allowEmptyValue": false
+                },
+                "designLogo": {
+                    "type": "string",
+                    "description": "Logo in base64",
+                    "allowEmptyValue": false
+                },
+                "designType": {
+                    "type": "string",
+                    "example": "NO_LOGO",
+                    "description": "Position of the logo (optional)",
+                    "allowEmptyValue": false,
+                    "enum": ["NO_LOGO", "ONLY_LOGO", "LOGO_LEFT", "LOGO_RIGHT"]
+                },
+                "fileType": {
+                    "type": "string",
+                    "description": "Type of file supported for the creation of the process",
+                    "allowEmptyValue": false,
+                    "enum": ["AUTO", "PDF", "XML", "BINARY"]
+                },
+                "groups": {
+                    "type": "array",
+                    "description": "List of groups for which they are visible (only if the scope is private)",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "id": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 25,
+                    "description": "Workflow identifier",
+                    "allowEmptyValue": false
+                },
+                "metas": {
+                    "type": "array",
+                    "description": "List of data attached that the workflow has",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Meta"
+                    }
+                },
+                "owner": {
+                    "type": "string",
+                    "example": "echogolf",
+                    "description": "Workflow owner",
+                    "allowEmptyValue": false
+                },
+                "scope": {
+                    "type": "string",
+                    "example": "PUBLIC",
+                    "description": "Workflow visibility",
+                    "allowEmptyValue": false,
+                    "enum": ["PUBLIC", "PRIVATE"]
+                },
+                "steps": {
+                    "type": "array",
+                    "description": "List of steps that the workflow has",
+                    "allowEmptyValue": false,
+                    "items": {
+                        "$ref": "#/definitions/Step"
+                    }
+                },
+                "tenant": {
+                    "type": "string",
+                    "example": "2aaa05f1-ad15-32f4-a16b-96773f60e043",
+                    "description": "Company identifier",
+                    "allowEmptyValue": false
+                },
+                "title": {
+                    "type": "string",
+                    "example": "Title of workflow",
+                    "description": "Workflow title",
+                    "allowEmptyValue": false
+                },
+                "validPeriod": {
+                    "type": "integer",
+                    "format": "int64",
+                    "example": 1562064508,
+                    "description": "Default validity time of the processes created with this workflow",
+                    "allowEmptyValue": false
+                }
+            },
+            "title": "Workflow"
+        },
+        "WorkflowDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "group": {
+                    "type": "string"
+                },
+                "owner": {
+                    "type": "string"
+                },
+                "scope": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "workflowId": {
+                    "type": "integer",
+                    "format": "int32"
+                }
+            },
+            "title": "WorkflowDTO"
+        },
+        "WorkflowListDTO": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalWorkflows": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "worfklowsList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WorkflowDTO"
+                    }
+                }
+            },
+            "title": "WorkflowListDTO"
+        },
+        "WorkflowListV2DTO": {
+            "type": "object",
+            "properties": {
+                "page": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalPages": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "totalWorkflows": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "workflowsList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/WorkflowDTO"
+                    }
+                }
+            },
+            "title": "WorkflowListV2DTO"
+        },
+        "XadesSignatureReqDTO": {
+            "type": "object",
+            "properties": {
+                "certId": {
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "certPin": {
+                    "type": "string"
+                },
+                "certTicket": {
+                    "type": "string"
+                },
+                "commitmentTypes": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "company": {
+                    "type": "string"
+                },
+                "digestAlgorithm": {
+                    "type": "string"
+                },
+                "fileHash": {
+                    "type": "string"
+                },
+                "fileHashDigestAlgorithm": {
+                    "type": "string"
+                },
+                "fileHashName": {
+                    "type": "string"
+                },
+                "policyDigestAlgorithm": {
+                    "type": "string"
+                },
+                "policyHash": {
+                    "type": "string"
+                },
+                "policyId": {
+                    "type": "string"
+                },
+                "policyQualifier": {
+                    "type": "string"
+                },
+                "signContainer": {
+                    "type": "string"
+                },
+                "signLevel": {
+                    "type": "string"
+                },
+                "signLocation": {
+                    "$ref": "#/definitions/SignLocation"
+                },
+                "signPackage": {
+                    "type": "string"
+                },
+                "signerRoles": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "tsaPWD": {
+                    "type": "string"
+                },
+                "tsaURL": {
+                    "type": "string"
+                },
+                "tsaUSR": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                }
+            },
+            "title": "XadesSignatureReqDTO"
+        },
+        "XadesSignatureResponseDTO": {
+            "type": "object",
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "rcSign": {
+                    "type": "string"
+                },
+                "signedData": {
+                    "type": "string"
+                }
+            },
+            "title": "XadesSignatureResponseDTO"
+        },
+        "XadesValidationDTO": {
+            "type": "object",
+            "properties": {
+                "company": {
+                    "type": "string"
+                },
+                "fileHash": {
+                    "type": "string"
+                },
+                "fileHashDigestAlgorithm": {
+                    "type": "string"
+                },
+                "originalFileB64": {
+                    "type": "string"
+                },
+                "reportFormat": {
+                    "type": "string"
+                },
+                "signedFileB64": {
+                    "type": "string"
+                },
+                "userId": {
+                    "type": "string"
+                },
+                "userUuid": {
+                    "type": "string"
+                },
+                "validationLevel": {
+                    "type": "string"
+                }
+            },
+            "title": "XadesValidationDTO"
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT",
+                "description": "User access token required"
+            }
+        }
+    }
+}

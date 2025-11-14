@@ -1,0 +1,25 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.fundaciobit.pluginsib.signatureweb.nebulaparent</groupId>
+    <artifactId>pluginsib-signatureweb-nebula-parent</artifactId>
+    <version>4.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>FundacioBit - PluginsIB - SignatureWeb - Nebula Parent</name>
+<!--
+    <parent>
+        <groupId>org.fundaciobit.pluginsib.signatureweb</groupId>
+        <artifactId>pluginsib-signatureweb</artifactId>
+        <version>4.1.0-SNAPSHOT</version>
+    </parent>
+-->
+    <modules>
+        <module>vintegris-nebula-api-client-digital-certificate-v1</module>
+        <module>vintegris-nebula-api-client-digital-signature-v1</module>
+        <module>vintegris-nebula-api-client-trusted-applications-v1</module>
+        <module>pluginib-signatureweb-nebula</module>
+    </modules>
+
+</project>

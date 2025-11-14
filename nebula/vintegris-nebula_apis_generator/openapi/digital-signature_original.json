@@ -1,0 +1,441 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Digital signature API",
+        "version": "v4"
+    },
+    "externalDocs": {
+        "description": "API Documentation",
+        "url": "https://portal.nebulaservice.net/docs/developer/en/HTML/digital-signature.html"
+    },
+    "servers": [{
+            "url": "https://api-ansmt01.nebulaservice.net"
+        }
+    ],
+    "tags": [{
+            "name": "Current: Operations with documents"
+        }
+    ],
+    "paths": {
+        "/signature/pades/v1/sign": {
+            "post": {
+                "tags": ["Current: Operations with documents"],
+                "summary": "Sign a PDF file",
+                "operationId": "signDocumentV1",
+                "requestBody": {
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": ["data", "file"],
+                                "type": "object",
+                                "properties": {
+                                    "file": {
+                                        "type": "string",
+                                        "description": "PDF file to sign",
+                                        "format": "binary"
+                                    },
+                                    "images": {
+                                        "type": "array",
+                                        "description": "List of images that will be used in the visible signature",
+                                        "items": {
+                                            "type": "string",
+                                            "format": "binary"
+                                        }
+                                    },
+                                    "data": {
+                                        "type": "string",
+                                        "description": "JSON containing the parameters needed to define how the signature will be made. See schema PadesSignatureRequest",
+                                        "format": "binary"
+                                    }
+                                }
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignaturePades400Codes"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignaturePades500Codes"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseSignaturePades404Codes"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ErrorResponseOldAuthEnum"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "Signed PDF file",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ItemResponseOkEnumSignatureResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "Authorization": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "ErrorResponseSignaturePades400Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "enum": ["SERVICE_ERROR", "INVALID_FILE", "INVALID_DATA", "INVALID_IMAGE", "INVALID_CERT", "INVALID_CERT_ID", "INVALID_PIN_SIZE", "INVALID_PIN_1", "INVALID_PIN_2", "PIN_BLOCKED", "PIN_REQUIRED", "CERTIFICATE_NOT_YET_VALID", "CERTIFICATE_EXPIRED", "ACL_BLOCK", "TSA_NOT_ENABLED"]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ErrorResponseSignaturePades500Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "enum": ["INTERNAL_ERROR", "INCORRECT_CONFIG_TSA", "INCORRECT_URL_TSA", "INVALID_PKCS11_RESPONSE"]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ErrorResponseSignaturePades404Codes": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "enum": ["SERVICE_ERROR", "INVALID_SIGNATURE_FIELD", "VERIFICATION_FAIL", "ISSUER_NOT_FOUND"]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ErrorResponseOldAuthEnum": {
+                "type": "object",
+                "properties": {
+                    "error": {
+                        "type": "string",
+                        "enum": ["INVALID_TOKEN", "EXPIRED_TOKEN", "INVALID_LVL"]
+                    },
+                    "message": {
+                        "type": "string"
+                    }
+                }
+            },
+            "ItemResponseOkEnumSignatureResponse": {
+                "type": "object",
+                "properties": {
+                    "code": {
+                        "type": "string",
+                        "enum": ["OK"]
+                    },
+                    "message": {
+                        "type": "string"
+                    },
+                    "content": {
+                        "$ref": "#/components/schemas/SignatureResponse"
+                    }
+                }
+            },
+            "SignatureResponse": {
+                "type": "object",
+                "properties": {
+                    "signedFile": {
+                        "type": "string"
+                    },
+                    "messageEmbedded": {
+                        "type": "string"
+                    },
+                    "cnCertificate": {
+                        "type": "string"
+                    }
+                }
+            },
+            "PadesSignatureRequest": {
+                "required": ["certId"],
+                "type": "object",
+                "properties": {
+                    "signLevel": {
+                        "type": "string",
+                        "description": "Signature level",
+                        "example": "B",
+                        "enum": ["B", "T", "LT", "LTA"],
+                        "default": "B"
+                    },
+                    "digestAlgorithm": {
+                        "type": "string",
+                        "description": "Algorithm used to obtain the digest of the document to sign",
+                        "example": "SHA256",
+                        "enum": ["SHA1", "SHA256", "SHA384", "SHA512"],
+                        "default": "SHA256"
+                    },
+                    "certId": {
+                        "type": "string",
+                        "description": "This parameter is linked with the signingId response parameter of the get user certificates operation",
+                        "example": "1"
+                    },
+                    "certPin": {
+                        "type": "string",
+                        "description": "PIN of the selected certificate",
+                        "example": "1234"
+                    },
+                    "location": {
+                        "type": "string",
+                        "description": "The CPU host name or physical location of the signing"
+                    },
+                    "signerRoles": {
+                        "type": "array",
+                        "description": "List of roles of signer",
+                        "items": {
+                            "type": "string",
+                            "description": "List of roles of signer"
+                        }
+                    },
+                    "commitmentTypes": {
+                        "type": "array",
+                        "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
+                        "example": ["ProofOfOrigin", "ProofOfReceipt"],
+                        "items": {
+                            "type": "string",
+                            "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
+                            "example": "[\"ProofOfOrigin\",\"ProofOfReceipt\"]",
+                            "enum": ["ProofOfOrigin", "ProofOfReceipt", "ProofOfDelivery", "ProofOfSender", "ProofOfApproval", "ProofOfCreation"]
+                        },
+                        "enum": ["ProofOfOrigin", "ProofOfReceipt", "ProofOfDelivery", "ProofOfSender", "ProofOfApproval", "ProofOfCreation"]
+                    },
+                    "tsaURL": {
+                        "type": "string",
+                        "description": "URL of a Timestamping authority to be used in T, LT or LTA signature levels"
+                    },
+                    "tsaUSR": {
+                        "type": "string",
+                        "description": "User of the credentials of the Timestamping authority, if authentication is required"
+                    },
+                    "tsaPWD": {
+                        "type": "string",
+                        "description": "Password of the credentials of the Timestamping authority, if authentication is required"
+                    },
+                    "signatureSize": {
+                        "type": "integer",
+                        "description": "Signature size",
+                        "format": "int32"
+                    },
+                    "visualSignature": {
+                        "$ref": "#/components/schemas/VisualSignature"
+                    },
+                    "dateFormat": {
+                        "type": "string",
+                        "description": "A date format pattern, based on Java's SimpleDateFormat specification, used for the %DATE% tag in the visual signature.",
+                        "example": "dd-MM-yyyy HH:mm:ss Z",
+                        "default": "dd/MM/yyyy"
+                    },
+                    "timeZone": {
+                        "type": "string",
+                        "description": "The value must be a string corresponding to a valid IANA Time Zone Database name.",
+                        "example": "Europe/London",
+                        "default": "UTC"
+                    },
+                    "certificationPermission": {
+                        "type": "string",
+                        "description": "File permissions after signature",
+                        "example": "NO_CHANGE_PERMITTED",
+                        "enum": ["NO_CHANGE_PERMITTED", "MINIMAL_CHANGES_PERMITTED", "CHANGES_PERMITTED"]
+                    },
+                    "application": {
+                        "type": "string",
+                        "description": "Application token that grants some permissions",
+                        "example": "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjgyNDI2NDQsImp0aSI6IlVVSUQiLCJ0dWlkIjoidGVuYW50SWQiLCJpc3MiOiJJc3N1ZXIgYXBwIiwiYXV0aE9yaWdpbiI6ImF1dGhPcmlnaW4iLCJwZXJtaXNzaW9ucyI6WyJESVNBQkxFX1BJTl9QT0xJQ1kiXX0.hlT0Tv7btldV4UqMlfi6U4M54nolkUvrBi-S3PLOkgk"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Reason for signature"
+                    },
+                    "signerName": {
+                        "type": "string",
+                        "description": "Signer name"
+                    }
+                }
+            },
+            "VisualSignature": {
+                "type": "object",
+                "properties": {
+                    "xAxis": {
+                        "minimum": 0,
+                        "type": "number",
+                        "description": "Horizontal position of the visible signature in pixels",
+                        "format": "float",
+                        "example": 75,
+                        "default": 75
+                    },
+                    "yAxis": {
+                        "minimum": 0,
+                        "type": "number",
+                        "description": "Vertical position of the visible signature in pixels",
+                        "format": "float",
+                        "example": 85,
+                        "default": 85
+                    },
+                    "width": {
+                        "type": "integer",
+                        "description": "Width of the visible signature in pixels. By default, the value will be the width of the image, images and/or the text defined",
+                        "format": "int32",
+                        "example": 170,
+                        "default": 170
+                    },
+                    "height": {
+                        "type": "integer",
+                        "description": "Height of the visible signature in pixels. By default, the value will be the height of the image, images and/or the text defined",
+                        "format": "int32",
+                        "example": 55,
+                        "default": 55
+                    },
+                    "page": {
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Page where the visible signature will be inserted",
+                        "format": "int32",
+                        "example": 1,
+                        "default": 1
+                    },
+                    "positionInPercentage": {
+                        "type": "boolean",
+                        "description": "When true, xAxis and yAxis will be interpreted as percentages",
+                        "example": true,
+                        "default": true
+                    },
+                    "multiImageBuild": {
+                        "type": "string",
+                        "description": "If there is more than one image for the visual signature, this parameter will define how this images will be merged into one image",
+                        "example": "HORIZONTAL",
+                        "enum": ["HORIZONTAL", "VERTICAL"],
+                        "default": "HORIZONTAL"
+                    },
+                    "backgroundColor": {
+                        "type": "array",
+                        "description": "The background color for the signature field in RGBA [0..255, 0..255, 0..255, 0..255]. By default, the color will be white with transparency",
+                        "items": {
+                            "type": "integer",
+                            "description": "The background color for the signature field in RGBA [0..255, 0..255, 0..255, 0..255]. By default, the color will be white with transparency",
+                            "format": "int32"
+                        }
+                    },
+                    "imageVerticalAlignment": {
+                        "type": "string",
+                        "description": "Vertical position of the visual signature in the page. In the case where the value is different than NONE and the parameter yAxis has a value different than the default one, the value defined by the parameter imageVerticalAlignment will prevail",
+                        "example": "NONE",
+                        "enum": ["NONE", "TOP", "MIDDLE", "BOTTOM"],
+                        "default": "NONE"
+                    },
+                    "fontName": {
+                        "type": "string",
+                        "description": "Name of the font that will be used for the text",
+                        "example": "COURIER",
+                        "enum": ["TIMES_ROMAN", "TIMES_BOLD", "TIMES_ITALIC", "TIMES_BOLD_ITALIC", "HELVETICA", "HELVETICA_BOLD", "HELVETICA_OBLIQUE", "HELVETICA_BOLD_OBLIQUE", "COURIER", "COURIER_BOLD", "COURIER_OBLIQUE", "COURIER_BOLD_OBLIQUE"],
+                        "default": "COURIER"
+                    },
+                    "fontSize": {
+                        "minimum": 2,
+                        "type": "integer",
+                        "description": "Letter size",
+                        "format": "int32",
+                        "example": 12,
+                        "default": 12
+                    },
+                    "textColor": {
+                        "type": "array",
+                        "description": "Text color in RGBA [0..255, 0..255, 0..255, 0..255]. The default text color is black without transparency",
+                        "items": {
+                            "type": "integer",
+                            "description": "Text color in RGBA [0..255, 0..255, 0..255, 0..255]. The default text color is black without transparency",
+                            "format": "int32"
+                        }
+                    },
+                    "text": {
+                        "type": "string",
+                        "description": "Text of the visual signature. It can contain the following macros for dynamic replacement: %CN% - Certificate Common Name, %DATE% - Signature date, %DATE_TIME% - Signature time",
+                        "example": "Signed by John Doe",
+                        "default": "Digitally signed by\n%CN%\n%DATE% %DATE_TIME%"
+                    },
+                    "textSignerPosition": {
+                        "type": "string",
+                        "description": "In case there is an image and text defined for the visual signature, this parameter will define the position between these two elements in the visual signature. The default value implies that the image will be at the left part of the visible signature while the text will be at the right part",
+                        "example": "LEFT",
+                        "enum": ["TOP", "BOTTOM", "RIGHT", "LEFT"],
+                        "default": "RIGHT"
+                    },
+                    "textHorizontalAlignment": {
+                        "type": "string",
+                        "description": "Text alignment",
+                        "example": "LEFT",
+                        "enum": ["LEFT", "CENTER", "RIGHT"],
+                        "default": "LEFT"
+                    },
+                    "textImageVerticalAlignment": {
+                        "type": "string",
+                        "description": "In case there is more than one image with the parameter multiImageBuild with a value of HORIZONTAL and/or an image and text where the parameter textSignerPosition with values LEFT or RIGHT, this parameter defines the vertical alignment between those elements",
+                        "example": "MIDDLE",
+                        "enum": ["TOP", "MIDDLE", "BOTTOM"],
+                        "default": "MIDDLE"
+                    },
+                    "signLastPage": {
+                        "type": "boolean",
+                        "description": "Flag to perform the signature on the last page, ignoring the value defined in the page attribute",
+                        "example": false,
+                        "default": false
+                    },
+                    "signatureField": {
+                        "type": "string",
+                        "description": "Indicates the name of the signature field in which the signature will be made. The field must previously exist in the PDF"
+                    }
+                },
+                "description": "Required parameters in case that a visual signature is desired in the PDF file"
+            }
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

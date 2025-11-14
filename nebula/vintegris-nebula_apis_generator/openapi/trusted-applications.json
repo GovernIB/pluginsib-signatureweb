@@ -1,0 +1,1680 @@
+{
+    "openapi": "3.0.1",
+    "info": {
+        "title": "Trusted Applications API",
+        "version": "v4"
+    },
+    "externalDocs": {
+        "description": "API Documentation",
+        "url": "https://portal.nebulaservice.net/docs/developer/en/HTML/trusted-applications.html"
+    },
+    "servers": [{
+            "url": "https://api.nebulaservice.net/trustedapps/v1"
+        }
+    ],
+    "paths": {
+        "/trusted/app/{id}": {
+            "get": {
+                "tags": ["Manage trusted app"],
+                "summary": "Get a specific trusted app",
+                "operationId": "getTrustedApp",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseDetailedTrustedAppViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": ["Manage trusted app"],
+                "summary": "Update a trusted app",
+                "operationId": "updateTrustedApp",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTrustedAppViewModel"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseDetailedTrustedAppViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": ["Manage trusted app"],
+                "summary": "Delete a trusted app",
+                "operationId": "deleteTrustedApp",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/{id}/security": {
+            "put": {
+                "tags": ["Manage trusted app permissions"],
+                "summary": "Modify the security parameters assigned to a trusted app",
+                "operationId": "setSecurityParameters",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/TrustedAppSecParamsViewModel"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/{id}/permissions": {
+            "put": {
+                "tags": ["Manage trusted app permissions"],
+                "summary": "Modify the permissions assigned to a trusted app",
+                "operationId": "changePermissions",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/PermissionsBody"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/{id}/groups": {
+            "get": {
+                "tags": ["Manage groups"],
+                "summary": "Get list of all groups configured in a trusted app",
+                "description": "List only the groups of a trusted app",
+                "operationId": "getAllGroups",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseListGroupViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            },
+            "put": {
+                "tags": ["Manage groups"],
+                "summary": "Modify the groups assigned to a trusted app",
+                "operationId": "changeGroups",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/AccessGroupsViewModel"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/{id}/accesskey": {
+            "put": {
+                "tags": ["Manage trusted app permissions"],
+                "summary": "Generate signature key for trusted app authorization",
+                "operationId": "regenerateAccessKey",
+                "parameters": [{
+                        "name": "id",
+                        "in": "path",
+                        "description": "Trusted app identifier",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b7530d2a-d035-465b-a549-e81caaba63b6"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseRegenerateTrustedAppViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app": {
+            "post": {
+                "tags": ["Manage trusted app"],
+                "summary": "Create a new trusted app",
+                "operationId": "createTrustedApp",
+                "requestBody": {
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CreateTrustedAppViewModel"
+                            }
+                        }
+                    },
+                    "required": true
+                },
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseDetailedTrustedAppViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/validate": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Validate permissions of a user in the trusted app",
+                "description": "Used to check if the user has the requested permissions from the trusted app",
+                "operationId": "validatePermission",
+                "parameters": [{
+                        "name": "application",
+                        "in": "header",
+                        "description": "Token generated by the authorize endpoint",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "JWT"
+                    }, {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "nebulaSUITE token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Bearer JWT"
+                    }, {
+                        "name": "permission",
+                        "in": "query",
+                        "description": "Trusted app permission",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "description": "Permission granted to the trusted app",
+                            "enum": ["DISABLE_AUTH_FIRST", "DISABLE_AUTH_SECOND", "DISABLE_PIN_POLICY"]
+                        },
+                        "example": "DISABLE_PIN_POLICY"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/login/second": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Second factor login",
+                "description": "It is used to obtain a robust nebulaSUITE token from the specified user",
+                "operationId": "appLoginSecond",
+                "parameters": [{
+                        "name": "application",
+                        "in": "header",
+                        "description": "Token generated by the authorize endpoint",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "JWT"
+                    }, {
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Simple nebulaSUITE token",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "Bearer JWT"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseLoginResponseViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/login/first": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "First factor login",
+                "description": "It is used to obtain a simple nebulaSUITE token from the specified user",
+                "operationId": "appLoginFirst",
+                "parameters": [{
+                        "name": "application",
+                        "in": "header",
+                        "description": "Token generated by the authorize endpoint",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "JWT"
+                    }, {
+                        "name": "username",
+                        "in": "query",
+                        "description": "User UID in base64",
+                        "required": true,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "b3duZXI="
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseLoginResponseViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/app/authorize": {
+            "post": {
+                "tags": ["Authentication"],
+                "summary": "Authorize an trusted app",
+                "description": "It is used to obtain the token necessary for the trusted app to consume the permissions it has",
+                "operationId": "authorize",
+                "parameters": [{
+                        "name": "Authorization",
+                        "in": "header",
+                        "description": "Token generated by the trusted app",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        },
+                        "example": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxM2IxODZhNy1jZDVlLTMwNjgtOGIxOS1iYWE1ODBlOTEyMTMiLCJpYXQiOiIxNjY1MTM2NjgyIiwianRpIjoiVVVJRCIsImlzcyI6Iklzc3VlciBhcHAiLCJhenAiOiJkYjMzOTllNy0wNzIxLTQ0ODktYjg2Ny1jNDRmYzdiYzQyNzIifQ.F-o-kNESluUz3Ta6ftEwy-tNUWPOwY-aHG43RNcVHP4HjHNas5uxvpA2Aw7YJTDrJ2amFSD9Ff74X-rroPXk7w"
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseAuthorizeResponseViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        },
+        "/trusted/apps": {
+            "get": {
+                "tags": ["Manage trusted app"],
+                "summary": "Get list of trusted apps created in the system",
+                "operationId": "getTrustedApps",
+                "parameters": [{
+                        "name": "page",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }, {
+                        "name": "size",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    }
+                ],
+                "responses": {
+                    "401": {
+                        "description": "Unauthorized",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Forbidden",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Not Found",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponse"
+                                }
+                            }
+                        }
+                    },
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "*/*": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/NebulaResponseListTrustedAppViewModel"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [{
+                        "nebulasuite": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "NebulaPagination": {
+                "required": ["totalElements", "totalPages"],
+                "type": "object",
+                "properties": {
+                    "totalElements": {
+                        "type": "integer",
+                        "description": "Total number of items of the operation carried out",
+                        "format": "int32",
+                        "example": 10
+                    },
+                    "totalPages": {
+                        "type": "integer",
+                        "description": "Total number of available pages of the operation carried out",
+                        "format": "int32",
+                        "example": 5
+                    }
+                },
+                "description": "Pagination information for listing operations"
+            },
+            "NebulaResponse": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "object"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "CreateTrustedAppViewModel": {
+                "required": ["name"],
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "maxLength": 255,
+                        "minLength": 1,
+                        "pattern": "(?i)^(?:(?!</?\\w+(( |\\t|/)+.*)?>).)*$",
+                        "type": "string",
+                        "description": "Trusted app name"
+                    },
+                    "description": {
+                        "maxLength": 1024,
+                        "minLength": 0,
+                        "pattern": "(?i)^(?:(?!</?\\w+(( |\\t|/)+.*)?>).)*$",
+                        "type": "string",
+                        "description": "Trusted app description"
+                    }
+                }
+            },
+            "DetailedTrustedAppViewModel": {
+                "required": ["appId", "description", "expiration", "groups", "jwtSignatureAlgorithm", "name", "permissions", "status", "tenantId"],
+                "type": "object",
+                "properties": {
+                    "appId": {
+                        "type": "string",
+                        "description": "UUID of the trusted app"
+                    },
+                    "tenantId": {
+                        "type": "string",
+                        "description": "Tenant ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name defined in the trusted app"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Current status of the trusted app",
+                        "enum": ["ENABLED", "DISABLED"]
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "description": "List of permissions assigned to the trusted app",
+                        "items": {
+                            "type": "string",
+                            "description": "Permission granted to the trusted app"
+                        }
+                    },
+                    "description": {
+                        "type": "string",
+                        "description": "Description defined in the trusted app"
+                    },
+                    "groups": {
+                        "type": "array",
+                        "description": "List of groups defined in the trusted app",
+                        "items": {
+                            "type": "string",
+                            "description": "Group (GID) defined in the trusted app"
+                        }
+                    },
+                    "jwtSignatureAlgorithm": {
+                        "type": "string",
+                        "description": "Algorithm defined to generate the token to perform the authorisation",
+                        "enum": ["HMAC_SHA256", "HMAC_SHA384", "HMAC_SHA512"]
+                    },
+                    "expiration": {
+                        "type": "integer",
+                        "description": "Expiration time (in seconds) defined for the token generated when the trusted app is authorised",
+                        "format": "int32"
+                    }
+                }
+            },
+            "NebulaResponseDetailedTrustedAppViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "$ref": "#/components/schemas/DetailedTrustedAppViewModel"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "TrustedAppSecParamsViewModel": {
+                "required": ["signatureAlgorithm", "status", "tokenExpiration"],
+                "type": "object",
+                "properties": {
+                    "tokenExpiration": {
+                        "maximum": 1440,
+                        "minimum": 1,
+                        "type": "integer",
+                        "description": "Expiration time (in minutes) of the token to be generated by the system when the trusted app is authorised",
+                        "format": "int32",
+                        "example": 60
+                    },
+                    "signatureAlgorithm": {
+                        "type": "string",
+                        "description": "Algorithm used by the trusted app to generate the token to perform the authorisation",
+                        "enum": ["HMAC_SHA256", "HMAC_SHA384", "HMAC_SHA512", "HMAC_SHA256", "HMAC_SHA384", "HMAC_SHA512"]
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Trusted app status",
+                        "enum": ["ENABLED", "DISABLED", "ENABLED", "DISABLED"]
+                    }
+                }
+            },
+            "PermissionsBody": {
+                "required": ["permissions"],
+                "type": "object",
+                "properties": {
+                    "permissions": {
+                        "type": "array",
+                        "description": "List of permissions granted to the trusted app",
+                        "items": {
+                            "type": "string",
+                            "description": "Permission granted to the trusted app",
+                            "enum": ["DISABLE_AUTH_FIRST", "DISABLE_AUTH_SECOND", "DISABLE_PIN_POLICY"]
+                        }
+                    }
+                }
+            },
+            "AccessGroupsViewModel": {
+                "required": ["groups"],
+                "type": "object",
+                "properties": {
+                    "groups": {
+                        "type": "array",
+                        "description": "List of GUIDs to be assigned to the trusted app",
+                        "items": {
+                            "type": "string",
+                            "description": "GUID to be assigned to the trusted app"
+                        }
+                    }
+                }
+            },
+            "NebulaResponseRegenerateTrustedAppViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "$ref": "#/components/schemas/RegenerateTrustedAppViewModel"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "RegenerateTrustedAppViewModel": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "description": "Trusted app name",
+                        "example": "Trusted App demo"
+                    },
+                    "accessKey": {
+                        "type": "string",
+                        "description": "Trusted app access key",
+                        "example": "6160123E656BE6DFF4CBec3174c541CAe8feccb63f9D3107d36e1841BAd8ddd3"
+                    }
+                }
+            },
+            "LoginResponseViewModel": {
+                "required": ["token"],
+                "type": "object",
+                "properties": {
+                    "token": {
+                        "type": "string",
+                        "example": "JWT"
+                    }
+                }
+            },
+            "NebulaResponseLoginResponseViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "$ref": "#/components/schemas/LoginResponseViewModel"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "AuthorizeResponseViewModel": {
+                "required": ["authorization", "expiration", "grants"],
+                "type": "object",
+                "properties": {
+                    "authorization": {
+                        "type": "string",
+                        "description": "Token generated for future operations in nebulaSUITE",
+                        "example": "JWT"
+                    },
+                    "expiration": {
+                        "type": "integer",
+                        "description": "Token expiration time in minutes",
+                        "format": "int64",
+                        "example": 10
+                    },
+                    "grants": {
+                        "type": "array",
+                        "description": "Permissions held with the generated token",
+                        "items": {
+                            "type": "string",
+                            "description": "Permissions held with the generated token",
+                            "enum": ["DISABLE_AUTH_FIRST", "DISABLE_AUTH_SECOND", "DISABLE_PIN_POLICY"]
+                        }
+                    }
+                }
+            },
+            "NebulaResponseAuthorizeResponseViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "$ref": "#/components/schemas/AuthorizeResponseViewModel"
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "NebulaResponseListTrustedAppViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/TrustedAppViewModel"
+                        }
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            },
+            "TrustedAppViewModel": {
+                "required": ["appId", "name", "permissions", "status", "tenantId"],
+                "type": "object",
+                "properties": {
+                    "appId": {
+                        "type": "string",
+                        "description": "UUID of the trusted app"
+                    },
+                    "tenantId": {
+                        "type": "string",
+                        "description": "Tenant ID"
+                    },
+                    "name": {
+                        "type": "string",
+                        "description": "Name defined in the trusted app"
+                    },
+                    "status": {
+                        "type": "string",
+                        "description": "Current status of the trusted app",
+                        "enum": ["ENABLED", "DISABLED"]
+                    },
+                    "permissions": {
+                        "type": "array",
+                        "description": "List of permissions assigned to the trusted app",
+                        "items": {
+                            "type": "string",
+                            "description": "Permission granted to the trusted app"
+                        }
+                    }
+                }
+            },
+            "GroupViewModel": {
+                "required": ["gid", "guid"],
+                "type": "object",
+                "properties": {
+                    "gid": {
+                        "type": "string",
+                        "description": "Name of the group. In case the group does not exist in nebulaUSERS, it shall have the value of GUID",
+                        "example": "Group demo"
+                    },
+                    "guid": {
+                        "type": "string",
+                        "description": "UUID of the group",
+                        "example": "4bd1acc4-6827-3543-813c-3983297479f0"
+                    }
+                }
+            },
+            "NebulaResponseListGroupViewModel": {
+                "required": ["code", "message"],
+                "type": "object",
+                "properties": {
+                    "content": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/GroupViewModel"
+                        }
+                    },
+                    "code": {
+                        "type": "string",
+                        "description": "Execution response code"
+                    },
+                    "message": {
+                        "type": "string",
+                        "description": "Message describing the status resulting from execution"
+                    },
+                    "pagination": {
+                        "$ref": "#/components/schemas/NebulaPagination"
+                    }
+                }
+            }
+        },
+        "securitySchemes": {
+            "Authorization": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            },
+            "nebulasuite": {
+                "type": "http",
+                "scheme": "bearer",
+                "bearerFormat": "JWT"
+            }
+        }
+    }
+}

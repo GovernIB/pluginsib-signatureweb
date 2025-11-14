@@ -21,3 +21,7 @@ nb-configuration.xml
 /firmanocripto/test.properties
 /fire/doc/fire_mapping_test.properties
 /miniappletinserversia/config/sia_mapping.properties
+/nebula/pluginib-signatureweb-nebula/binari_bin_signed.csig
+/nebula/pluginib-signatureweb-nebula/nebula.properties
+/nebula/pluginib-signatureweb-nebula/pdf-signat.pdf
+/nebula/pluginib-signatureweb-nebula/sample_xml_signed.xsig

@@ -26,6 +26,7 @@
         <module>afirma-triphase-server-lib</module>
         <module>afirma-triphase-server</module>
         <module>miniappletinserver</module>
+        <module>nebula</module>
         <module>signaturewebtester</module>
     </modules>
 
