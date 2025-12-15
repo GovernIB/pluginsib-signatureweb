@@ -146,4 +146,11 @@ public interface ISignatureWebPlugin extends ISignaturePlugin {
      */
     public boolean administrationIdCanBeValidated();
 
+    
+    /**
+     * 
+     * @return true Indica si despres de la signatura el sistema pot comprovar si el document ha canviat.
+     *         false No pot validar si el document signat difereix de l'original.
+     */
+    public boolean willCanCheckIfSignedDocumentWasAlteredAfterSignature();
 }

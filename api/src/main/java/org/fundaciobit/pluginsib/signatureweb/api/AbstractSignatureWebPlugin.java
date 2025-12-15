@@ -508,24 +508,24 @@ public abstract class AbstractSignatureWebPlugin extends
     /*
     @Override
     public int[] getSupportedSignatureModes(String signType) {
-
+    
         if (signType == null || signType.trim().length() == 0) {
             log.error("S'ha cridat a getSupportedSignatureModes amb un tipus de firma null o buit");
             return new int[0];
         }
-
+    
         switch (signType) {
             case FileInfoSignature.SIGN_TYPE_PADES:
                 return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
-
+    
             case FileInfoSignature.SIGN_TYPE_CADES:
                 return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
                         FileInfoSignature.SIGN_MODE_DETACHED };
-
+    
             case FileInfoSignature.SIGN_TYPE_XADES:
                 return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
                         FileInfoSignature.SIGN_MODE_INTERNALLY_DETACHED };
-
+    
             default:
                 log.error("S'ha cridat a getSupportedSignatureModes amb un amb un tipus de firma desconegut: ]"
                         + signType + "[");
@@ -547,6 +547,11 @@ public abstract class AbstractSignatureWebPlugin extends
 
     @Override
     public boolean administrationIdCanBeValidated() {
+        return true;
+    }
+
+    @Override
+    public boolean willCanCheckIfSignedDocumentWasAlteredAfterSignature() {
         return true;
     }
 

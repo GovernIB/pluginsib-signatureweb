@@ -599,6 +599,12 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
     public boolean administrationIdCanBeValidated() {
         return false;
     }
+    
+    
+    @Override
+    public boolean willCanCheckIfSignedDocumentWasAlteredAfterSignature() {
+        return false;
+    }
 
     @Override
     public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
