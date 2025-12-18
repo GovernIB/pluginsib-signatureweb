@@ -18,6 +18,12 @@
     <packaging>jar</packaging>
 
     <dependencies>
+    
+        <dependency>
+            <groupId>org.fundaciobit.pluginsib.signatureweb</groupId>
+            <artifactId>pluginsib-signatureweb-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

@@ -23,7 +23,9 @@
         <module>miniappletinserversia</module>
         <module>fortress</module>
         <module>firmanocripto</module>
+        <!--
         <module>afirma-triphase-server-lib</module>
+        -->
         <module>afirma-triphase-server</module>
         <module>miniappletinserver</module>
         <module>nebula</module>

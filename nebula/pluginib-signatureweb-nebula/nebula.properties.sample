@@ -8,5 +8,6 @@ applicationName=MYAPPNAME
 tenantId=8ds65e2d-rt05-12ad-9367-789ky2678c1
 appId=12341244-1234-1234-dfg567-456fdhj657
 accessKey=12435dfg3y3h34gefg43grt345gdfgtgefg54gert354gg544563456gtr345gtt3ty6hjk785ym
-# DNI
-username=12345678Z
+
+
+es.caib.sample.pluginsib.signatureweb.nebula.debug=false

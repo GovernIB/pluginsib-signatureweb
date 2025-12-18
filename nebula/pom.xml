@@ -8,13 +8,13 @@
     <packaging>pom</packaging>
 
     <name>FundacioBit - PluginsIB - SignatureWeb - Nebula Parent</name>
-<!--
+
     <parent>
-        <groupId>org.fundaciobit.pluginsib.signatureweb</groupId>
-        <artifactId>pluginsib-signatureweb</artifactId>
-        <version>4.1.0-SNAPSHOT</version>
+        <artifactId>caib-artifacts-jdk11-jboss72or74-with-github-governib-distribution</artifactId>
+        <groupId>es.caib.maven</groupId>
+        <version>1.0.1-SNAPSHOT</version>
     </parent>
--->
+
     <modules>
         <module>vintegris-nebula-api-client-digital-certificate-v1</module>
         <module>vintegris-nebula-api-client-digital-signature-v1</module>
