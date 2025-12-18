@@ -40,3 +40,7 @@ nb-configuration.xml
 /fire/cert-fire-pro-caib/installCertToCacerts.bat
 /fire/cert-fire-pro-caib/log_fire_pro.txt
 /nebula/pluginib-signatureweb-nebula/src/test/java/org/fundaciobit/pluginsib/signatureweb/nebula/MyNebulaTester.java
+/nebula/pluginib-signatureweb-nebula/test.properties
+/miniappletinserversia/test.properties
+/fortress/test.log
+/fortress/test.properties
