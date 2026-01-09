@@ -8,7 +8,12 @@ es.caib.portafib.pluginsib.signatureweb.fortress.url=https://pre.firmacloud.com/
 
 # Dades d'autenticació del sistema
 es.caib.portafib.pluginsib.signatureweb.fortress.client_id=caib
-es.caib.portafib.pluginsib.signatureweb.fortress.client_secret=40939ba2250c9fd28ba42f23eefac
+es.caib.portafib.pluginsib.signatureweb.fortress.client_secret=40939ba2250c9fd28ba
+
+# Si val false la firma Fortress s'obre en una altra finestra. 
+# Si no es defineix o val true llavors es mostra dins de l'iframe
+es.caib.portafib.pluginsib.signatureweb.fortress.usesamewindow=false
+
 
 es.caib.portafib.pluginsib.signatureweb.fortress.debug=true
 

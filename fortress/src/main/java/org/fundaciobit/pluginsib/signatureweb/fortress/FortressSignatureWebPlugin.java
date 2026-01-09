@@ -15,6 +15,8 @@ import org.fundaciobit.pluginsib.signatureweb.miniappletutils.AbstractMiniApplet
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import java.io.PrintWriter;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -83,7 +85,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
         return getPropertyRequired(FORTRESS_BASE_PROPERTIES + "client_secret");
     }
 
-    public boolean isDebug() throws Exception {
+    public boolean isDebug() {
         return "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "debug"));
     }
 
@@ -107,18 +109,17 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
         //Comprovam si l'usuari ja existeix o no a viafirma
         try {
             FortressApi api = getApi();
-            
+
             String dni = signaturesSet.getCommonInfoSignature().getAdministrationID();
             try {
 
                 // XYZ ZZZ 
-                String tmpWeb="https://localhost:8080/portafib";
-                
+                String tmpWeb = "https://localhost:8080/portafib";
+
                 String accessToken = getToken(tmpWeb);
-                
-                
+
                 UserStatus us = api.getUserStatus(accessToken, dni);
-                
+
                 // XYZ ZZZ
                 log.info("User Status => Hem trobat l'usuari " + dni);
                 log.info("User Status => us.isAuth(): " + us.isAuth());
@@ -130,7 +131,6 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
                 if (!us.isSign()) {
                     return "L'usuari " + dni + " no té permís per Firmar";
                 }
-                
 
             } catch (com.viafirma.fortress.sdk.exception.UserNotFoundException userNotFoundException) {
                 return "User Status => L'usuari amb " + dni + " no està donat d'alta a Fortress";
@@ -156,7 +156,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             String relativePluginRequestPath, SignaturesSetWeb signaturesSet, Map<String, Object> parameters) {
 
         addSignaturesSet(signaturesSet);
-        return relativePluginRequestPath + "/" + INICI_FIRMA;
+        return relativePluginRequestPath + "/" + PAGINA_PRINCIPAL_PAGE;
     }
 
     @Override
@@ -180,11 +180,23 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             SignaturesSetWeb signaturesSet, int signatureIndex, HttpServletRequest request,
             HttpServletResponse response, Locale locale, boolean isGet) {
 
-        if (query.startsWith(INICI_FIRMA)) {
+        if (isDebug()) {
+            log.info("\n--------------------------------------------"
+                    + "\nFortressSignatureWebPlugin - commonRequestGETPOST - absolutePluginRequestPath: "
+                    + absolutePluginRequestPath
+                    + "\nFortressSignatureWebPlugin - commonRequestGETPOST - relativePluginRequestPath: "
+                    + relativePluginRequestPath + "\nFortressSignatureWebPlugin - commonRequestGETPOST - query: "
+                    + query);
+        }
+
+        if (query.startsWith(PAGINA_PRINCIPAL_PAGE)) {
+            paginaPrincipalGET(absolutePluginRequestPath, relativePluginRequestPath, request, response, query,
+                    signaturesSet, locale, new SignIDAndIndex(signaturesSet.getSignaturesSetID(), signatureIndex));
+        } else if (query.startsWith(INICI_FIRMA)) {
             iniciFirma(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet, locale);
         } else if (query.startsWith(EXECUCIO_FIRMA)) {
             execucioFirma(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet,
-                    locale);
+                    new SignIDAndIndex(signaturesSet.getSignaturesSetID(), signatureIndex), locale);
         } else {
             if (isGet) {
                 super.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSet,
@@ -195,6 +207,85 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             }
         }
     }
+
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ------------------ P A G I N A - P R I N C I P A L -------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+    private static final String PAGINA_PRINCIPAL_PAGE = "paginaprincipal";
+
+    private void paginaPrincipalGET(String absolutePluginRequestPath, String relativePluginRequestPath,
+            HttpServletRequest request, HttpServletResponse response, String query, SignaturesSetWeb signaturesSet,
+            Locale locale, final SignIDAndIndex sai) {
+
+        //final String signaturesSetID = signaturesSet.getSignaturesSetID();
+
+        PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
+                locale.getLanguage(), sai, signaturesSet);
+
+        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow"));
+
+        if (isDebug()) {
+            log.info("FortressSignatureWebPlugin - paginaPrincipalGET - usesamewindow: " + usesamewindow);
+        }
+
+        String url = absolutePluginRequestPath + "/" + INICI_FIRMA;
+
+        final String cancelURL = relativePluginRequestPath + "/" + CANCEL_PAGE;
+
+        out.println("<script type=\"text/javascript\">" + "\n");
+        out.println("    let windowObjectReference = null;");
+        out.println("\n");
+        out.println("    reintentar();");
+        out.println("\n");
+        out.println("    function reintentar() {");
+
+        if (usesamewindow) {
+            out.println("      document.location.href = '" + url + "';");
+        } else {
+            out.println("      windowObjectReference = window.open('" + url + "', '_blank');");
+        }
+
+        //out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
+
+        out.println("    }");
+        out.println("\n");
+        out.println("    function cancelPeticio() {");
+        out.println("        if (windowObjectReference === null || windowObjectReference.closed) {");
+        out.println("           // No fer res;");
+        out.println("        } else {");
+        out.println("           windowObjectReference.close();");
+        out.println("        }");
+        out.println("        document.location.href = '" + cancelURL + "';");
+        out.println("    }");
+        out.println("\n");
+        out.println("</script>" + "\n");
+        out.println("<center>" + "\n");
+        out.println("<h4> " + getTraduccio("esperar", locale) + " </h4><br/>" + "\n");
+        out.println(
+                "<img src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE + "/img/ajax-loader2.gif\" />" + "\n");
+        out.println("<br/><br/><input id=\"cancel\" name=\"cancel\" class=\"btn btn-warning btn-large\"\r\n"
+                + "                             onclick=\"cancelPeticio();\"\r\n"
+                + "                             value=\"" + getTraduccio("cancel", locale) + "\" />");
+
+        out.println("<br/><br/><h4> " + getTraduccio("pipellabloquejada", locale) + " </h4>" + "\n");
+        out.println("<br/><button class=\"btn btn-succes btn-large\" onclick=\"reintentar();\">");
+        out.println("       &#8634; " + getTraduccio("reintentar", locale) + "</button>");
+        out.println("</center>");
+
+        out.flush();
+
+        generateFooter(out, sai, signaturesSet);
+
+    }
+
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
+    // ------------------ I N I C I - F I R M A - F O R T R E S S ----------------
+    // ---------------------------------------------------------------------------
+    // ---------------------------------------------------------------------------
 
     private static final String INICI_FIRMA = "inicifirma";
 
@@ -244,7 +335,8 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
     private static final String EXECUCIO_FIRMA = "execuciofirma";
 
     private void execucioFirma(String absolutePluginRequestPath, String relativePluginRequestPath,
-            HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet, Locale locale) {
+            HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet,
+            final SignIDAndIndex sai, Locale locale) {
 
         try {
             if (isDebug()) {
@@ -265,7 +357,42 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             SignatureAdapter adapter = new SignatureAdapter(signaturesSet);
             adapter.updateSignatureStatus(signatureResponses);
 
-            sendRedirect(response, signaturesSet.getUrlFinal());
+            //sendRedirect(response, signaturesSet.getUrlFinal());
+
+            // Estam en la finestra nova 
+
+            // (1) Hem de carregar la pagina de final al iframe
+            // (2) Hem de tancar aquesta finestra
+
+            PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
+                    locale.getLanguage(), sai, signaturesSet);
+
+            final String url;
+            url = signaturesSet.getUrlFinal();
+
+            boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow"));
+
+            out.println("<script type=\"text/javascript\">" + "\n");
+
+            out.println("  function returnToMain() {\n");
+            if (usesamewindow) {
+                out.println("    document.location.href='" + url + "';\n");
+            } else {
+                out.println("    window.opener.location.href='" + url + "';\n");
+                out.println("    setTimeout(() => { window.close(); }, 1000);" + "\n");
+            }
+            //out.println("    window.opener.location.href='" + url + "';\n");
+            out.println("  }\n");
+
+            out.println("  returnToMain();\n");
+
+            out.println("</script>" + "\n");
+            out.println("<center>" + "\n");
+            out.println("<img onClick='returnToMain();' src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE
+                    + "/img/ajax-loader2.gif\" />" + "\n");
+            out.println("</center>\n");
+
+            generateFooter(out, sai, signaturesSet);
 
         } catch (CancelledException e) {
             cancel(request, response, signaturesSet);
@@ -370,8 +497,6 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
         return null;
     }
 
-
-
     @Override
     public int[] getSupportedSignatureModes(String signType) {
 
@@ -389,7 +514,8 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
                         FileInfoSignature.SIGN_MODE_DETACHED };
 
             case FileInfoSignature.SIGN_TYPE_XADES:
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING, FileInfoSignature.SIGN_MODE_DETACHED };
+                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
+                        FileInfoSignature.SIGN_MODE_DETACHED };
 
             default:
                 log.error("S'ha cridat a getSupportedSignatureModes amb un amb un tipus de firma desconegut: ]"
@@ -397,9 +523,6 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
                 return new int[0];
         }
     }
-    
-    
-    
 
     @Override
     public boolean acceptExternalTimeStampGenerator(String signType) {
