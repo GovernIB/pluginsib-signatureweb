@@ -225,7 +225,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
         PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
                 locale.getLanguage(), sai, signaturesSet);
 
-        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow"));
+        boolean usesamewindow = useSameWindow();
 
         if (isDebug()) {
             log.info("FortressSignatureWebPlugin - paginaPrincipalGET - usesamewindow: " + usesamewindow);
@@ -279,6 +279,18 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
 
         generateFooter(out, sai, signaturesSet);
 
+    }
+
+    protected boolean useSameWindow() {
+        
+        String usesamewindowProp = getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow");
+        
+        if (usesamewindowProp == null) {
+            // Per compatibilitat amb versions anteriors
+            return true;
+        }
+                        
+        return "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow"));
     }
 
     // ---------------------------------------------------------------------------
@@ -361,7 +373,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
 
             // Estam en la finestra nova 
 
-            // (1) Hem de carregar la pagina de final al iframe
+            // (1) Hem de carregar la pàgina de final al iframe
             // (2) Hem de tancar aquesta finestra
 
             PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
@@ -370,7 +382,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             final String url;
             url = signaturesSet.getUrlFinal();
 
-            boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FORTRESS_BASE_PROPERTIES + "usesamewindow"));
+            boolean usesamewindow = useSameWindow();
 
             out.println("<script type=\"text/javascript\">" + "\n");
 
