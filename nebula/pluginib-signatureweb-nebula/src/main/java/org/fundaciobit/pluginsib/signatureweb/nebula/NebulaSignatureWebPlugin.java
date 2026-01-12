@@ -372,9 +372,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
 
     }
-    
-    
-    
+
     protected String convertAlgorithm(String algorithm) throws Exception {
         switch (algorithm) {
             case FileInfoSignature.SIGN_ALGORITHM_SHA1:
@@ -389,8 +387,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                 throw new Exception("L'algoritme de signatura " + algorithm + " no està suportat per XAdES");
         }
     }
-    
-    
 
     protected org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.XadesSignatureRequest.DigestAlgorithmEnum convertAlgorithmToDigestAlgorithmEnumXades(
             String algorithm) throws Exception {
@@ -711,6 +707,16 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         return dataStr;
     }
 
+    @Override
+    public boolean administrationIdCanBeValidated() {
+        // Només si ignoreNifValidation és true llavors no validam NIF
+        String ignoreNifValidation = getProperty(NEBULA_BASE_PROPERTIES + "ignoreNifValidation");
+        if (ignoreNifValidation != null && "true".equalsIgnoreCase(ignoreNifValidation)) {
+            return false;
+        }
+        return true;
+    }
+
     /*
     @Override
     public void requestGET(String absolutePluginRequestPath, String relativePluginRequestPath, String query,
@@ -894,7 +900,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public boolean providesTimeStampGenerator(String signType) {
         return true;
     }
-    
 
     @Override
     public boolean acceptExternalTimeStampGenerator(String signType) {
@@ -905,7 +910,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public boolean acceptExternalRubricGenerator() {
         return false;
     }
-    
 
     @Override
     protected boolean isSuportXadesT() {
@@ -956,7 +960,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
     }
 
-
     // --------------------------------------
 
     public List<GetMyCertificates200ResponseCertificatesListInner> getUserCertificates(String username)
@@ -988,7 +991,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         return response.getCertificatesList();
     }
-
 
     protected DigitalCertificateApi getDigitalCertificateApi(String username) throws Exception {
 

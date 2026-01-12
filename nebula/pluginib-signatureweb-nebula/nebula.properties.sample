@@ -1,13 +1,14 @@
 
 
-url=https://api-ansmt01.nebulaservice.net
-url_auth=https://api.nebulaservice.net/trustedapps/v1
+es.caib.sample.pluginsib.signatureweb.nebula.url=https://api-ansmt01.nebulaservice.net
+es.caib.sample.pluginsib.signatureweb.nebula.url_auth=https://api.nebulaservice.net/trustedapps/v1
 
+es.caib.sample.pluginsib.signatureweb.nebula.applicationName=MYAPP-NAME
+es.caib.sample.pluginsib.signatureweb.nebula.tenantId=8d65d72d-cf05-40ad
+es.caib.sample.pluginsib.signatureweb.nebula.appId=133f9228-2235-47db
+es.caib.sample.pluginsib.signatureweb.nebula.accessKey=765c0DAC2c20dF623BA94B0a5acD80B39ff697CA6fe2Cdb0c
 
-applicationName=MYAPPNAME
-tenantId=8ds65e2d-rt05-12ad-9367-789ky2678c1
-appId=12341244-1234-1234-dfg567-456fdhj657
-accessKey=12435dfg3y3h34gefg43grt345gdfgtgefg54gert354gg544563456gtr345gtt3ty6hjk785ym
-
+# En entorn de PRE de NEBULA els certificats no inclouen el NIF, per tant cal ignorar la seva validació
+es.caib.sample.pluginsib.signatureweb.nebula.ignoreNifValidation=true
 
 es.caib.sample.pluginsib.signatureweb.nebula.debug=false
