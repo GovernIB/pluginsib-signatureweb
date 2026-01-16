@@ -6,12 +6,19 @@
 
 # Class => org.fundaciobit.pluginsib.signatureweb.firmanocriptografica.FirmaNoCriptograficaSignatureWebPlugin
 
-pluginsib.signatureweb.firmanocriptografica.evidencies.host=http://anadal:8888/evidenciesibapi/externa
-pluginsib.signatureweb.firmanocriptografica.evidencies.username=appusername
-pluginsib.signatureweb.firmanocriptografica.evidencies.password=apppassword
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.host=http://anadal:8888/evidenciesibapi/externa
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.username=appusername
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.password=apppassword
 
 es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.debug=true
 
 # Si s'usa dins d'un ifram llavors ha de valer false, si s'utilitza dins pantalla completa llavors ha de valer true
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.usesamewindow=false
+
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.debug=false
+
+# S'ha de consultar si el perfil que usa EvidenciesIB suporta 
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.providestimestampgenerator=false
+
 es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.usesamewindow=false
 

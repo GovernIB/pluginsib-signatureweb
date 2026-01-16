@@ -102,6 +102,22 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
         String f = super.filter(request, signaturesSet, parameters);
 
+        if (f == null) {
+            // Problema és que només pot fer o PADes normal o PADES amb Segell de Temps, però no els dos a la vegada
+            boolean userRequiresTimeStamp = signaturesSet.getFileInfoSignatureArray()[0].isUserRequiresTimeStamp();
+            boolean profileGenerateTimeStamp = providesTimeStampGenerator(SIGNTYPE_PAdES);
+
+            if (userRequiresTimeStamp != profileGenerateTimeStamp) {
+
+                if (userRequiresTimeStamp) {
+                    f = "No es pot fer una signatura amb segell de temps ja que el perfil de firma no ho permet.";
+                } else {
+                    f = "No es pot fer una signatura sense segell de temps ja que el perfil de firma si que en genera";
+                }
+            }
+        }
+
+        // TOT OK
         return f;
 
     }
@@ -122,7 +138,6 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
             parametersBySignatureSetID.put(signatureSetID, parameters);
 
             final String returnUrl = absolutePluginRequestPath + "/" + CALLBACK_PAGE + "/{0}";
-
 
             EvidenciaStartRequest start = new EvidenciaStartRequest();
 
@@ -362,12 +377,12 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
         final String url;
         url = signaturesSet.getUrlFinal();
-        
-        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
+
+        boolean usesamewindow = "true"
+                .equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
 
         out.println("<script type=\"text/javascript\">" + "\n");
-        
-        
+
         out.println("  function returnToMain() {\n");
         if (usesamewindow) {
             out.println("    document.location.href='" + url + "';\n");
@@ -377,7 +392,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
         }
         //out.println("    window.opener.location.href='" + url + "';\n");
         out.println("  }\n");
-        
+
         out.println("  returnToMain();\n");
 
         out.println("</script>" + "\n");
@@ -408,11 +423,9 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
         PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
                 locale.getLanguage(), sai, signaturesSet);
-        
-        
-        boolean usesamewindow = "true".equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
-        
-        
+
+        boolean usesamewindow = "true"
+                .equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "usesamewindow"));
 
         final String cancelURL = relativePluginRequestPath + "/" + CANCEL_PAGE;
 
@@ -429,9 +442,8 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
             out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
         }
 
-        
         //out.println("      windowObjectReference = window.open('" + sfnc.getUrlEvidencies() + "', '_blank');");
-        
+
         out.println("    }");
         out.println("\n");
         out.println("    function cancelEvidencia() {");
@@ -571,7 +583,8 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
     @Override
     public boolean providesTimeStampGenerator(String signType) {
         try {
-            return false;
+            return "true"
+                    .equalsIgnoreCase(getProperty(FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "providestimestampgenerator"));
         } catch (Exception e) {
             log.error("providesTimeStampGenerator: " + e.getMessage(), e);
             return false;
@@ -580,13 +593,9 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
 
     @Override
     public void resetAndClean(HttpServletRequest request) throws Exception {
-
         try {
-
             statusBySignatureSetID.clear();
-
             parametersBySignatureSetID.clear();
-
         } catch (Exception e) {
             log.error("resetAndClean: " + e.getMessage(), e);
         }
@@ -599,8 +608,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
     public boolean administrationIdCanBeValidated() {
         return false;
     }
-    
-    
+
     @Override
     public boolean willCanCheckIfSignedDocumentWasAlteredAfterSignature() {
         return false;
