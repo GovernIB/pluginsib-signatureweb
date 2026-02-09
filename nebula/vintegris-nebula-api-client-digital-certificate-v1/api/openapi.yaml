@@ -569,8 +569,60 @@ paths:
       x-content-type: application/json
       x-accepts:
       - application/json
+  /api/v1/certificate/import:
+    post:
+      description: Import a certificate into nebulaSUITE
+      operationId: importCertificate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportCertificateDTO'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CertIdDTO'
+          description: OK
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - Authorization: []
+      summary: Import Certificate
+      tags:
+      - Digital Certificate
+      x-content-type: application/json
+      x-accepts:
+      - application/json
 components:
   schemas:
+    ImportCertificateDTO:
+      example:
+        pfxInBase64: pfxInBase64
+        pfxPassword: pfxPassword
+      properties:
+        pfxInBase64:
+          type: string
+        pfxPassword:
+          type: string
+      title: ImportCertificateDTO
+      type: object
+    CertIdDTO:
+      example:
+        certificateId: certificateId
+      properties:
+        certificateId:
+          type: string
+      title: CertIdDTO
+      type: object
     Policy:
       example:
         dateValidStart: 6

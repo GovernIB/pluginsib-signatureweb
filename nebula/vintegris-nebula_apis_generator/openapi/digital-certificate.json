@@ -868,10 +868,77 @@
                     }
                 ]
             }
-        }
+        },
+        "/api/v1/certificate/import": {
+    "post": {
+        "tags": ["Digital Certificate"],
+        "summary": "Import Certificate",
+        "description": "Import a certificate into nebulaSUITE",
+        "operationId": "importCertificate",
+        "requestBody": {
+            "required": true,
+            "content": {
+                "application/json": {
+                    "schema": {
+                        "$ref": "#/components/schemas/ImportCertificateDTO"
+                    }
+                }
+            }
+        },
+        "responses": {
+            "200": {
+                "description": "OK",
+                "content": {
+                    "application/json": {
+                        "schema": {
+                            "$ref": "#/components/schemas/CertIdDTO"
+                        }
+                    }
+                }
+            },
+            "201": {
+                "description": "Created"
+            },
+            "401": {
+                "description": "Unauthorized"
+            },
+            "403": {
+                "description": "Forbidden"
+            },
+            "404": {
+                "description": "Not Found"
+            }
+        },
+        "security": [{
+            "Authorization": []
+        }]
+    }
+}
+        
     },
     "components": {
         "schemas": {
+        "ImportCertificateDTO": {
+            "type": "object",
+            "properties": {
+                "pfxInBase64": {
+                    "type": "string"
+                },
+                "pfxPassword": {
+                    "type": "string"
+                }
+            },
+            "title": "ImportCertificateDTO"
+        },
+                "CertIdDTO": {
+            "type": "object",
+            "properties": {
+                "certificateId": {
+                    "type": "string"
+                }
+            },
+            "title": "CertIdDTO"
+        },
             "Policy": {
                 "type": "object",
                 "properties": {

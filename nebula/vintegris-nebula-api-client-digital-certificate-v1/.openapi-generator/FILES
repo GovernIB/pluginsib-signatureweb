@@ -6,6 +6,7 @@ build.gradle
 build.sbt
 docs/ActivateCertificate200Response.md
 docs/ActivateCertificateRequest.md
+docs/CertIdDTO.md
 docs/Certificate.md
 docs/ChangeCertificatePinRequest.md
 docs/DigitalCertificateApi.md
@@ -17,6 +18,7 @@ docs/GetMyCertificates200Response.md
 docs/GetMyCertificates200ResponseCertificatesListInner.md
 docs/GetPolicy200Response.md
 docs/GetUserCertificates200Response.md
+docs/ImportCertificateDTO.md
 docs/IssueCertificateRequest.md
 docs/Policy.md
 docs/SigningCertificate.md
@@ -31,6 +33,7 @@ src/main/AndroidManifest.xml
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/api/DigitalCertificateApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ActivateCertificate200Response.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ActivateCertificateRequest.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CertIdDTO.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/Certificate.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ChangeCertificatePinRequest.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/FindCertificatesToSign200Response.java
@@ -41,6 +44,7 @@ src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetMyCertificates200ResponseCertificatesListInner.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetPolicy200Response.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetUserCertificates200Response.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ImportCertificateDTO.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/IssueCertificateRequest.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/Policy.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/SigningCertificate.java

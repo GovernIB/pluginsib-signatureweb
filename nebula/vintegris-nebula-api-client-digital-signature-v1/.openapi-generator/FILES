@@ -4,6 +4,8 @@ README.md
 api/openapi.yaml
 build.gradle
 build.sbt
+docs/CSignDTO.md
+docs/CSignReqDTOV3.md
 docs/CadEsSignatureApi.md
 docs/CadesSignLocation.md
 docs/CadesSignatureRequest.md
@@ -32,6 +34,8 @@ src/main/AndroidManifest.xml
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/api/CadEsSignatureApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/api/PadEsSignatureApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/api/XadEsSignatureApi.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/model/CSignDTO.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/model/CSignReqDTOV3.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/model/CadesSignLocation.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/model/CadesSignatureRequest.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalsignature/v1/model/CadesSignatureResponse.java

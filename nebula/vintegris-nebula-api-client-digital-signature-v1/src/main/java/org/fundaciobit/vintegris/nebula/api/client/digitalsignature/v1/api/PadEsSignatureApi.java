@@ -7,6 +7,8 @@ import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.services.
 
 import javax.ws.rs.core.GenericType;
 
+import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.CSignDTO;
+import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.CSignReqDTOV3;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.ErrorResponseOldAuthEnum;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.ErrorResponseSignature400Codes;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.model.ErrorResponseSignature404Codes;
@@ -93,6 +95,49 @@ if (data != null)
     String[] localVarAuthNames = new String[] { "Authorization" };
 
     GenericType<PadesSignatureOperationResponse> localVarReturnType = new GenericType<PadesSignatureOperationResponse>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * signHash
+   * Sign a hash with a certificate
+   * @param csignReqDTOV3  (required)
+   * @return a {@code CSignDTO}
+   * @throws ApiException if fails to make API call
+   */
+  public CSignDTO signHashUsingPOST2(CSignReqDTOV3 csignReqDTOV3) throws ApiException {
+    Object localVarPostBody = csignReqDTOV3;
+    
+    // verify the required parameter 'csignReqDTOV3' is set
+    if (csignReqDTOV3 == null) {
+      throw new ApiException(400, "Missing the required parameter 'csignReqDTOV3' when calling signHashUsingPOST2");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v3/certificate/signhash".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSignDTO> localVarReturnType = new GenericType<CSignDTO>() {};
     return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
       }
 }

@@ -12,6 +12,7 @@ All URIs are relative to *https://api-ansmt01.nebulaservice.net/api*
 | [**getMyCertificates**](DigitalCertificateApi.md#getMyCertificates) | **GET** /api/v2/certificate/mycertificates | Get User Certificates |
 | [**getPolicy**](DigitalCertificateApi.md#getPolicy) | **GET** /v2/certificate/policy/{certificateid} | Get Policy |
 | [**getUserCertificates**](DigitalCertificateApi.md#getUserCertificates) | **GET** /v2/certificate/mycertificates | Get User Certificates |
+| [**importCertificate**](DigitalCertificateApi.md#importCertificate) | **POST** /api/v1/certificate/import | Import Certificate |
 | [**issueCertificate**](DigitalCertificateApi.md#issueCertificate) | **PUT** /v2/certificate/request/{requestId}/issue | Issue Certificate |
 
 
@@ -645,6 +646,81 @@ public class Example {
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **200** | OK |  -  |
+
+
+## importCertificate
+
+> CertIdDTO importCertificate(importCertificateDTO)
+
+Import Certificate
+
+Import a certificate into nebulaSUITE
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        ImportCertificateDTO importCertificateDTO = new ImportCertificateDTO(); // ImportCertificateDTO | 
+        try {
+            CertIdDTO result = apiInstance.importCertificate(importCertificateDTO);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#importCertificate");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **importCertificateDTO** | [**ImportCertificateDTO**](ImportCertificateDTO.md)|  | |
+
+### Return type
+
+[**CertIdDTO**](CertIdDTO.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
 
 
 ## issueCertificate

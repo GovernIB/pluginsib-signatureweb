@@ -63,7 +63,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     public static final String NEBULA_BASE_PROPERTIES = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY + "nebula.";
 
-    public static String SELECTED_CERTIFICATE_SESSION = "Selected_Certificate_Session";
+    public static String CERTIFICATES_OF_USER_SESSIONKEY = "CERTIFICATES_OF_USER_SESSIONKEY";
 
     // Constructors per defecte
 
@@ -154,6 +154,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                 return msg;
             }
 
+            request.getSession().setAttribute(CERTIFICATES_OF_USER_SESSIONKEY, certs);
+
         } catch (Exception e) {
             String msg = "Error durant la connexio amb el servidor NEBULA: " + e.getMessage();
             log.error(msg, e);
@@ -194,18 +196,19 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             signaturesSet.getStatusSignaturesSet().setStatus(StatusSignaturesSet.STATUS_IN_PROGRESS);
 
-            GetMyCertificates200ResponseCertificatesListInner selectedCertificate = null;
+            List<GetMyCertificates200ResponseCertificatesListInner> certs = null;
+
             // Només per entorn de test
             if (request != null) {
-                selectedCertificate = (GetMyCertificates200ResponseCertificatesListInner) request.getSession()
-                        .getAttribute(SELECTED_CERTIFICATE_SESSION);
+                certs = (List<GetMyCertificates200ResponseCertificatesListInner>) request.getSession()
+                        .getAttribute(CERTIFICATES_OF_USER_SESSIONKEY);
             }
 
             Locale locale = new Locale(signaturesSet.getCommonInfoSignature().getLanguageUI());
 
             String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
 
-            if (selectedCertificate == null) {
+            if (certs == null) {
 
                 List<GetMyCertificates200ResponseCertificatesListInner> certificates = getUserCertificates(nif);
 
@@ -215,9 +218,12 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                     throw new Exception("No s'han trobat certificats per l'usuari " + nif);
                 }
 
-                selectedCertificate = certificates.get(0);
+                certs = certificates;
 
             }
+
+            // TODO
+            GetMyCertificates200ResponseCertificatesListInner selectedCertificate = certs.get(0);
 
             for (FileInfoSignature fis : signaturesSet.getFileInfoSignatureArray()) {
 
@@ -418,6 +424,11 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     }
 
+    protected void doSignaturePadesUsingTriphase(FileInfoSignature fis, SignaturesSetWeb signaturesSet,
+            GetMyCertificates200ResponseCertificatesListInner certificat, String nif) throws Exception, ApiException {
+
+    }
+
     protected void doSignaturePades(FileInfoSignature fis, SignaturesSetWeb signaturesSet,
             GetMyCertificates200ResponseCertificatesListInner certificat, String nif) throws Exception, ApiException {
 
@@ -492,20 +503,9 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         File pdfASignar = fis.getFileToSign();
 
-        //org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.services.ApiClient apiClient;
-        //apiClient = new org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.services.ApiClient();
-        SignatureApiClient apiClient = new SignatureApiClient();
+        PadEsSignatureApi apiSign = getPadesSignatureApi(nif);
 
-        //url = "http://localhost:80";
-
-        apiClient.setBasePath(getPropertyRequired(NEBULA_BASE_PROPERTIES + "url"));
-        HttpBearerAuth auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
-        auth.setBearerToken(getApiToken(nif));
-
-        // {{url}}/signature/pades/v1/sign
-        PadEsSignatureApi apiSign = new PadEsSignatureApi(apiClient);
-
-        String dataStr = toJson(apiClient.getJSON(), psr);
+        String dataStr = toJson(apiSign.getApiClient().getJSON(), psr);
         if (isDebug()) {
             log.info(dataStr);
         }
@@ -531,6 +531,23 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             throw new Exception("Error realitzant la firma PAdES: Code " + signedResponse.getCode() + ", Msg: "
                     + signedResponse.getMessage());
         }
+    }
+
+    public PadEsSignatureApi getPadesSignatureApi(String nif) throws Exception {
+        PadEsSignatureApi apiSign;
+        //org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.services.ApiClient apiClient;
+        //apiClient = new org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.services.ApiClient();
+        SignatureApiClient apiClient = new SignatureApiClient();
+
+        //url = "http://localhost:80";
+
+        apiClient.setBasePath(getPropertyRequired(NEBULA_BASE_PROPERTIES + "url"));
+        HttpBearerAuth auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
+        auth.setBearerToken(getApiToken(nif));
+
+        // {{url}}/signature/pades/v1/sign
+        apiSign = new PadEsSignatureApi(apiClient);
+        return apiSign;
     }
 
     protected void doSignatureCades(FileInfoSignature fis, SignaturesSetWeb signaturesSet,
@@ -992,7 +1009,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         return response.getCertificatesList();
     }
 
-    protected DigitalCertificateApi getDigitalCertificateApi(String username) throws Exception {
+    public DigitalCertificateApi getDigitalCertificateApi(String username) throws Exception {
 
         String url = getPropertyRequired(NEBULA_BASE_PROPERTIES + "url");
         String token = getApiToken(username);

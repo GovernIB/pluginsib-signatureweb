@@ -128,6 +128,7 @@ Class | Method | HTTP request | Description
 *DigitalCertificateApi* | [**getMyCertificates**](docs/DigitalCertificateApi.md#getMyCertificates) | **GET** /api/v2/certificate/mycertificates | Get User Certificates
 *DigitalCertificateApi* | [**getPolicy**](docs/DigitalCertificateApi.md#getPolicy) | **GET** /v2/certificate/policy/{certificateid} | Get Policy
 *DigitalCertificateApi* | [**getUserCertificates**](docs/DigitalCertificateApi.md#getUserCertificates) | **GET** /v2/certificate/mycertificates | Get User Certificates
+*DigitalCertificateApi* | [**importCertificate**](docs/DigitalCertificateApi.md#importCertificate) | **POST** /api/v1/certificate/import | Import Certificate
 *DigitalCertificateApi* | [**issueCertificate**](docs/DigitalCertificateApi.md#issueCertificate) | **PUT** /v2/certificate/request/{requestId}/issue | Issue Certificate
 
 
@@ -135,6 +136,7 @@ Class | Method | HTTP request | Description
 
  - [ActivateCertificate200Response](docs/ActivateCertificate200Response.md)
  - [ActivateCertificateRequest](docs/ActivateCertificateRequest.md)
+ - [CertIdDTO](docs/CertIdDTO.md)
  - [Certificate](docs/Certificate.md)
  - [ChangeCertificatePinRequest](docs/ChangeCertificatePinRequest.md)
  - [FindCertificatesToSign200Response](docs/FindCertificatesToSign200Response.md)
@@ -145,6 +147,7 @@ Class | Method | HTTP request | Description
  - [GetMyCertificates200ResponseCertificatesListInner](docs/GetMyCertificates200ResponseCertificatesListInner.md)
  - [GetPolicy200Response](docs/GetPolicy200Response.md)
  - [GetUserCertificates200Response](docs/GetUserCertificates200Response.md)
+ - [ImportCertificateDTO](docs/ImportCertificateDTO.md)
  - [IssueCertificateRequest](docs/IssueCertificateRequest.md)
  - [Policy](docs/Policy.md)
  - [SigningCertificate](docs/SigningCertificate.md)

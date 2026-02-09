@@ -9,18 +9,22 @@
         "description": "API Documentation",
         "url": "https://portal.nebulaservice.net/docs/developer/en/HTML/digital-signature.html"
     },
-    "servers": [{
+    "servers": [
+        {
             "url": "https://api-ansmt01.nebulaservice.net",
             "description": "Nebula production server"
         }
     ],
-    "tags": [{
+    "tags": [
+        {
             "name": "PAdES Signature",
             "description": "PAdES Signature"
-        }, {
+        },
+        {
             "name": "XAdES Signature",
             "description": "XAdES Signature"
-        }, {
+        },
+        {
             "name": "CAdES Signature",
             "description": "CAdES Signature"
         }
@@ -117,7 +121,8 @@
                         }
                     }
                 },
-                "security": [{
+                "security": [
+                    {
                         "Authorization": []
                     }
                 ]
@@ -215,7 +220,8 @@
                         }
                     }
                 },
-                "security": [{
+                "security": [
+                    {
                         "Authorization": []
                     }
                 ]
@@ -323,7 +329,57 @@
                         }
                     }
                 },
-                "security": [{
+                "security": [
+                    {
+                        "Authorization": []
+                    }
+                ]
+            }
+        },
+        "/api/v3/certificate/signhash": {
+            "post": {
+                "tags": [
+                    "PAdES Signature"
+                ],
+                "summary": "signHash",
+                "description": "Sign a hash with a certificate",
+                "operationId": "signHashUsingPOST_2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/CSignReqDTOV3"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/CSignDTO"
+                                }
+                            }
+                        }
+                    },
+                    "201": {
+                        "description": "Created"
+                    },
+                    "401": {
+                        "description": "Unauthorized"
+                    },
+                    "403": {
+                        "description": "Forbidden"
+                    },
+                    "404": {
+                        "description": "Not Found"
+                    }
+                },
+                "security": [
+                    {
                         "Authorization": []
                     }
                 ]
@@ -331,8 +387,40 @@
         }
     },
     "components": {
-
         "schemas": {
+            "CSignReqDTOV3": {
+                "type": "object",
+                "properties": {
+                    "mechanism": {
+                        "type": "string"
+                    },
+                    "objId": {
+                        "type": "string"
+                    },
+                    "session": {
+                        "type": "string"
+                    },
+                    "signdata": {
+                        "type": "string"
+                    }
+                },
+                "title": "CSignReqDTOV3"
+            },
+            "CSignDTO": {
+                "type": "object",
+                "properties": {
+                    "message": {
+                        "type": "string"
+                    },
+                    "rcSign": {
+                        "type": "string"
+                    },
+                    "signedData": {
+                        "type": "string"
+                    }
+                },
+                "title": "CSignDTO"
+            },
             "XadesSignatureResponse": {
                 "type": "object",
                 "properties": {
@@ -351,7 +439,10 @@
                         "type": "string"
                     }
                 },
-                "required": ["responseCode", "responseMessage"],
+                "required": [
+                    "responseCode",
+                    "responseMessage"
+                ],
                 "example": {
                     "signedFile": "signedFile",
                     "responseMessage": "SIGN_OK",
@@ -386,7 +477,12 @@
                     "digestAlgorithm": {
                         "default": "SHA256",
                         "description": "Algorithm used to obtain the digest of the document to sign",
-                        "enum": ["SHA1", "SHA256", "SHA384", "SHA512"],
+                        "enum": [
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "SHA512"
+                        ],
                         "example": "SHA256",
                         "type": "string"
                     },
@@ -417,7 +513,12 @@
                     "signLevel": {
                         "default": "B",
                         "description": "Signature level",
-                        "enum": ["B", "T", "LT", "LTA"],
+                        "enum": [
+                            "B",
+                            "T",
+                            "LT",
+                            "LTA"
+                        ],
                         "example": "B",
                         "type": "string"
                     },
@@ -426,7 +527,11 @@
                     },
                     "signPackage": {
                         "description": "Signature Mode",
-                        "enum": ["DETACHED", "ENVELOPED", "ENVELOPING"],
+                        "enum": [
+                            "DETACHED",
+                            "ENVELOPED",
+                            "ENVELOPING"
+                        ],
                         "example": "ENVELOPING",
                         "type": "string"
                     },
@@ -562,7 +667,11 @@
                 "type": "object",
                 "properties": {
                     "error": {
-                        "enum": ["INVALID_TOKEN", "EXPIRED_TOKEN", "INVALID_LVL"],
+                        "enum": [
+                            "INVALID_TOKEN",
+                            "EXPIRED_TOKEN",
+                            "INVALID_LVL"
+                        ],
                         "type": "string"
                     },
                     "message": {
@@ -578,7 +687,9 @@
                 "type": "object",
                 "properties": {
                     "code": {
-                        "enum": ["OK"],
+                        "enum": [
+                            "OK"
+                        ],
                         "type": "string"
                     },
                     "message": {
@@ -623,14 +734,24 @@
                     "signLevel": {
                         "default": "B",
                         "description": "Signature level",
-                        "enum": ["B", "T", "LT", "LTA"],
+                        "enum": [
+                            "B",
+                            "T",
+                            "LT",
+                            "LTA"
+                        ],
                         "example": "B",
                         "type": "string"
                     },
                     "digestAlgorithm": {
                         "default": "SHA256",
                         "description": "Algorithm used to obtain the digest of the document to sign",
-                        "enum": ["SHA1", "SHA256", "SHA384", "SHA512"],
+                        "enum": [
+                            "SHA1",
+                            "SHA256",
+                            "SHA384",
+                            "SHA512"
+                        ],
                         "example": "SHA256",
                         "type": "string"
                     },
@@ -658,7 +779,10 @@
                     },
                     "commitmentTypes": {
                         "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
-                        "example": ["ProofOfOrigin", "ProofOfReceipt"],
+                        "example": [
+                            "ProofOfOrigin",
+                            "ProofOfReceipt"
+                        ],
                         "items": {
                             "description": "List of compromises of the signed document. This parameter shall be ignored if the parameter 'reason' is defined",
                             "enum": [
@@ -708,7 +832,11 @@
                     },
                     "certificationPermission": {
                         "description": "File permissions after signature",
-                        "enum": ["NO_CHANGE_PERMITTED", "MINIMAL_CHANGES_PERMITTED", "CHANGES_PERMITTED"],
+                        "enum": [
+                            "NO_CHANGE_PERMITTED",
+                            "MINIMAL_CHANGES_PERMITTED",
+                            "CHANGES_PERMITTED"
+                        ],
                         "example": "NO_CHANGE_PERMITTED",
                         "type": "string"
                     },
@@ -726,7 +854,9 @@
                         "type": "string"
                     }
                 },
-                "required": ["certId"]
+                "required": [
+                    "certId"
+                ]
             },
             "PadesVisualSignature": {
                 "description": "Required parameters in case that a visual signature is desired in the PDF file",
@@ -779,7 +909,10 @@
                     "multiImageBuild": {
                         "default": "HORIZONTAL",
                         "description": "If there is more than one image for the visual signature, this parameter will define how this images will be merged into one image",
-                        "enum": ["HORIZONTAL", "VERTICAL"],
+                        "enum": [
+                            "HORIZONTAL",
+                            "VERTICAL"
+                        ],
                         "example": "HORIZONTAL",
                         "type": "string"
                     },
@@ -795,7 +928,12 @@
                     "imageVerticalAlignment": {
                         "default": "NONE",
                         "description": "Vertical position of the visual signature in the page. In the case where the value is different than NONE and the parameter yAxis has a value different than the default one, the value defined by the parameter imageVerticalAlignment will prevail",
-                        "enum": ["NONE", "TOP", "MIDDLE", "BOTTOM"],
+                        "enum": [
+                            "NONE",
+                            "TOP",
+                            "MIDDLE",
+                            "BOTTOM"
+                        ],
                         "example": "NONE",
                         "type": "string"
                     },
@@ -845,21 +983,34 @@
                     "textSignerPosition": {
                         "default": "RIGHT",
                         "description": "In case there is an image and text defined for the visual signature, this parameter will define the position between these two elements in the visual signature. The default value implies that the image will be at the left part of the visible signature while the text will be at the right part",
-                        "enum": ["TOP", "BOTTOM", "RIGHT", "LEFT"],
+                        "enum": [
+                            "TOP",
+                            "BOTTOM",
+                            "RIGHT",
+                            "LEFT"
+                        ],
                         "example": "LEFT",
                         "type": "string"
                     },
                     "textHorizontalAlignment": {
                         "default": "LEFT",
                         "description": "Text alignment",
-                        "enum": ["LEFT", "CENTER", "RIGHT"],
+                        "enum": [
+                            "LEFT",
+                            "CENTER",
+                            "RIGHT"
+                        ],
                         "example": "LEFT",
                         "type": "string"
                     },
                     "textImageVerticalAlignment": {
                         "default": "MIDDLE",
                         "description": "In case there is more than one image with the parameter multiImageBuild with a value of HORIZONTAL and/or an image and text where the parameter textSignerPosition with values LEFT or RIGHT, this parameter defines the vertical alignment between those elements",
-                        "enum": ["TOP", "MIDDLE", "BOTTOM"],
+                        "enum": [
+                            "TOP",
+                            "MIDDLE",
+                            "BOTTOM"
+                        ],
                         "example": "MIDDLE",
                         "type": "string"
                     },
@@ -875,7 +1026,6 @@
                     }
                 }
             },
-
             "CadesSignatureResponse": {
                 "type": "object",
                 "properties": {

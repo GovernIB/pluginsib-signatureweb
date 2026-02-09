@@ -388,23 +388,47 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
 
             out.println("  function returnToMain() {\n");
             if (usesamewindow) {
-                out.println("    document.location.href='" + url + "';\n");
+                //Codi anterior out.println("    document.location.href='" + url + "';\n");
+                //out.println("    window.location.replace('" + url + "');\n");
+                
+                out.println("        // Enviar mensaje a la página padre\r\n"
+                        + "    window.parent.postMessage({ \r\n"
+                        + "        type: 'FIRMA_COMPLETE', \r\n"
+                        + "        url: '" + url + "' // La URL a donde quieres volver\r\n"
+                        + "    }, 'http://anadal:8080');\r\n"
+                        + "");
+                
+                
             } else {
                 out.println("    window.opener.location.href='" + url + "';\n");
                 out.println("    setTimeout(() => { window.close(); }, 1000);" + "\n");
             }
-            //out.println("    window.opener.location.href='" + url + "';\n");
+
             out.println("  }\n");
 
             out.println("  returnToMain();\n");
 
             out.println("</script>" + "\n");
             out.println("<center>" + "\n");
+            
+            out.println("<h1>555</h1>" + "\n");
             out.println("<img onClick='returnToMain();' src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE
                     + "/img/ajax-loader2.gif\" />" + "\n");
             out.println("</center>\n");
 
             generateFooter(out, sai, signaturesSet);
+            
+            
+            /*
+             
+             
+             function isFirefox() {
+                return typeof InstallTrigger !== 'undefined';
+            }
+             
+             */
+            
+            
 
         } catch (CancelledException e) {
             cancel(request, response, signaturesSet);

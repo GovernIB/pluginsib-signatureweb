@@ -184,8 +184,72 @@ paths:
       x-content-type: multipart/form-data
       x-accepts:
       - application/json
+  /api/v3/certificate/signhash:
+    post:
+      description: Sign a hash with a certificate
+      operationId: signHashUsingPOST_2
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CSignReqDTOV3'
+        required: true
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CSignDTO'
+          description: OK
+        "201":
+          description: Created
+        "401":
+          description: Unauthorized
+        "403":
+          description: Forbidden
+        "404":
+          description: Not Found
+      security:
+      - Authorization: []
+      summary: signHash
+      tags:
+      - PAdES Signature
+      x-content-type: application/json
+      x-accepts:
+      - application/json
 components:
   schemas:
+    CSignReqDTOV3:
+      example:
+        signdata: signdata
+        session: session
+        objId: objId
+        mechanism: mechanism
+      properties:
+        mechanism:
+          type: string
+        objId:
+          type: string
+        session:
+          type: string
+        signdata:
+          type: string
+      title: CSignReqDTOV3
+      type: object
+    CSignDTO:
+      example:
+        signedData: signedData
+        message: message
+        rcSign: rcSign
+      properties:
+        message:
+          type: string
+        rcSign:
+          type: string
+        signedData:
+          type: string
+      title: CSignDTO
+      type: object
     XadesSignatureResponse:
       example:
         signedFile: signedFile

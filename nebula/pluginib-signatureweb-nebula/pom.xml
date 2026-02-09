@@ -24,6 +24,19 @@
             <artifactId>pluginsib-signatureweb-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        
+        
+        <dependency>
+            <groupId>org.fundaciobit.pluginsib.signatureweb</groupId>
+            <artifactId>pluginsib-signatureweb-miniappletutils</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <artifactId>afirma-crypto-pdf-for-pluginsib</artifactId>
+            <groupId>es.gob.afirma</groupId>
+            <version>1.7.2</version>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

@@ -32,8 +32,8 @@ import org.junit.Test;
 public class NebulaTester {
 
     public static final String TEST_RESULTS_FOLDER = "./results/";
-    private static final String NEBULA_PROPERTIES_FILE = "nebula.properties";
-    private static final String TEST_PROPERTIES_FILE = "test.properties";
+    public static final String NEBULA_PROPERTIES_FILE = "nebula.properties";
+    public static final String TEST_PROPERTIES_FILE = "test.properties";
 
     static {
         new File(TEST_RESULTS_FOLDER).mkdirs();

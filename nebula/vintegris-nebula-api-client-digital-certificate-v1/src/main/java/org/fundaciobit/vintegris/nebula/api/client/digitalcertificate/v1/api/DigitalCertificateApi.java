@@ -9,6 +9,7 @@ import javax.ws.rs.core.GenericType;
 
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ActivateCertificate200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ActivateCertificateRequest;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CertIdDTO;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.Certificate;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ChangeCertificatePinRequest;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.FindCertificatesToSign200Response;
@@ -17,6 +18,7 @@ import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.G
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetPolicy200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetUserCertificates200Response;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ImportCertificateDTO;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.IssueCertificateRequest;
 import java.time.LocalDate;
 
@@ -441,6 +443,49 @@ public class DigitalCertificateApi {
 
     GenericType<GetUserCertificates200Response> localVarReturnType = new GenericType<GetUserCertificates200Response>() {};
     return apiClient.invokeAPI(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * Import Certificate
+   * Import a certificate into nebulaSUITE
+   * @param importCertificateDTO  (required)
+   * @return a {@code CertIdDTO}
+   * @throws ApiException if fails to make API call
+   */
+  public CertIdDTO importCertificate(ImportCertificateDTO importCertificateDTO) throws ApiException {
+    Object localVarPostBody = importCertificateDTO;
+    
+    // verify the required parameter 'importCertificateDTO' is set
+    if (importCertificateDTO == null) {
+      throw new ApiException(400, "Missing the required parameter 'importCertificateDTO' when calling importCertificate");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v1/certificate/import".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CertIdDTO> localVarReturnType = new GenericType<CertIdDTO>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
       }
   /**
    * Issue Certificate
