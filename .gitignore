@@ -44,3 +44,9 @@ nb-configuration.xml
 /miniappletinserversia/test.properties
 /fortress/test.log
 /fortress/test.properties
+/nebula/pluginib-signatureweb-nebula/certificate.json
+/nebula/pluginib-signatureweb-nebula/certificate_api.json
+/nebula/pluginib-signatureweb-nebula/data.json
+/nebula/pluginib-signatureweb-nebula/fnmt.p12
+/nebula/pluginib-signatureweb-nebula/nebula_anadal.cer
+/nebula/pluginib-signatureweb-nebula/nebula_anadal.cert
