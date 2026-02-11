@@ -335,92 +335,11 @@
                     }
                 ]
             }
-        },
-        "/api/v3/certificate/signhash": {
-            "post": {
-                "tags": [
-                    "PAdES Signature"
-                ],
-                "summary": "signHash",
-                "description": "Sign a hash with a certificate",
-                "operationId": "signHashUsingPOST_2",
-                "requestBody": {
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/components/schemas/CSignReqDTOV3"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/CSignDTO"
-                                }
-                            }
-                        }
-                    },
-                    "201": {
-                        "description": "Created"
-                    },
-                    "401": {
-                        "description": "Unauthorized"
-                    },
-                    "403": {
-                        "description": "Forbidden"
-                    },
-                    "404": {
-                        "description": "Not Found"
-                    }
-                },
-                "security": [
-                    {
-                        "Authorization": []
-                    }
-                ]
-            }
         }
     },
     "components": {
         "schemas": {
-            "CSignReqDTOV3": {
-                "type": "object",
-                "properties": {
-                    "mechanism": {
-                        "type": "string"
-                    },
-                    "objId": {
-                        "type": "string"
-                    },
-                    "session": {
-                        "type": "string"
-                    },
-                    "signdata": {
-                        "type": "string"
-                    }
-                },
-                "title": "CSignReqDTOV3"
-            },
-            "CSignDTO": {
-                "type": "object",
-                "properties": {
-                    "message": {
-                        "type": "string"
-                    },
-                    "rcSign": {
-                        "type": "string"
-                    },
-                    "signedData": {
-                        "type": "string"
-                    }
-                },
-                "title": "CSignDTO"
-            },
+ 
             "XadesSignatureResponse": {
                 "type": "object",
                 "properties": {

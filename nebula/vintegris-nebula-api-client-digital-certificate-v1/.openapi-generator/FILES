@@ -6,6 +6,14 @@ build.gradle
 build.sbt
 docs/ActivateCertificate200Response.md
 docs/ActivateCertificateRequest.md
+docs/CLoginRequestDTO.md
+docs/CSessionDTO.md
+docs/CSessionDTOV2.md
+docs/CSessionDTOV3.md
+docs/CSignCloseDTO.md
+docs/CSignDTO.md
+docs/CSignReqDTOV2.md
+docs/CSignReqDTOV3.md
 docs/CertIdDTO.md
 docs/Certificate.md
 docs/ChangeCertificatePinRequest.md
@@ -17,7 +25,6 @@ docs/GetCertPolicies200Response.md
 docs/GetMyCertificates200Response.md
 docs/GetMyCertificates200ResponseCertificatesListInner.md
 docs/GetPolicy200Response.md
-docs/GetUserCertificates200Response.md
 docs/ImportCertificateDTO.md
 docs/IssueCertificateRequest.md
 docs/Policy.md
@@ -33,6 +40,14 @@ src/main/AndroidManifest.xml
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/api/DigitalCertificateApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ActivateCertificate200Response.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ActivateCertificateRequest.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CLoginRequestDTO.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSessionDTO.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSessionDTOV2.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSessionDTOV3.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSignCloseDTO.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSignDTO.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSignReqDTOV2.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CSignReqDTOV3.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/CertIdDTO.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/Certificate.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ChangeCertificatePinRequest.java
@@ -43,7 +58,6 @@ src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetMyCertificates200Response.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetMyCertificates200ResponseCertificatesListInner.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetPolicy200Response.java
-src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/GetUserCertificates200Response.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/ImportCertificateDTO.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/IssueCertificateRequest.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/digitalcertificate/v1/model/Policy.java

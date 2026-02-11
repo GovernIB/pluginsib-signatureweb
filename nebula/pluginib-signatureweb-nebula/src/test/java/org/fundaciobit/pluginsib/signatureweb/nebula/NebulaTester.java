@@ -7,7 +7,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
@@ -21,6 +24,8 @@ import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureweb.api.ISignatureWebPlugin;
 import org.fundaciobit.pluginsib.signatureweb.api.SignaturesSetWeb;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200ResponseCertificatesListInner;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -65,6 +70,8 @@ public class NebulaTester {
         try {
 
             NebulaTester nebulaTest = new NebulaTester();
+            
+            nebulaTest.getCertificatesOfUser();
 
             nebulaTest.padesBasicSignature();
             
@@ -109,6 +116,58 @@ public class NebulaTester {
 
         return pluginInstance;
     }
+    
+    
+    
+    @Test
+    public List<GetMyCertificates200ResponseCertificatesListInner> getCertificatesOfUser(
+            ) throws ApiException, Exception, IOException {
+        
+        return getCertificatesOfUser(true);
+    }
+    
+    
+    
+    
+    public List<GetMyCertificates200ResponseCertificatesListInner> getCertificatesOfUser(boolean printInfo
+            ) throws ApiException, Exception, IOException {
+        
+        
+        NebulaSignatureWebPlugin nebula = (NebulaSignatureWebPlugin) getPlugin();
+        
+        Properties test = new Properties();
+        test.load(new FileReader("test.properties"));
+        String nif = test.getProperty("nif");
+        
+        
+        List<GetMyCertificates200ResponseCertificatesListInner> certificates = nebula.getUserCertificatesFromCache(null, nif);
+        if (printInfo) {
+            
+            if (certificates == null || certificates.isEmpty()) {
+                System.out.println("No s'han trobat certificats per l'usuari amb NIF: " + nif);             
+            } else {
+            
+                for (GetMyCertificates200ResponseCertificatesListInner cert : certificates) {
+                    System.out.println("\n\n ---------- Cert + " + cert.getCertificateId() + " \n" + cert + "\n\n");
+        
+                    String certificateCer = cert.getCertificate();
+                    byte[] certBytes = Base64.getDecoder().decode(certificateCer);
+        
+                    File f = new File("nebula_certificate_" + cert.getCertificateId()+ ".cer");
+                    Files.write(f.toPath(), certBytes);
+                    
+                    System.out.println(" Certificat guardat a " + f.getAbsolutePath()); 
+        
+                }
+            }
+        }
+
+        return certificates;
+    }
+    
+    
+    
+    
 
     @Test
     public void padesBasicSignature() throws IOException, FileNotFoundException, Exception {
@@ -312,44 +371,8 @@ public class NebulaTester {
 
         System.out.println("\n\n================ Iniciant test: " + testName + " ================\n");
 
-        SignaturesSetWeb ssw = new SignaturesSetWeb();
-        {
-
-            CommonInfoSignature commonInfo = new CommonInfoSignature();
-            commonInfo.setAdministrationID(nif);
-            commonInfo.setUsername(username);
-            commonInfo.setLanguageUI(languageUI);
-
-            StatusSignature statusSignatureSign = new StatusSignature();
-            statusSignatureSign.setStatus(StatusSignature.STATUS_INITIALIZING);
-
-            FileInfoSignature fis = new FileInfoSignature();
-            fis.setFileToSign(new File(fileToSignPath));
-            fis.setLanguageSign("es");
-            fis.setLocation("Esporles");
-            fis.setMimeType(mimeType);
-            fis.setName(fis.getFileToSign().getName());
-            fis.setReason("Prova de firmar amb Nebula");
-            fis.setSignAlgorithm(FileInfoSignature.SIGN_ALGORITHM_SHA256);
-            fis.setSignID("nebula_sign_" + System.nanoTime());
-            fis.setSignMode(signMode);
-            fis.setSignNumber(1);
-            fis.setSignOperation(FileInfoSignature.SIGN_OPERATION_SIGN);
-            fis.setSignType(signType);
-            fis.setStatusSignature(statusSignatureSign);
-            fis.setUserRequiresTimeStamp(userRequiresTimeStamp);
-
-            StatusSignaturesSet statusSignatureGlobal = new StatusSignaturesSet();
-            statusSignatureGlobal.setStatus(StatusSignature.STATUS_INITIALIZING);
-
-            ssw.setCommonInfoSignature(commonInfo);
-            ssw.setExpiryDate(new java.util.Date(System.currentTimeMillis() + 3600 * 1000));
-            ssw.setFileInfoSignatureArray(new FileInfoSignature[] { fis });
-            ssw.setSignaturesSetID("nebula_ss_" + System.nanoTime());
-            ssw.setStatusSignaturesSet(statusSignatureGlobal);
-            ssw.setUrlFinal("/url/de/return/de/prova");
-
-        }
+        SignaturesSetWeb ssw = createSignaturesSetWeb(nif, username, languageUI, fileToSignPath, mimeType, signType,
+                signMode, userRequiresTimeStamp);
 
         final HttpServletRequest request = null; // Proves va ok
         final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -442,6 +465,49 @@ public class NebulaTester {
                 return msg;
             }
         }
+    }
+
+    protected SignaturesSetWeb createSignaturesSetWeb(String nif, String username, String languageUI,
+            String fileToSignPath, String mimeType, String signType, int signMode, boolean userRequiresTimeStamp) {
+        SignaturesSetWeb ssw = new SignaturesSetWeb();
+        {
+
+            CommonInfoSignature commonInfo = new CommonInfoSignature();
+            commonInfo.setAdministrationID(nif);
+            commonInfo.setUsername(username);
+            commonInfo.setLanguageUI(languageUI);
+
+            StatusSignature statusSignatureSign = new StatusSignature();
+            statusSignatureSign.setStatus(StatusSignature.STATUS_INITIALIZING);
+
+            FileInfoSignature fis = new FileInfoSignature();
+            fis.setFileToSign(new File(fileToSignPath));
+            fis.setLanguageSign("es");
+            fis.setLocation("Esporles");
+            fis.setMimeType(mimeType);
+            fis.setName(fis.getFileToSign().getName());
+            fis.setReason("Prova de firmar amb Nebula");
+            fis.setSignAlgorithm(FileInfoSignature.SIGN_ALGORITHM_SHA256);
+            fis.setSignID("nebula_sign_" + System.nanoTime());
+            fis.setSignMode(signMode);
+            fis.setSignNumber(1);
+            fis.setSignOperation(FileInfoSignature.SIGN_OPERATION_SIGN);
+            fis.setSignType(signType);
+            fis.setStatusSignature(statusSignatureSign);
+            fis.setUserRequiresTimeStamp(userRequiresTimeStamp);
+
+            StatusSignaturesSet statusSignatureGlobal = new StatusSignaturesSet();
+            statusSignatureGlobal.setStatus(StatusSignature.STATUS_INITIALIZING);
+
+            ssw.setCommonInfoSignature(commonInfo);
+            ssw.setExpiryDate(new java.util.Date(System.currentTimeMillis() + 3600 * 1000));
+            ssw.setFileInfoSignatureArray(new FileInfoSignature[] { fis });
+            ssw.setSignaturesSetID("nebula_ss_" + System.nanoTime());
+            ssw.setStatusSignaturesSet(statusSignatureGlobal);
+            ssw.setUrlFinal("/url/de/return/de/prova");
+
+        }
+        return ssw;
     }
 
     protected void checkTest(String testName, long startTime, String result) {

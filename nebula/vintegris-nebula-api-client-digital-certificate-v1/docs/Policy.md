@@ -12,8 +12,8 @@
 |**idCert** | **String** | Certificate identifier |  [optional] |
 |**agentName** | **String** | User name in case userType is USER or group name in case userType is GROUP |  [optional] |
 |**status** | **String** | Policy status |  [optional] |
-|**dateValidStart** | **Integer** | Valid start date |  [optional] |
-|**dateValidEnd** | **Integer** | Valid end date |  [optional] |
+|**dateValidStart** | **Long** | Valid start date |  [optional] |
+|**dateValidEnd** | **Long** | Valid end date |  [optional] |
 |**validIpSource** | **String** | Valid IP source |  [optional] |
 |**idAcl** | **String** | ACL identifier |  [optional] |
 |**aclName** | **String** | ACL name |  [optional] |

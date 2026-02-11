@@ -66,11 +66,11 @@ public class Policy {
 
   public static final String JSON_PROPERTY_DATE_VALID_START = "dateValidStart";
   @javax.annotation.Nullable
-  private Integer dateValidStart;
+  private Long dateValidStart;
 
   public static final String JSON_PROPERTY_DATE_VALID_END = "dateValidEnd";
   @javax.annotation.Nullable
-  private Integer dateValidEnd;
+  private Long dateValidEnd;
 
   public static final String JSON_PROPERTY_VALID_IP_SOURCE = "validIpSource";
   @javax.annotation.Nullable
@@ -228,7 +228,7 @@ public class Policy {
     this.status = status;
   }
 
-  public Policy dateValidStart(@javax.annotation.Nullable Integer dateValidStart) {
+  public Policy dateValidStart(@javax.annotation.Nullable Long dateValidStart) {
     
     this.dateValidStart = dateValidStart;
     return this;
@@ -242,18 +242,18 @@ public class Policy {
   @JsonProperty(JSON_PROPERTY_DATE_VALID_START)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public Integer getDateValidStart() {
+  public Long getDateValidStart() {
     return dateValidStart;
   }
 
 
   @JsonProperty(JSON_PROPERTY_DATE_VALID_START)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDateValidStart(@javax.annotation.Nullable Integer dateValidStart) {
+  public void setDateValidStart(@javax.annotation.Nullable Long dateValidStart) {
     this.dateValidStart = dateValidStart;
   }
 
-  public Policy dateValidEnd(@javax.annotation.Nullable Integer dateValidEnd) {
+  public Policy dateValidEnd(@javax.annotation.Nullable Long dateValidEnd) {
     
     this.dateValidEnd = dateValidEnd;
     return this;
@@ -267,14 +267,14 @@ public class Policy {
   @JsonProperty(JSON_PROPERTY_DATE_VALID_END)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public Integer getDateValidEnd() {
+  public Long getDateValidEnd() {
     return dateValidEnd;
   }
 
 
   @JsonProperty(JSON_PROPERTY_DATE_VALID_END)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDateValidEnd(@javax.annotation.Nullable Integer dateValidEnd) {
+  public void setDateValidEnd(@javax.annotation.Nullable Long dateValidEnd) {
     this.dateValidEnd = dateValidEnd;
   }
 

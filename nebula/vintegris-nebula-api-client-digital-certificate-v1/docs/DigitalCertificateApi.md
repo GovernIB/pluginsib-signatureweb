@@ -5,15 +5,19 @@ All URIs are relative to *https://api-ansmt01.nebulaservice.net/api*
 | Method | HTTP request | Description |
 |------------- | ------------- | -------------|
 | [**activateCertificate**](DigitalCertificateApi.md#activateCertificate) | **PUT** /v2/certificate/request/{requestid}/activate | Activate Certificate |
-| [**changeCertificatePin**](DigitalCertificateApi.md#changeCertificatePin) | **PUT** /v1/certificate/changepin | Change Certificate Pin |
-| [**findCertificatesToSign**](DigitalCertificateApi.md#findCertificatesToSign) | **GET** /v4/certificates/available-for-signing | Find Certificates to Sign |
-| [**getCertPolicies**](DigitalCertificateApi.md#getCertPolicies) | **GET** /v2/certificate/mypolicies | Get Cert Policies |
-| [**getCertificate**](DigitalCertificateApi.md#getCertificate) | **GET** /v2/certificate/{certificateid} | Get Certificate |
+| [**changeCertificatePin**](DigitalCertificateApi.md#changeCertificatePin) | **PUT** /api/v1/certificate/changepin | Change Certificate Pin |
+| [**findCertificatesToSign**](DigitalCertificateApi.md#findCertificatesToSign) | **GET** /api/v4/certificates/available-for-signing | Find Certificates to Sign |
+| [**getCertPolicies**](DigitalCertificateApi.md#getCertPolicies) | **GET** /api/v2/certificate/mypolicies | Get Cert Policies |
+| [**getCertificate**](DigitalCertificateApi.md#getCertificate) | **GET** /api/v2/certificate/{certificateid} | Get Certificate |
 | [**getMyCertificates**](DigitalCertificateApi.md#getMyCertificates) | **GET** /api/v2/certificate/mycertificates | Get User Certificates |
 | [**getPolicy**](DigitalCertificateApi.md#getPolicy) | **GET** /v2/certificate/policy/{certificateid} | Get Policy |
-| [**getUserCertificates**](DigitalCertificateApi.md#getUserCertificates) | **GET** /v2/certificate/mycertificates | Get User Certificates |
 | [**importCertificate**](DigitalCertificateApi.md#importCertificate) | **POST** /api/v1/certificate/import | Import Certificate |
 | [**issueCertificate**](DigitalCertificateApi.md#issueCertificate) | **PUT** /v2/certificate/request/{requestId}/issue | Issue Certificate |
+| [**signCloseV2**](DigitalCertificateApi.md#signCloseV2) | **POST** /api/v2/certificate/signclose | Sign Close |
+| [**signHashV2**](DigitalCertificateApi.md#signHashV2) | **POST** /api/v2/certificate/signhash | Sign Hash |
+| [**signHashV3**](DigitalCertificateApi.md#signHashV3) | **POST** /api/v3/certificate/signhash | Sign Hash V3 |
+| [**signInitV2**](DigitalCertificateApi.md#signInitV2) | **POST** /api/v2/certificate/signinit | Sign Init |
+| [**signInitV3**](DigitalCertificateApi.md#signInitV3) | **POST** /api/v3/certificate/signinit | Sign Init V3 |
 
 
 
@@ -563,91 +567,6 @@ public class Example {
 | **200** | OK |  -  |
 
 
-## getUserCertificates
-
-> GetUserCertificates200Response getUserCertificates(ownerId, offset, limit, enableFilter, expireFilter, certType, isOrphan, dateValidStart)
-
-Get User Certificates
-
-Gets the user&#39;s certificate list and returns its search result that fulfills the given input search criteria. The role of the user who executes this operation must be admin, owner or signer
-
-### Example
-
-```java
-// Import classes:
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
-
-public class Example {
-    public static void main(String[] args) {
-        ApiClient defaultClient = Configuration.getDefaultApiClient();
-        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
-        
-        // Configure HTTP bearer authorization: Authorization
-        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
-        Authorization.setBearerToken("BEARER TOKEN");
-
-        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
-        String ownerId = "ownerId_example"; // String | Unique Owner identifier (uuid). The parameter is exclusive for admin users
-        Integer offset = 56; // Integer | Search offset
-        Integer limit = 56; // Integer | Search limit 0 means no limit
-        String enableFilter = "ENABLED"; // String | If the certificate is usable
-        String expireFilter = "EXPIRED"; // String | If the certificate is expired or expiring
-        String certType = "IMPORTED"; // String | Certificate type
-        Boolean isOrphan = true; // Boolean | True if the certificate is orphan (This parameter is exclusive for the Admin role)
-        String dateValidStart = "dateValidStart_example"; // String | Start date for the certificate's valid period
-        try {
-            GetUserCertificates200Response result = apiInstance.getUserCertificates(ownerId, offset, limit, enableFilter, expireFilter, certType, isOrphan, dateValidStart);
-            System.out.println(result);
-        } catch (ApiException e) {
-            System.err.println("Exception when calling DigitalCertificateApi#getUserCertificates");
-            System.err.println("Status code: " + e.getCode());
-            System.err.println("Reason: " + e.getResponseBody());
-            System.err.println("Response headers: " + e.getResponseHeaders());
-            e.printStackTrace();
-        }
-    }
-}
-```
-
-### Parameters
-
-
-| Name | Type | Description  | Notes |
-|------------- | ------------- | ------------- | -------------|
-| **ownerId** | **String**| Unique Owner identifier (uuid). The parameter is exclusive for admin users | [optional] |
-| **offset** | **Integer**| Search offset | [optional] |
-| **limit** | **Integer**| Search limit 0 means no limit | [optional] |
-| **enableFilter** | **String**| If the certificate is usable | [optional] [enum: ENABLED, DISABLED, BOTH] |
-| **expireFilter** | **String**| If the certificate is expired or expiring | [optional] [enum: EXPIRED, EXPIRING, BOTH] |
-| **certType** | **String**| Certificate type | [optional] [enum: IMPORTED, INTERMEDIATE, QUALIFIED, ALL] |
-| **isOrphan** | **Boolean**| True if the certificate is orphan (This parameter is exclusive for the Admin role) | [optional] |
-| **dateValidStart** | **String**| Start date for the certificate&#39;s valid period | [optional] |
-
-### Return type
-
-[**GetUserCertificates200Response**](GetUserCertificates200Response.md)
-
-### Authorization
-
-[Authorization](../README.md#Authorization)
-
-### HTTP request headers
-
-- **Content-Type**: Not defined
-- **Accept**: application/json
-
-
-### HTTP response details
-| Status code | Description | Response headers |
-|-------------|-------------|------------------|
-| **200** | OK |  -  |
-
-
 ## importCertificate
 
 > CertIdDTO importCertificate(importCertificateDTO)
@@ -793,4 +712,379 @@ null (empty response body)
 | Status code | Description | Response headers |
 |-------------|-------------|------------------|
 | **202** | Accepted |  -  |
+
+
+## signCloseV2
+
+> CSessionDTO signCloseV2(csignCloseDTO)
+
+Sign Close
+
+Closes a signing session for CAdES signature
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        CSignCloseDTO csignCloseDTO = new CSignCloseDTO(); // CSignCloseDTO | 
+        try {
+            CSessionDTO result = apiInstance.signCloseV2(csignCloseDTO);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#signCloseV2");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **csignCloseDTO** | [**CSignCloseDTO**](CSignCloseDTO.md)|  | |
+
+### Return type
+
+[**CSessionDTO**](CSessionDTO.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
+
+
+## signHashV2
+
+> CSignDTO signHashV2(csignReqDTOV2)
+
+Sign Hash
+
+Sign a hash using a CAdES signature
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        CSignReqDTOV2 csignReqDTOV2 = new CSignReqDTOV2(); // CSignReqDTOV2 | 
+        try {
+            CSignDTO result = apiInstance.signHashV2(csignReqDTOV2);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#signHashV2");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **csignReqDTOV2** | [**CSignReqDTOV2**](CSignReqDTOV2.md)|  | |
+
+### Return type
+
+[**CSignDTO**](CSignDTO.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
+
+
+## signHashV3
+
+> CSignDTO signHashV3(csignReqDTOV3)
+
+Sign Hash V3
+
+Sign a hash using a CAdES signature (V3)
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        CSignReqDTOV3 csignReqDTOV3 = new CSignReqDTOV3(); // CSignReqDTOV3 | 
+        try {
+            CSignDTO result = apiInstance.signHashV3(csignReqDTOV3);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#signHashV3");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **csignReqDTOV3** | [**CSignReqDTOV3**](CSignReqDTOV3.md)|  | |
+
+### Return type
+
+[**CSignDTO**](CSignDTO.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
+
+
+## signInitV2
+
+> CSessionDTOV2 signInitV2(cloginRequestDTO)
+
+Sign Init
+
+Initializes a signing session for CAdES signature
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        CLoginRequestDTO cloginRequestDTO = new CLoginRequestDTO(); // CLoginRequestDTO | 
+        try {
+            CSessionDTOV2 result = apiInstance.signInitV2(cloginRequestDTO);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#signInitV2");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **cloginRequestDTO** | [**CLoginRequestDTO**](CLoginRequestDTO.md)|  | |
+
+### Return type
+
+[**CSessionDTOV2**](CSessionDTOV2.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
+
+
+## signInitV3
+
+> CSessionDTOV3 signInitV3(cloginRequestDTO)
+
+Sign Init V3
+
+Initializes a signing session for CAdES signature (V3)
+
+### Example
+
+```java
+// Import classes:
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiClient;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.Configuration;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.auth.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.models.*;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+
+public class Example {
+    public static void main(String[] args) {
+        ApiClient defaultClient = Configuration.getDefaultApiClient();
+        defaultClient.setBasePath("https://api-ansmt01.nebulaservice.net/api");
+        
+        // Configure HTTP bearer authorization: Authorization
+        HttpBearerAuth Authorization = (HttpBearerAuth) defaultClient.getAuthentication("Authorization");
+        Authorization.setBearerToken("BEARER TOKEN");
+
+        DigitalCertificateApi apiInstance = new DigitalCertificateApi(defaultClient);
+        CLoginRequestDTO cloginRequestDTO = new CLoginRequestDTO(); // CLoginRequestDTO | 
+        try {
+            CSessionDTOV3 result = apiInstance.signInitV3(cloginRequestDTO);
+            System.out.println(result);
+        } catch (ApiException e) {
+            System.err.println("Exception when calling DigitalCertificateApi#signInitV3");
+            System.err.println("Status code: " + e.getCode());
+            System.err.println("Reason: " + e.getResponseBody());
+            System.err.println("Response headers: " + e.getResponseHeaders());
+            e.printStackTrace();
+        }
+    }
+}
+```
+
+### Parameters
+
+
+| Name | Type | Description  | Notes |
+|------------- | ------------- | ------------- | -------------|
+| **cloginRequestDTO** | [**CLoginRequestDTO**](CLoginRequestDTO.md)|  | |
+
+### Return type
+
+[**CSessionDTOV3**](CSessionDTOV3.md)
+
+### Authorization
+
+[Authorization](../README.md#Authorization)
+
+### HTTP request headers
+
+- **Content-Type**: application/json
+- **Accept**: application/json
+
+
+### HTTP response details
+| Status code | Description | Response headers |
+|-------------|-------------|------------------|
+| **200** | OK |  -  |
+| **201** | Created |  -  |
+| **401** | Unauthorized |  -  |
+| **403** | Forbidden |  -  |
+| **404** | Not Found |  -  |
 

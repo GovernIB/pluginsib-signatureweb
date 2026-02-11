@@ -9,6 +9,14 @@ import javax.ws.rs.core.GenericType;
 
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ActivateCertificate200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ActivateCertificateRequest;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CLoginRequestDTO;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSessionDTO;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSessionDTOV2;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSessionDTOV3;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSignCloseDTO;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSignDTO;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSignReqDTOV2;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CSignReqDTOV3;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.CertIdDTO;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.Certificate;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ChangeCertificatePinRequest;
@@ -17,7 +25,6 @@ import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.F
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetCertPolicies200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetPolicy200Response;
-import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetUserCertificates200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.ImportCertificateDTO;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.IssueCertificateRequest;
 import java.time.LocalDate;
@@ -112,7 +119,7 @@ public class DigitalCertificateApi {
     }
     
     // create path and map variables
-    String localVarPath = "/v1/certificate/changepin".replaceAll("\\{format\\}","json");
+    String localVarPath = "/api/v1/certificate/changepin".replaceAll("\\{format\\}","json");
 
     // query params
     List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -161,7 +168,7 @@ public class DigitalCertificateApi {
     Object localVarPostBody = null;
     
     // create path and map variables
-    String localVarPath = "/v4/certificates/available-for-signing".replaceAll("\\{format\\}","json");
+    String localVarPath = "/api/v4/certificates/available-for-signing".replaceAll("\\{format\\}","json");
 
     // query params
     List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -213,7 +220,7 @@ public class DigitalCertificateApi {
     Object localVarPostBody = null;
     
     // create path and map variables
-    String localVarPath = "/v2/certificate/mypolicies".replaceAll("\\{format\\}","json");
+    String localVarPath = "/api/v2/certificate/mypolicies".replaceAll("\\{format\\}","json");
 
     // query params
     List<Pair> localVarQueryParams = new ArrayList<Pair>();
@@ -259,7 +266,7 @@ public class DigitalCertificateApi {
     }
     
     // create path and map variables
-    String localVarPath = "/v2/certificate/{certificateid}".replaceAll("\\{format\\}","json")
+    String localVarPath = "/api/v2/certificate/{certificateid}".replaceAll("\\{format\\}","json")
       .replaceAll("\\{" + "certificateid" + "\\}", apiClient.escapeString(certificateid.toString()));
 
     // query params
@@ -392,59 +399,6 @@ public class DigitalCertificateApi {
     return apiClient.invokeAPI(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
       }
   /**
-   * Get User Certificates
-   * Gets the user&#39;s certificate list and returns its search result that fulfills the given input search criteria. The role of the user who executes this operation must be admin, owner or signer
-   * @param ownerId Unique Owner identifier (uuid). The parameter is exclusive for admin users (optional)
-   * @param offset Search offset (optional)
-   * @param limit Search limit 0 means no limit (optional)
-   * @param enableFilter If the certificate is usable (optional)
-   * @param expireFilter If the certificate is expired or expiring (optional)
-   * @param certType Certificate type (optional)
-   * @param isOrphan True if the certificate is orphan (This parameter is exclusive for the Admin role) (optional)
-   * @param dateValidStart Start date for the certificate&#39;s valid period (optional)
-   * @return a {@code GetUserCertificates200Response}
-   * @throws ApiException if fails to make API call
-   */
-  public GetUserCertificates200Response getUserCertificates(String ownerId, Integer offset, Integer limit, String enableFilter, String expireFilter, String certType, Boolean isOrphan, String dateValidStart) throws ApiException {
-    Object localVarPostBody = null;
-    
-    // create path and map variables
-    String localVarPath = "/v2/certificate/mycertificates".replaceAll("\\{format\\}","json");
-
-    // query params
-    List<Pair> localVarQueryParams = new ArrayList<Pair>();
-    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
-    Map<String, String> localVarCookieParams = new HashMap<String, String>();
-    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
-
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "ownerId", ownerId));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "offset", offset));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "limit", limit));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "enableFilter", enableFilter));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "expireFilter", expireFilter));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "certType", certType));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "isOrphan", isOrphan));
-    localVarQueryParams.addAll(apiClient.parameterToPairs("", "dateValidStart", dateValidStart));
-
-    
-    
-    
-    final String[] localVarAccepts = {
-      "application/json"
-    };
-    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
-
-    final String[] localVarContentTypes = {
-      
-    };
-    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
-
-    String[] localVarAuthNames = new String[] { "Authorization" };
-
-    GenericType<GetUserCertificates200Response> localVarReturnType = new GenericType<GetUserCertificates200Response>() {};
-    return apiClient.invokeAPI(localVarPath, "GET", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
-      }
-  /**
    * Import Certificate
    * Import a certificate into nebulaSUITE
    * @param importCertificateDTO  (required)
@@ -536,4 +490,219 @@ public class DigitalCertificateApi {
 
     apiClient.invokeAPI(localVarPath, "PUT", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, null);
   }
+  /**
+   * Sign Close
+   * Closes a signing session for CAdES signature
+   * @param csignCloseDTO  (required)
+   * @return a {@code CSessionDTO}
+   * @throws ApiException if fails to make API call
+   */
+  public CSessionDTO signCloseV2(CSignCloseDTO csignCloseDTO) throws ApiException {
+    Object localVarPostBody = csignCloseDTO;
+    
+    // verify the required parameter 'csignCloseDTO' is set
+    if (csignCloseDTO == null) {
+      throw new ApiException(400, "Missing the required parameter 'csignCloseDTO' when calling signCloseV2");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v2/certificate/signclose".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSessionDTO> localVarReturnType = new GenericType<CSessionDTO>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * Sign Hash
+   * Sign a hash using a CAdES signature
+   * @param csignReqDTOV2  (required)
+   * @return a {@code CSignDTO}
+   * @throws ApiException if fails to make API call
+   */
+  public CSignDTO signHashV2(CSignReqDTOV2 csignReqDTOV2) throws ApiException {
+    Object localVarPostBody = csignReqDTOV2;
+    
+    // verify the required parameter 'csignReqDTOV2' is set
+    if (csignReqDTOV2 == null) {
+      throw new ApiException(400, "Missing the required parameter 'csignReqDTOV2' when calling signHashV2");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v2/certificate/signhash".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSignDTO> localVarReturnType = new GenericType<CSignDTO>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * Sign Hash V3
+   * Sign a hash using a CAdES signature (V3)
+   * @param csignReqDTOV3  (required)
+   * @return a {@code CSignDTO}
+   * @throws ApiException if fails to make API call
+   */
+  public CSignDTO signHashV3(CSignReqDTOV3 csignReqDTOV3) throws ApiException {
+    Object localVarPostBody = csignReqDTOV3;
+    
+    // verify the required parameter 'csignReqDTOV3' is set
+    if (csignReqDTOV3 == null) {
+      throw new ApiException(400, "Missing the required parameter 'csignReqDTOV3' when calling signHashV3");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v3/certificate/signhash".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSignDTO> localVarReturnType = new GenericType<CSignDTO>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * Sign Init
+   * Initializes a signing session for CAdES signature
+   * @param cloginRequestDTO  (required)
+   * @return a {@code CSessionDTOV2}
+   * @throws ApiException if fails to make API call
+   */
+  public CSessionDTOV2 signInitV2(CLoginRequestDTO cloginRequestDTO) throws ApiException {
+    Object localVarPostBody = cloginRequestDTO;
+    
+    // verify the required parameter 'cloginRequestDTO' is set
+    if (cloginRequestDTO == null) {
+      throw new ApiException(400, "Missing the required parameter 'cloginRequestDTO' when calling signInitV2");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v2/certificate/signinit".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSessionDTOV2> localVarReturnType = new GenericType<CSessionDTOV2>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
+  /**
+   * Sign Init V3
+   * Initializes a signing session for CAdES signature (V3)
+   * @param cloginRequestDTO  (required)
+   * @return a {@code CSessionDTOV3}
+   * @throws ApiException if fails to make API call
+   */
+  public CSessionDTOV3 signInitV3(CLoginRequestDTO cloginRequestDTO) throws ApiException {
+    Object localVarPostBody = cloginRequestDTO;
+    
+    // verify the required parameter 'cloginRequestDTO' is set
+    if (cloginRequestDTO == null) {
+      throw new ApiException(400, "Missing the required parameter 'cloginRequestDTO' when calling signInitV3");
+    }
+    
+    // create path and map variables
+    String localVarPath = "/api/v3/certificate/signinit".replaceAll("\\{format\\}","json");
+
+    // query params
+    List<Pair> localVarQueryParams = new ArrayList<Pair>();
+    Map<String, String> localVarHeaderParams = new HashMap<String, String>();
+    Map<String, String> localVarCookieParams = new HashMap<String, String>();
+    Map<String, Object> localVarFormParams = new HashMap<String, Object>();
+
+
+    
+    
+    
+    final String[] localVarAccepts = {
+      "application/json"
+    };
+    final String localVarAccept = apiClient.selectHeaderAccept(localVarAccepts);
+
+    final String[] localVarContentTypes = {
+      "application/json"
+    };
+    final String localVarContentType = apiClient.selectHeaderContentType(localVarContentTypes);
+
+    String[] localVarAuthNames = new String[] { "Authorization" };
+
+    GenericType<CSessionDTOV3> localVarReturnType = new GenericType<CSessionDTOV3>() {};
+    return apiClient.invokeAPI(localVarPath, "POST", localVarQueryParams, localVarPostBody, localVarHeaderParams, localVarCookieParams, localVarFormParams, localVarAccept, localVarContentType, localVarAuthNames, localVarReturnType);
+      }
 }

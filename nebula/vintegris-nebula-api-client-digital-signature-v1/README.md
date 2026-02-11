@@ -122,14 +122,11 @@ Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
 *CadEsSignatureApi* | [**cadesSign**](docs/CadEsSignatureApi.md#cadesSign) | **POST** /api/v1/cadessign/sign | Sign a document with CAdES
 *PadEsSignatureApi* | [**signDocumentV1**](docs/PadEsSignatureApi.md#signDocumentV1) | **POST** /signature/pades/v1/sign | Sign a PDF file
-*PadEsSignatureApi* | [**signHashUsingPOST2**](docs/PadEsSignatureApi.md#signHashUsingPOST2) | **POST** /api/v3/certificate/signhash | signHash
 *XadEsSignatureApi* | [**xadesSign**](docs/XadEsSignatureApi.md#xadesSign) | **POST** /api/v2/xadessign/sign | Sign an XML file with XAdES
 
 
 ## Documentation for Models
 
- - [CSignDTO](docs/CSignDTO.md)
- - [CSignReqDTOV3](docs/CSignReqDTOV3.md)
  - [CadesSignLocation](docs/CadesSignLocation.md)
  - [CadesSignatureRequest](docs/CadesSignatureRequest.md)
  - [CadesSignatureResponse](docs/CadesSignatureResponse.md)
