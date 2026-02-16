@@ -9,6 +9,7 @@ import org.fundaciobit.pluginsib.core.v3.utils.CertificateUtils;
 import org.fundaciobit.pluginsib.signature.api.CommonInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.PolicyInfoSignature;
+import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletSignInfo;
@@ -83,8 +84,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     private static final String FIELD_PIN = "pin";
 
-    public static final String IGNORE_CERTIFICATE_FILTER = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY
-            + "ignore_certificate_filter";
+    public static final String IGNORE_CERTIFICATE_FILTER = NEBULA_BASE_PROPERTIES + "ignore_certificate_filter";
 
     public static final DateFormat DATE_FORMATTER = SimpleDateFormat.getDateTimeInstance();
 
@@ -1499,5 +1499,83 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     }
 
     // ----------------------------------------------------
+
+    @Override
+    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+
+        List<PropertyInfo> props = new ArrayList<>();
+
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.url=https://api-ansmt01.nebulaservice.net
+            PropertyInfo propUrl = new PropertyInfo(NEBULA_BASE_PROPERTIES + "url", "URL de la API de Nebula", false,
+                    "https://api-ansmt01.nebulaservice.net");
+            props.add(propUrl);
+        }
+
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.url_auth=https://api.nebulaservice.net/trustedapps/v1
+            PropertyInfo propUrlAuth = new PropertyInfo(NEBULA_BASE_PROPERTIES + "url_auth",
+                    "URL de autenticació de Nebula", false, "https://api.nebulaservice.net/trustedapps/v1");
+            props.add(propUrlAuth);
+        }
+
+        {
+            //             es.caib.sample.pluginsib.signatureweb.nebula.applicationName=PORTAFIB
+            PropertyInfo propApplicationName = new PropertyInfo(NEBULA_BASE_PROPERTIES + "applicationName",
+                    "Nom de l'aplicació registrada a Nebula", false, null);
+            props.add(propApplicationName);
+        }
+
+        {
+            //  es.caib.sample.pluginsib.signatureweb.nebula.tenantId=2d-cf05-40ad-9493-XXXXXXXXXX
+            PropertyInfo propTenantId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "tenantId", "ID del tenant a Nebula",
+                    false, null);
+            props.add(propTenantId);
+        }
+
+        {
+            //  es.caib.sample.pluginsib.signatureweb.nebula.appId=18-2235-47db-a2fd-XXXXXXXXXXXX
+            PropertyInfo propAppId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "appId",
+                    "ID de l'aplicació registrada a Nebula", false, null);
+            props.add(propAppId);
+        }
+
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.accessKey=60dF623BA94B0a5acD80B39XXXXXXXXXXXXXXXXXX
+            PropertyInfo propAccessKey = new PropertyInfo(NEBULA_BASE_PROPERTIES + "accessKey",
+                    "Clau d'accés de l'aplicació registrada a Nebula", false, null);
+            props.add(propAccessKey);
+        }
+
+        {
+            // En entorn de PRE de NEBULA els certificats no inclouen el NIF, per tant cal ignorar la seva validació
+            // es.caib.sample.pluginsib.signatureweb.nebula.ignoreNifValidation=true
+            PropertyInfo propIgnoreNifValidation = new PropertyInfo(NEBULA_BASE_PROPERTIES + "ignoreNifValidation",
+                    "Indica si s'ha d'ignorar la validació del NIF"
+                            + " (En entorn de PRE de NEBULA els certificats"
+                            + " no inclouen el NIF, per tant cal ignorar la seva validació)",
+                    true, "false", new String[] { "true", "false" }, null);
+            props.add(propIgnoreNifValidation);
+        }
+
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.ignore_certificate_filter
+            PropertyInfo propIgnoreCertificateFilter = new PropertyInfo(
+                    NEBULA_BASE_PROPERTIES + "ignore_certificate_filter",
+                    "Indica si s'ha d'ignorar el filtre de certificats definit a l'Administració (filtreCertificats)",
+                    true, "false", new String[] { "true", "false" }, null);
+            props.add(propIgnoreCertificateFilter);
+        }
+
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.debug=false
+            PropertyInfo propDebug = new PropertyInfo(NEBULA_BASE_PROPERTIES + "debug",
+                    "Indica si s'activa el mode debug, que mostra informació addicional als logs", true, "false",
+                    new String[] { "true", "false" }, null);
+            props.add(propDebug);
+        }
+
+        return props;
+    }
 
 }
