@@ -16,8 +16,10 @@ import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletUtils
 import org.fundaciobit.pluginsib.signatureweb.api.AbstractSignatureWebPlugin;
 import org.fundaciobit.pluginsib.signatureweb.api.SignaturesSetWeb;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.api.DigitalCertificateApi;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetCertPolicies200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200Response;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200ResponseCertificatesListInner;
+import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.Policy;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.api.CadEsSignatureApi;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.api.PadEsSignatureApi;
 import org.fundaciobit.vintegris.nebula.api.client.digitalsignature.v1.api.XadEsSignatureApi;
@@ -41,6 +43,7 @@ import org.fundaciobit.vintegris.nebula.api.client.trustedapplications.v1.servic
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ext.ContextResolver;
 
 import java.io.ByteArrayInputStream;
@@ -48,11 +51,17 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.X509Certificate;
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -62,7 +71,7 @@ import java.util.Properties;
 import java.util.Random;
 
 /**
- * Implementaciónx del plugin de firma web de Nebula (Vintegris)
+ * Implementació del plugin de firma web de Nebula (Vintegris)
  *
  * @author anadal
  */
@@ -71,6 +80,13 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public static final String NEBULA_BASE_PROPERTIES = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY + "nebula.";
 
     public static String CERTIFICATES_OF_USER_SESSIONKEY = "CERTIFICATES_OF_USER_SESSIONKEY";
+
+    private static final String FIELD_PIN = "pin";
+
+    public static final String IGNORE_CERTIFICATE_FILTER = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY
+            + "ignore_certificate_filter";
+
+    public static final DateFormat DATE_FORMATTER = SimpleDateFormat.getDateTimeInstance();
 
     // Constructors per defecte
 
@@ -85,38 +101,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public NebulaSignatureWebPlugin(String propertyKeyBase, Properties properties) {
         super(propertyKeyBase, properties);
     }
-
-    /*
-    DigitalCertificateApi apiCert = getDigitalCertificateApi(url, token);
-    
-    // Inicialització
-    private FortressApi getApi(String username) throws Exception {
-        String url = prop.getProperty("url");
-        String url_auth = prop.getProperty("url_auth");
-    
-    
-        // PORTAFIB CONFIGURACIO
-        String applicationName = prop.getProperty("applicationName");
-        String tenantId = prop.getProperty("tenantId");
-        String appId = prop.getProperty("appId");
-        String accessKey = prop.getProperty("accessKey");
-        String username = prop.getProperty("username");
-        String usernameB64 = Base64.getEncoder().encodeToString(username.getBytes());
-        System.out.println("base64[" + username + "] = " + usernameB64);
-    
-        String trusted_app_token = generateTrustedAppToken(applicationName, tenantId, appId, accessKey);
-    
-        // Print the trusted_app_token
-        System.out.println("------ trusted_app_token (authorization en PostMan) ---- ");
-        System.out.println(trusted_app_token);
-    
-        //if (true) return;
-    
-        String token = getUserToken(trusted_app_token, url_auth, applicationName, tenantId, appId, accessKey,
-                usernameB64);
-    
-    }
-    */
 
     // Propietats de configuració
     /*
@@ -151,19 +135,17 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
 
-            List<GetMyCertificates200ResponseCertificatesListInner> certs = getUserCertificatesFromCache(request, nif);
+            NebulaCacheInfo info = getNebulaCache(nif);
 
             // TODO ficar dins sessió el certificat !!!!!
+            Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
 
             if (certs == null || certs.size() == 0) {
+                // XYZ ZZZ TRA
                 String msg = "L'usuari amb nif " + nif + " no té cap certificat digital vàlid a NEBULA.";
                 log.error(msg);
                 return msg;
             }
-
-            // Podem fer CACHE del certificat de l'usuari dins de sessió 
-            // per evitar haver de consultar a NEBULA diverses vegades durant el procés de signatura.
-            setUserCertificatesListToCache(request, certs);
 
         } catch (Exception e) {
             String msg = "Error durant la connexio amb el servidor NEBULA: " + e.getMessage();
@@ -175,58 +157,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     }
 
-    protected ThreadLocal<List<GetMyCertificates200ResponseCertificatesListInner>> certificatesOfUserThreadLocal = new ThreadLocal<>();
-
-    public void setUserCertificatesListToCache(HttpServletRequest request,
-            List<GetMyCertificates200ResponseCertificatesListInner> certs) {
-        if (certs != null) {
-            if (request == null) {
-                // Executam des de TEST. Guardam dins de ThradLocal
-                certificatesOfUserThreadLocal.set(certs);
-            } else {
-                request.getSession().setAttribute(CERTIFICATES_OF_USER_SESSIONKEY, certs);
-            }
-        }
-    }
-
-    public List<GetMyCertificates200ResponseCertificatesListInner> getUserCertificatesFromCache(
-            HttpServletRequest request, String administrationID) throws Exception {
-
-        List<GetMyCertificates200ResponseCertificatesListInner> certs = null;
-        if (request != null) {
-            // Executam en entorn normal. Recuperam de sessió
-            certs = (List<GetMyCertificates200ResponseCertificatesListInner>) request.getSession()
-                    .getAttribute(CERTIFICATES_OF_USER_SESSIONKEY);
-        } else {
-            // Executam des de TEST. Recuperam de ThreadLocal
-            certs = certificatesOfUserThreadLocal.get();
-        }
-
-        if (certs == null) {
-
-            DigitalCertificateApi apiCert = getDigitalCertificateApi(administrationID);
-
-            // @param enableFilter ENABLED/DISABLED (optional)
-            final String enableFilter = "ENABLED";
-            // @param expireFilter EXPIRED, EXPIRING, BOTH (optional)
-            final String expireFilter = null;
-
-            GetMyCertificates200Response response = apiCert.getMyCertificates(null, null, enableFilter, expireFilter,
-                    null, null, null);
-
-            certs = response.getCertificatesList();
-
-            setUserCertificatesListToCache(request, certs);
-
-        }
-
-        return certs;
-
-        //        DigitalCertificateApi apiCert = getDigitalCertificateApi(nif);
-        //        GetMyCertificates200Response certsResponse = apiCert.getMyCertificates();
-        //        return certsResponse.getCertificates();
-    }
-
     @Override
     public void closeSignaturesSet(HttpServletRequest request, String id) {
         super.closeSignaturesSet(request, id);
@@ -236,9 +166,81 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public String signDocuments(HttpServletRequest request, String absolutePluginRequestPath,
             String relativePluginRequestPath, SignaturesSetWeb signaturesSet, Map<String, Object> parameters) {
 
-        return signDocumentsDirect(request, absolutePluginRequestPath, relativePluginRequestPath, signaturesSet,
-                parameters);
+        String pin;
+        GetMyCertificates200ResponseCertificatesListInner selectedCertificate;
+        try {
 
+            NebulaCacheInfo info = getNebulaCache(signaturesSet.getCommonInfoSignature().getAdministrationID());
+
+            Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
+            if (certs == null || certs.size() == 0) {
+
+                // TODO XYZ ZZZ TRA 
+                throw new Exception("La llista de certificats de l'usuari està buida."
+                        + "No s'ha executat el mètode filter() o s'ha fet neteja de la informació de cache."
+                        + " Tornau-ho a intentar i si el problema persisteix contacti amb suport.");
+
+            }
+
+            if (certs.size() != 1) {
+
+                super.addSignaturesSet(signaturesSet);
+
+                // Redireccionam a la pàgina de selecció de certificat i pin
+                return relativePluginRequestPath + "/" + SELECT_CERTIFICATE_GET_PAGE;
+            }
+
+            // Hi ha un sol certificat, el seleccionam directament
+            selectedCertificate = new ArrayList<GetMyCertificates200ResponseCertificatesListInner>(certs.values())
+                    .get(0);
+
+            Map<String, Policy> politiques = info.getPoliciesByCertID();
+
+            if (politiques == null || politiques.size() == 0) {
+                // TODO XYZ ZZZ TRA 
+                throw new Exception("No s'ha pogut recuperar les polítiques associades als certificats de l'usuari."
+                        + " Tornau-ho a intentar i si el problema persisteix contacti amb suport.");
+            }
+
+            Policy policyCertificat = politiques.get(selectedCertificate.getCertificateId());
+            if (policyCertificat == null) {
+                // TODO XYZ ZZZ TRA 
+                throw new Exception("No s'ha pogut recuperar la política associada al ID de certificat "
+                        + selectedCertificate.getCertificateId() + "."
+                        + " Tornau-ho a intentar i si el problema persisteix contacti amb suport.");
+            }
+
+            if (isPinRequired(policyCertificat)) {
+
+                super.addSignaturesSet(signaturesSet);
+
+                // Redireccionam a la pàgina de selecció de certificat i pin
+                return relativePluginRequestPath + "/" + SELECT_CERTIFICATE_GET_PAGE;
+
+            } else {
+                pin = null;
+            }
+
+        } catch (Throwable th) {
+
+            String errorMsg = "Error global preparant per signar: " + th.getMessage();
+
+            StatusSignaturesSet sss = signaturesSet.getStatusSignaturesSet();
+            sss.setErrorMsg(errorMsg);
+            sss.setErrorException(th);
+            sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+
+            return signaturesSet.getUrlFinal();
+
+        }
+
+        return signDocumentsDirect(request, absolutePluginRequestPath, relativePluginRequestPath, signaturesSet,
+                selectedCertificate, pin);
+
+    }
+
+    protected boolean isPinRequired(Policy policyCertificat) {
+        return "1".equalsIgnoreCase(policyCertificat.getUsePin());
     }
 
     /**
@@ -251,27 +253,18 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
      * @return
      */
     protected String signDocumentsDirect(HttpServletRequest request, String absolutePluginRequestPath,
-            String relativePluginRequestPath, SignaturesSetWeb signaturesSet, Map<String, Object> parameters) {
+            String relativePluginRequestPath, SignaturesSetWeb signaturesSet,
+            GetMyCertificates200ResponseCertificatesListInner selectedCertificate, String pin) {
 
         try {
 
             signaturesSet.getStatusSignaturesSet().setStatus(StatusSignaturesSet.STATUS_IN_PROGRESS);
-            
+
             CommonInfoSignature commonInfoSignature = signaturesSet.getCommonInfoSignature();
 
             String nif = commonInfoSignature.getAdministrationID();
 
-            List<GetMyCertificates200ResponseCertificatesListInner> certs = getUserCertificatesFromCache(request, nif);
-
             Locale locale = new Locale(signaturesSet.getCommonInfoSignature().getLanguageUI());
-
-            if (certs == null || certs.size() == 0) {
-                // TODO XYZ ZZZ TRA 
-                throw new Exception("No s'han trobat certificats actius a Nebula per l'usuari " + nif);
-            }
-
-            // TODO
-            GetMyCertificates200ResponseCertificatesListInner selectedCertificate = certs.get(0);
 
             for (FileInfoSignature fis : signaturesSet.getFileInfoSignatureArray()) {
 
@@ -279,9 +272,9 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                     if (fis.getSignType().equals(FileInfoSignature.SIGN_TYPE_PADES)) {
 
                         if (fis.isUserRequiresTimeStamp()) {
-                            doSignaturePades(fis, selectedCertificate, nif);
+                            doSignaturePades(fis, selectedCertificate, nif, pin);
                         } else {
-                            doSignatureTriphasePades(commonInfoSignature, fis, selectedCertificate);
+                            doSignatureTriphasePades(commonInfoSignature, fis, selectedCertificate, pin);
                         }
                     } else if (fis.getSignType().equals(FileInfoSignature.SIGN_TYPE_CADES)) {
 
@@ -349,8 +342,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         //return relativePluginRequestPath + "/" + INICI_FIRMA;
     }
 
-    protected void doSignatureXades(FileInfoSignature fis,
-            GetMyCertificates200ResponseCertificatesListInner certificat, String nif) throws Exception {
+    protected void doSignatureXades(FileInfoSignature fis, GetMyCertificates200ResponseCertificatesListInner certificat,
+            String nif) throws Exception {
 
         String certId = certificat.getSigningId();
 
@@ -475,14 +468,15 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     }
 
-    protected void doSignaturePades(FileInfoSignature fis, GetMyCertificates200ResponseCertificatesListInner certificat, String nif) throws Exception, ApiException {
+    protected void doSignaturePades(FileInfoSignature fis, GetMyCertificates200ResponseCertificatesListInner certificat,
+            String nif, String pin) throws Exception, ApiException {
 
         if (isDebug()) {
             log.info("---------- Realitzant Firma PAdES ... ----------");
         }
 
         String certId = certificat.getSigningId();
-        /*
+        /**
         String dataStr = "{\n"
                 // Tipus de firma a realitzar
                 + "    \"signLevel\":\"LTA\",\n" + "    \"digestAlgorithm\":\"SHA256\",\n"
@@ -509,6 +503,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         */
 
         PadesSignatureRequest psr = new PadesSignatureRequest();
+
+        psr.setCertPin(pin);
 
         if (fis.isUserRequiresTimeStamp()) {
             psr.setSignLevel(SignLevelEnum.LT);
@@ -578,16 +574,11 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
     }
 
-
-    protected void doSignatureTriphasePades(
-            CommonInfoSignature commonInfo, FileInfoSignature fileInfo,
-            GetMyCertificates200ResponseCertificatesListInner cert)
+    protected void doSignatureTriphasePades(CommonInfoSignature commonInfo, FileInfoSignature fileInfo,
+            GetMyCertificates200ResponseCertificatesListInner cert, String pin)
             throws ApiException, Exception, IOException, FileNotFoundException {
 
-        
-        
         DigitalCertificateApi api = getDigitalCertificateApi(commonInfo.getAdministrationID());
-        //myNebula.importCertificate(nebula, properties, nif);
 
         X509Certificate x509Cert;
         x509Cert = CertificateUtils
@@ -608,10 +599,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             params = info.getProperties();
 
         }
-        
-        log.info(" \n\n XYZ ZZZ   API =   " + api + "\n\n");
 
-        NebulaTriphaseSigner nTriPhase = new NebulaTriphaseSigner(api, params, cert);
+        NebulaTriphaseSigner nTriPhase = new NebulaTriphaseSigner(api, params, cert, pin);
 
         byte[] hashDocumento = nTriPhase.step1_PreSign(dataToSign, algo,
                 new java.security.cert.Certificate[] { x509Cert }, params);
@@ -647,13 +636,12 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         HttpBearerAuth auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
         auth.setBearerToken(getApiToken(nif));
 
-        // {{url}}/signature/pades/v1/sign
         apiSign = new PadEsSignatureApi(apiClient);
         return apiSign;
     }
 
-    protected void doSignatureCades(FileInfoSignature fis, 
-            GetMyCertificates200ResponseCertificatesListInner certificat, String nif) throws Exception, ApiException {
+    protected void doSignatureCades(FileInfoSignature fis, GetMyCertificates200ResponseCertificatesListInner certificat,
+            String nif) throws Exception, ApiException {
 
         String certId = certificat.getSigningId();
 
@@ -836,16 +824,15 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         return true;
     }
 
-    /*
     @Override
     public void requestGET(String absolutePluginRequestPath, String relativePluginRequestPath, String query,
             SignaturesSetWeb signaturesSet, int signatureIndex, HttpServletRequest request,
             HttpServletResponse response, Locale locale) {
-    
+
         commonRequestGETPOST(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSet, signatureIndex,
                 request, response, locale, true);
     }
-    
+
     @Override
     public void requestPOST(String absolutePluginRequestPath, String relativePluginRequestPath, String query,
             SignaturesSetWeb signaturesSet, int signatureIndex, HttpServletRequest request,
@@ -853,16 +840,25 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         commonRequestGETPOST(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSet, signatureIndex,
                 request, response, locale, false);
     }
-    
+
     private void commonRequestGETPOST(String absolutePluginRequestPath, String relativePluginRequestPath, String query,
             SignaturesSetWeb signaturesSet, int signatureIndex, HttpServletRequest request,
             HttpServletResponse response, Locale locale, boolean isGet) {
-    
-        if (query.startsWith(INICI_FIRMA)) {
-            iniciFirma(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet, locale);
-        } else if (query.startsWith(EXECUCIO_FIRMA)) {
-            execucioFirma(absolutePluginRequestPath, relativePluginRequestPath, request, response, signaturesSet,
-                    locale);
+
+        final SignIDAndIndex sai = new SignIDAndIndex(signaturesSet, signatureIndex);
+        final String lang = locale.getLanguage();
+
+        if (query.startsWith(SELECT_CERTIFICATE_GET_PAGE)) {
+            PrintWriter out = generateHeader(request, response, absolutePluginRequestPath, relativePluginRequestPath,
+                    lang, sai, signaturesSet);
+            selectCertificateGET(request, response, relativePluginRequestPath, query, signaturesSet, out, locale);
+
+            generateFooter(out, sai, signaturesSet);
+        } else if (query.startsWith(SELECT_CERTIFICATE_POST_PAGE)) {
+
+            selectCertificatePOST(absolutePluginRequestPath, relativePluginRequestPath, request, response,
+                    signaturesSet, locale);
+
         } else {
             if (isGet) {
                 super.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSet,
@@ -873,99 +869,271 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             }
         }
     }
-    
-    private static final String INICI_FIRMA = "inicifirma";
-    
-    private void iniciFirma(String absolutePluginRequestPath, String relativePluginRequestPath,
-            HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet, Locale locale) {
+
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ------------------ FIRMAR -------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+    // ------------------ S E L E C T     C E R T I F I C A T E -------------------
+    // ----------------------------------------------------------------------------
+    // ----------------------------------------------------------------------------
+
+    private static final String SELECT_CERTIFICATE_GET_PAGE = "selectCertificateGet";
+
+    private void selectCertificateGET(HttpServletRequest request, HttpServletResponse response,
+            String relativePluginRequestPath, String relativePath, SignaturesSetWeb signaturesSet, PrintWriter out,
+            Locale locale) {
+
+        out.println("<h3>" + getTraduccio("selectcertificat.titol", locale) + "</h3><br/>");
+
+        NebulaCacheInfo info;
+
         try {
-            if (isDebug()) {
-                log.info("iniciFirma");
-            }
-    
-            String token = getToken(absolutePluginRequestPath);
-    
-            int pos = relativePluginRequestPath.lastIndexOf("-1");
-            String baseSignaturesSet = relativePluginRequestPath.substring(0, pos - 1);
-            String callbackhost = getHostAndContextPath(absolutePluginRequestPath, relativePluginRequestPath);
-            String baseTimeStampURL = callbackhost + baseSignaturesSet;
-    
-            SignatureAdapter adapter = new SignatureAdapter(signaturesSet);
-            List<SignatureConfiguration> configurationList = adapter.getSignatureConfigurationList(baseTimeStampURL);
-    
-            SignatureRequest signatureRequest = new SignatureRequest();
-            signatureRequest.setSignatureConfigurations(configurationList);
-            signatureRequest.setUserCode(signaturesSet.getCommonInfoSignature().getAdministrationID());
-    
-            FortressApi api = getApi();
-    
-            SignatureRequestResponse signatureRequestResponse = api.signatureRequest(token, signatureRequest);
-            executionCodes.put(signaturesSet.getSignaturesSetID(), signatureRequestResponse.getExeCode());
-            signaturesSet.getStatusSignaturesSet().setStatus(StatusSignaturesSet.STATUS_IN_PROGRESS);
-    
-            String callbackUrl = absolutePluginRequestPath + "/" + EXECUCIO_FIRMA;
-            String authCode = signatureRequestResponse.getAuthCode();
-            if (isDebug()) {
-                log.info("authcode: " + authCode);
-                log.info("callbackUrl: " + callbackUrl);
-            }
-            String signatureAuthorizationUri = api.getSignatureAuthorizationUri(authCode, callbackUrl);
-    
-            sendRedirect(response, signatureAuthorizationUri);
-    
-        } catch (Exception e) {
-            String msg = "Error preparant inici de firma ViaFirma-Fortress: " + e.getMessage();
-            finishWithError(response, signaturesSet, msg, e);
-        }
-    }
-    
-    private static final String EXECUCIO_FIRMA = "execuciofirma";
-    
-    private void execucioFirma(String absolutePluginRequestPath, String relativePluginRequestPath,
-            HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet, Locale locale) {
-    
-        try {
-            if (isDebug()) {
-                log.info("execucioFirma");
-            }
-    
-            checkErrors(request);
-    
-            String exeCode = executionCodes.get(signaturesSet.getSignaturesSetID());
-            if (exeCode == null) {
-                throw new Exception("No s'ha trobat exeCode");
-            }
-    
-            String token = getToken(absolutePluginRequestPath);
-    
-            List<SignatureResponse> signatureResponses = getApi().executeSignature(token, exeCode);
-    
-            SignatureAdapter adapter = new SignatureAdapter(signaturesSet);
-            adapter.updateSignatureStatus(signatureResponses);
-    
+
+            info = getNebulaCache(signaturesSet.getCommonInfoSignature().getAdministrationID());
+
+        } catch (Throwable th) {
+
+            String errorMsg = th.getMessage();
+
+            StatusSignaturesSet sss = signaturesSet.getStatusSignaturesSet();
+            sss.setErrorMsg(errorMsg);
+            sss.setErrorException(th);
+            sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+
+            log.error(errorMsg, th);
+
             sendRedirect(response, signaturesSet.getUrlFinal());
-    
-        } catch (CancelledException e) {
-            cancel(request, response, signaturesSet);
-        } catch (Exception e) {
-            String msg = "Error executant firma ViaFirma-Fortress: " + e.getMessage();
-            finishWithError(response, signaturesSet, msg, e);
+
+            return;
+
         }
-    }
-    
-    
-    
-    protected void checkErrors(HttpServletRequest request) throws Exception {
-        String error = request.getParameter("error");
-        if (error != null && !error.isEmpty()) {
-            if (error.equals("access_denied")) {
-                throw new CancelledException();
-            } else {
-                throw new Exception(error);
+
+        out.println("<form action=\"" + relativePluginRequestPath + "/" + SELECT_CERTIFICATE_POST_PAGE
+                + "\" method=\"post\" >"); // enctype=\"multipart/form-data\"
+
+        out.println("<table border=\"0\">");
+
+        int certificatsDisponibles = 0;
+        int count = 0;
+
+        String filter = signaturesSet.getCommonInfoSignature().getFiltreCertificats();
+
+        Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
+
+        Map<String, Policy> politiques = info.getPoliciesByCertID();
+
+        for (Map.Entry<String, GetMyCertificates200ResponseCertificatesListInner> entry : certs.entrySet()) {
+            String certID = entry.getKey();
+            GetMyCertificates200ResponseCertificatesListInner cert = entry.getValue();
+
+            Policy politica = politiques.get(certID);
+
+            boolean passFilter;
+
+            X509Certificate certX509 = null;
+            try {
+
+                certX509 = CertificateUtils
+                        .decodeCertificate(new ByteArrayInputStream(Base64.getDecoder().decode(cert.getCertificate())));
+            } catch (Exception e) {
+                log.error("Error obteninr certX509 des de Certificat CER: " + e.getMessage(), e);
+
             }
+
+            if ("true".equals(getProperty(IGNORE_CERTIFICATE_FILTER))) {
+                passFilter = true;
+            } else {
+
+                try {
+
+                    passFilter = MiniAppletUtils.matchFilter(certX509, filter);
+                } catch (Exception e) {
+                    log.error(" Error comprovant filtre Certificat: " + e.getMessage(), e);
+                    passFilter = false;
+                }
+            }
+
+            if (passFilter) {
+                certificatsDisponibles++;
+            } else {
+                continue;
+            }
+
+            out.println("<tr>");
+            out.println("<td align=\"center\" width=\"50px\">");
+            //if (passFilter) {
+            out.println("<input type=\"radio\" name=\"cert\" id=\"optionsRadios_" + certID + "\" value=\""
+                    + cert.getCertificateId() + "\" " + ((count == 0) ? "checked" : "") + " >");
+
+            out.println("</td>");
+            out.println("<td style=\"border: 1px solid gray; padding-top:1px;\">");
+
+            out.println("<label class=\"radio\">");
+
+            String nom = null;
+            if (cert.getAlias() != null && !cert.getAlias().trim().isEmpty()) {
+                nom = cert.getAlias();
+            } else {
+                if (certX509 != null) {
+
+                    String subjectCN = CertificateUtils.getCN(certX509);
+                    if (subjectCN != null && !subjectCN.trim().isEmpty()) {
+                        nom = subjectCN;
+                    } else {
+                        nom = cert.getSubject();
+                    }
+
+                    String[] empresa;
+                    try {
+                        empresa = CertificateUtils.getEmpresaNIFNom(certX509);
+                        if (empresa != null) {
+                            nom += " (" + empresa[0] + " - " + empresa[1] + ")";
+                        }
+                    } catch (Exception e) {
+
+                    }
+
+                }
+
+            }
+
+            if (nom == null) {
+                nom = cert.getSubject();
+            }
+
+            out.println("<p style=\"margin-bottom: 15px;\"><b>" + nom + "</b></p>");
+            out.println("<small>");
+            out.println("<ul>");
+            out.println("<li>Subject: " + cert.getSubject() + "</li>");
+            out.println("<li>Issuer: " + cert.getIssuer() + " </li>");
+
+            // Afegir dates
+
+            //log.info("\n\nData inici: " + cert.getDateValidStart()+"Data fi: " + cert.getDateValidEnd() + "\n\n");
+
+            final String from = DATE_FORMATTER.format(new Timestamp(cert.getDateValidStart()));
+            final String to = DATE_FORMATTER.format(new Timestamp(cert.getDateValidEnd()));
+
+            out.println("<li>" + MessageFormat.format(getTraduccio("valid", locale), from, to) + "</li>");
+
+            out.println("</ul>");
+
+            out.println("</small>");
+
+            out.println("</label>");
+            out.println("</td>");
+
+            out.println("</td>");
+            out.println("<td style=\"border: 1px solid gray; padding-top:1px;\">");
+
+            if (isPinRequired(politica)) {
+
+                out.println(getTraduccio("pin", locale) + ":" + "<input type=\"password\" style=\"display: none;\" />"
+                        + "<input type=\"password\" id=\"" + FIELD_PIN + "_" + cert.getCertificateId() + "\" name=\""
+                        + FIELD_PIN + "_" + cert.getCertificateId() + "\" value=\"\" />");
+            } else {
+                String noPinRequired = getTraduccio("nopinrequired", locale);
+                out.println("<small>" + noPinRequired + "</small>");
+            }
+
+            out.println("</td>");
+
+            out.println("</tr>");
+
+            count++;
         }
+
+        out.println("</table>");
+
+        if (certificatsDisponibles == 0) {
+            String warn = getTraduccio("warn.notecertificats", locale);
+            out.println("<table>");
+            out.println("<tr>");
+            out.println("<br/><div class=\"alert alert-error\">");
+            out.println("<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>");
+            out.println(" <strong>" + warn + "</strong>");
+            out.println("</div>");
+            out.println("</td></tr>");
+            out.println("</table>");
+        }
+
+        out.println("<script type=\"text/javascript\">");
+
+        out.println("</script>");
+
+        out.println("<br/><br/>");
+
+        out.println("<button class=\"btn\" type=\"button\" id=\"btnCancel\"  onclick=\"location.href='"
+                + relativePluginRequestPath + "/" + CANCEL_PAGE + "'\" >" + getTraduccio("cancel", locale)
+                + "</button>");
+        out.println("&nbsp;&nbsp;");
+
+        if (certificatsDisponibles != 0) {
+            int numFitxers = signaturesSet.getFileInfoSignatureArray().length;
+            out.println(
+                    "<button class=\"btn btn-primary\" type=\"submit\" onclick=\"document.body.style.cursor='wait'; document.getElementById('btnCancel').disabled=true; this.disabled=true; this.form.submit();\">"
+                            + getTraduccio("firmardocument" + (numFitxers == 0 ? "" : ".plural"), locale)
+                            + "</button>");
+
+        }
+        out.println("</form>");
     }
-    */
+
+    private static final String SELECT_CERTIFICATE_POST_PAGE = "selectCertificatePost";
+
+    private void selectCertificatePOST(String absolutePluginRequestPath, String relativePluginRequestPath,
+            HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet, Locale locale) {
+
+        try {
+            //final String signaturesSetID = signaturesSet.getSignaturesSetID();
+            final CommonInfoSignature commonInfoSignature = signaturesSet.getCommonInfoSignature();
+
+            String certID = request.getParameter("cert");
+
+            if (certID == null || certID.trim().isEmpty()) {
+                // TODO XYZ ZZZ TRA 
+                throw new Exception("No s'ha elegit el Certificat amb el que vol signar."
+                        + " Tornau-ho a intentar i si el problema persisteix contacti amb suport.");
+            }
+
+            String pin = request.getParameter(FIELD_PIN + "_" + certID);
+
+            String nif = commonInfoSignature.getAdministrationID();
+            NebulaCacheInfo info = getNebulaCache(nif);
+
+            Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
+            GetMyCertificates200ResponseCertificatesListInner selectedCertificate = certs.get(certID);
+
+            if (selectedCertificate == null) {
+                throw new Exception("No s'ha trobat el certificat amb ID " + certID
+                        + " dins de la llista de certificats de l'usuari " + nif);
+            }
+
+            String url = signDocumentsDirect(request, absolutePluginRequestPath, relativePluginRequestPath,
+                    signaturesSet, selectedCertificate, pin);
+
+            sendRedirect(response, url);
+
+        } catch (Throwable th) {
+
+            String errorMsg = th.getMessage();
+
+            StatusSignaturesSet sss = signaturesSet.getStatusSignaturesSet();
+            sss.setErrorMsg(errorMsg);
+            sss.setErrorException(th);
+            sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+
+            sendRedirect(response, signaturesSet.getUrlFinal());
+
+        }
+
+    }
+
     @Override
     public String getResourceBundleName() {
         return "nebula";
@@ -984,6 +1152,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     @Override
     public void resetAndClean(HttpServletRequest request) {
         internalResetAndClean(request);
+        resetNebulaCacheInfo();
     }
 
     @Override
@@ -1045,8 +1214,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public String[] getSupportedSignatureAlgorithms(String signType) {
         if (FileInfoSignature.SIGN_TYPE_PADES.equals(signType) || FileInfoSignature.SIGN_TYPE_XADES.equals(signType)
                 || FileInfoSignature.SIGN_TYPE_CADES.equals(signType)) {
-            return new String[] { FileInfoSignature.SIGN_ALGORITHM_SHA1, FileInfoSignature.SIGN_ALGORITHM_SHA256,
-                    FileInfoSignature.SIGN_ALGORITHM_SHA384, FileInfoSignature.SIGN_ALGORITHM_SHA512 };
+            return new String[] { FileInfoSignature.SIGN_ALGORITHM_SHA256, FileInfoSignature.SIGN_ALGORITHM_SHA384,
+                    FileInfoSignature.SIGN_ALGORITHM_SHA512 };
         }
         return null;
     }
@@ -1078,40 +1247,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                 return new int[0];
         }
     }
-
-    // --------------------------------------
-
-    /*
-    public List<GetMyCertificates200ResponseCertificatesListInner> getUserCertificates(String administrationID)
-            throws org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException, Exception {
-    
-        if (isDebug()) {
-            log.info(" -------  Descarregant Certificats de l'usuari -------");
-        }
-        DigitalCertificateApi apiCert = getDigitalCertificateApi(administrationID);
-    
-        // @param enableFilter ENABLED/DISABLED (optional)
-        final String enableFilter = null; //"ENABLED";
-        // @param expireFilter BOTH/EXPIRED/NOT_EXPIRED (optional)
-        final String expireFilter = null; //"NOT_EXPIRED";
-    
-        GetMyCertificates200Response response = apiCert.getMyCertificates(null, null, enableFilter, expireFilter, null,
-                null, null);
-    
-        //System.out.println(response);
-    
-        Integer total = response.getTotalCertificates();
-        if (isDebug()) {
-            log.info("Total: " + total);
-        }
-    
-        if (total == null || total == 0) {
-            return null;
-        }
-    
-        return response.getCertificatesList();
-    }
-    */
 
     public DigitalCertificateApi getDigitalCertificateApi(String username) throws Exception {
 
@@ -1214,7 +1349,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         Random random = new Random();
         String trusted_app_tokenId = "ID_Aleatori_" + random.nextInt(300000000);
 
-        // Prepare timestamp in seconds
         long currentTimestamp = System.currentTimeMillis() / 1000;
 
         // Set headers for the trusted_app_token
@@ -1256,18 +1390,18 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         return trusted_app_token;
     }
 
-    // Método para codificar en Base64 URL Safe
+    // Mètode para codificar en Base64 URL Safe
     private static String base64UrlEncode(byte[] data) {
         return Base64.getUrlEncoder().withoutPadding().encodeToString(data);
     }
 
-    // Método para calcular SHA256
+    // Mètode per calcular SHA256
     private static byte[] sha256(String data) throws NoSuchAlgorithmException {
         java.security.MessageDigest digest = java.security.MessageDigest.getInstance("SHA-256");
         return digest.digest(data.getBytes(StandardCharsets.UTF_8));
     }
 
-    // Método para calcular HMAC-SHA256
+    // Mètode per calcular HMAC-SHA256
     private static byte[] hmacSha256(byte[] data, byte[] key) throws NoSuchAlgorithmException, InvalidKeyException {
         Mac mac = Mac.getInstance("HmacSHA256");
         SecretKeySpec secretKey = new SecretKeySpec(key, "HmacSHA256");
@@ -1278,5 +1412,92 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     protected boolean isDebug() {
         return Boolean.parseBoolean(getProperty(NEBULA_BASE_PROPERTIES + "debug", "false"));
     }
+
+    // ----------------------------------------------------
+    // ----------------------------------------------------
+    // ------------------ CACHE -------------------
+    // ----------------------------------------------------
+
+    public static Map<String, NebulaCacheInfo> cache = new HashMap<String, NebulaCacheInfo>();
+
+    public static boolean testing = false;
+
+    // Mètode per afegir nova cache
+    private NebulaCacheInfo getNebulaCache(String nif) throws Exception {
+
+        NebulaCacheInfo nci = cache.get(nif);
+
+        if (nci == null || nci.isExpired()) {
+            nci = initCertificatesAndPolicies(new NebulaCacheInfo(nif));
+            cache.put(nif, nci);
+        } else {
+            nci.sessionReset();
+        }
+
+        return nci;
+
+    }
+
+    private NebulaCacheInfo initCertificatesAndPolicies(NebulaCacheInfo cacheInfo) throws Exception {
+
+        String nif = cacheInfo.getNif();
+
+        {
+            List<GetMyCertificates200ResponseCertificatesListInner> certs = getCertificatesOfUser(nif);
+
+            Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = new HashMap<>();
+
+            for (GetMyCertificates200ResponseCertificatesListInner cert : certs) {
+
+                certificatesByCertID.put(cert.getCertificateId(), cert);
+            }
+
+            cacheInfo.setCertificatesByCertID(certificatesByCertID);
+
+        }
+
+        {
+
+            DigitalCertificateApi apiCert = getDigitalCertificateApi(nif);
+
+            Map<String, Policy> policiesByCertID = new HashMap<String, Policy>();
+
+            GetCertPolicies200Response allPolicies = apiCert.getCertPolicies(null, null, null);
+
+            for (Policy politica : allPolicies.getPolicyList()) {
+
+                policiesByCertID.put(politica.getIdCert(), politica);
+
+            }
+
+            cacheInfo.setPoliciesByCertID(policiesByCertID);
+
+        }
+
+        return cacheInfo;
+
+    }
+
+    public List<GetMyCertificates200ResponseCertificatesListInner> getCertificatesOfUser(String nif)
+            throws Exception, org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException {
+        DigitalCertificateApi apiCert = getDigitalCertificateApi(nif);
+
+        // @param enableFilter ENABLED/DISABLED (optional)
+        final String enableFilter = "ENABLED";
+        // @param expireFilter EXPIRED, EXPIRING, BOTH (optional)
+        final String expireFilter = null;
+
+        GetMyCertificates200Response response = apiCert.getMyCertificates(null, null, enableFilter, expireFilter, null,
+                null, null);
+
+        List<GetMyCertificates200ResponseCertificatesListInner> certs = response.getCertificatesList();
+        return certs;
+    }
+
+    public static void resetNebulaCacheInfo() {
+        cache.clear();
+    }
+
+    // ----------------------------------------------------
 
 }

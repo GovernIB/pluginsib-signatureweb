@@ -17,7 +17,7 @@ import org.jboss.logging.Logger;
 /**
  * Implementació de signatura trifàsica per a Nebula.
  * @author anadal
- * 10 feb 2026 13:26:58
+ * 10 febrer 2026 13:26:58
  */
 public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
     
@@ -28,22 +28,24 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
     protected final Properties params;
 
     protected final GetMyCertificates200ResponseCertificatesListInner cert;
+    
+    protected final String pin;
 
     public NebulaTriphaseSigner(final DigitalCertificateApi api, final Properties params,
-            final GetMyCertificates200ResponseCertificatesListInner cert) {
+            final GetMyCertificates200ResponseCertificatesListInner cert, String pin) {
         this.api = api;
         this.params = params;
         this.cert = cert;
+        this.pin = pin;
     }
 
     @Override
     public byte[] step2_signHash(final String algorithm, final byte[] hashDocumentoParam) throws Exception {
 
         CLoginRequestDTO clogin = new CLoginRequestDTO();
-        clogin.setPin(null); // properties.getProperty("pin")
+        clogin.setPin(pin);
         clogin.setSigningId(cert.getSigningId());
         
-        //log.info(" \n\n XYZ ZZZ   API SIGNER =   " + api + "\n\n");
 
         CSessionDTOV3 cSession = api.signInitV3(clogin);
 
@@ -59,7 +61,7 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
         3   CKM_RSA_X_509
         4   CKM_MD2_RSA_PKCS
         5   CKM_MD5_RSA_PKCS
-        6   CKM_SHA1_RSA_PKCS
+        6   CKM_SHA1_RSA_PKCS No suportat
         64  CKM_SHA256_RSA_PKCS
         65  CKM_SHA384_RSA_PKCS
         66  CKM_SHA512_RSA_PKCS
@@ -84,8 +86,8 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
                 throw new Exception("L'algorisme de signatura " + algorithm + " no està suportat");
         }
         
-        log.info(" \n\n XYZ ZZZ   ALGORITHM =   " + algorithm + "\n\n");
-        log.info(" \n\n XYZ ZZZ   ALGORITHM ID =   " + algorithmID + "\n\n");
+        log.info("XYZ ZZZ   ALGORITHM =   " + algorithm + "\n");
+        log.info("XYZ ZZZ   ALGORITHM ID =   " + algorithmID + "\n");
 
         request.setMechanism(algorithmID);
         request.setObjId(cSession.getObjId());
@@ -112,7 +114,7 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
     }
 
     /**
-     * Evita que la carrega es faci amb classloaders pensats per funcionar en applets.
+     * Evita que la càrrega es faci amb classloaders pensats per funcionar en applets.
      * Veure #541.
      */
     @Override

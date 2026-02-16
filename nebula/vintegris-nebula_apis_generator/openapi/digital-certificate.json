@@ -121,13 +121,13 @@
                                                         "description": "Certificate serial number."
                                                     },
                                                     "dateValidStart": {
-                                                        "type": "string",
-                                                        "format": "date-time",
+                                                        "type": "integer",
+                                                        "format": "int64",
                                                         "description": "Start date of certificate validity."
                                                     },
                                                     "dateValidEnd": {
-                                                        "type": "string",
-                                                        "format": "date-time",
+                                                        "type": "integer",
+                                                        "format": "int64",
                                                         "description": "Expiration date of the certificate."
                                                     },
                                                     "status": {

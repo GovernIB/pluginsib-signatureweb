@@ -61,7 +61,7 @@ public class NebulaTester {
             System.out.println("ATENCIÓ: El fitxer '" + TEST_PROPERTIES_FILE + "' no existeix. Els tests NO s'executaran.");
         }
         
-        // Aquesta línia farà que JUnit salti tots els tests si els fitxers no existeixen
+        // Aquesta línia farà que JUnit salti tots els tests si no hi ha fitxers de configuració
         assumeTrue("Els fitxers de configuració " + NEBULA_PROPERTIES_FILE + " i " + TEST_PROPERTIES_FILE + " han d'existir per executar els tests",
                    nebulaExists && testExists);
     }
@@ -71,6 +71,7 @@ public class NebulaTester {
 
             NebulaTester nebulaTest = new NebulaTester();
             
+                        
             nebulaTest.getCertificatesOfUser();
 
             nebulaTest.padesBasicSignature();
@@ -123,7 +124,7 @@ public class NebulaTester {
     public List<GetMyCertificates200ResponseCertificatesListInner> getCertificatesOfUser(
             ) throws ApiException, Exception, IOException {
         
-        return getCertificatesOfUser(true);
+        return getCertificatesOfUser(false);
     }
     
     
@@ -140,7 +141,7 @@ public class NebulaTester {
         String nif = test.getProperty("nif");
         
         
-        List<GetMyCertificates200ResponseCertificatesListInner> certificates = nebula.getUserCertificatesFromCache(null, nif);
+        List<GetMyCertificates200ResponseCertificatesListInner> certificates = nebula.getCertificatesOfUser(nif);
         if (printInfo) {
             
             if (certificates == null || certificates.isEmpty()) {

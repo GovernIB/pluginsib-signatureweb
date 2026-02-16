@@ -20,7 +20,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.annotation.JsonValue;
-import java.time.OffsetDateTime;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
@@ -70,11 +69,11 @@ public class GetMyCertificates200ResponseCertificatesListInner {
 
   public static final String JSON_PROPERTY_DATE_VALID_START = "dateValidStart";
   @javax.annotation.Nullable
-  private OffsetDateTime dateValidStart;
+  private Long dateValidStart;
 
   public static final String JSON_PROPERTY_DATE_VALID_END = "dateValidEnd";
   @javax.annotation.Nullable
-  private OffsetDateTime dateValidEnd;
+  private Long dateValidEnd;
 
   public static final String JSON_PROPERTY_STATUS = "status";
   @javax.annotation.Nullable
@@ -245,7 +244,7 @@ public class GetMyCertificates200ResponseCertificatesListInner {
     this.serialNumber = serialNumber;
   }
 
-  public GetMyCertificates200ResponseCertificatesListInner dateValidStart(@javax.annotation.Nullable OffsetDateTime dateValidStart) {
+  public GetMyCertificates200ResponseCertificatesListInner dateValidStart(@javax.annotation.Nullable Long dateValidStart) {
     
     this.dateValidStart = dateValidStart;
     return this;
@@ -259,18 +258,18 @@ public class GetMyCertificates200ResponseCertificatesListInner {
   @JsonProperty(JSON_PROPERTY_DATE_VALID_START)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public OffsetDateTime getDateValidStart() {
+  public Long getDateValidStart() {
     return dateValidStart;
   }
 
 
   @JsonProperty(JSON_PROPERTY_DATE_VALID_START)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDateValidStart(@javax.annotation.Nullable OffsetDateTime dateValidStart) {
+  public void setDateValidStart(@javax.annotation.Nullable Long dateValidStart) {
     this.dateValidStart = dateValidStart;
   }
 
-  public GetMyCertificates200ResponseCertificatesListInner dateValidEnd(@javax.annotation.Nullable OffsetDateTime dateValidEnd) {
+  public GetMyCertificates200ResponseCertificatesListInner dateValidEnd(@javax.annotation.Nullable Long dateValidEnd) {
     
     this.dateValidEnd = dateValidEnd;
     return this;
@@ -284,14 +283,14 @@ public class GetMyCertificates200ResponseCertificatesListInner {
   @JsonProperty(JSON_PROPERTY_DATE_VALID_END)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
 
-  public OffsetDateTime getDateValidEnd() {
+  public Long getDateValidEnd() {
     return dateValidEnd;
   }
 
 
   @JsonProperty(JSON_PROPERTY_DATE_VALID_END)
   @JsonInclude(value = JsonInclude.Include.USE_DEFAULTS)
-  public void setDateValidEnd(@javax.annotation.Nullable OffsetDateTime dateValidEnd) {
+  public void setDateValidEnd(@javax.annotation.Nullable Long dateValidEnd) {
     this.dateValidEnd = dateValidEnd;
   }
 

@@ -13,8 +13,8 @@
 |**subject** | **String** | Subject name (CN, OU, O...). |  |
 |**issuer** | **String** | Issuer of the certificate. |  |
 |**serialNumber** | **String** | Certificate serial number. |  |
-|**dateValidStart** | **OffsetDateTime** | Start date of certificate validity. |  [optional] |
-|**dateValidEnd** | **OffsetDateTime** | Expiration date of the certificate. |  [optional] |
+|**dateValidStart** | **Long** | Start date of certificate validity. |  [optional] |
+|**dateValidEnd** | **Long** | Expiration date of the certificate. |  [optional] |
 |**status** | **String** | Current status (ISSUED, etc.). |  [optional] |
 |**certificate** | **String** | Base64 encoded X.509 certificate. |  [optional] |
 |**certType** | **String** | Type of certificate (IMPORTED, INTERMEDIATE, QUALIFIED). |  [optional] |

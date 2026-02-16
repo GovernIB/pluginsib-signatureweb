@@ -957,7 +957,7 @@ components:
       type: object
     getMyCertificates_200_response_certificatesList_inner:
       example:
-        dateValidStart: 2000-01-23T04:56:07.000+00:00
+        dateValidStart: 6
         certType: certType
         serialNumber: serialNumber
         isUsable: isUsable
@@ -966,7 +966,7 @@ components:
         certificate: certificate
         alias: alias
         signingId: signingId
-        dateValidEnd: 2000-01-23T04:56:07.000+00:00
+        dateValidEnd: 1
         issuer: issuer
         status: status
       properties:
@@ -990,12 +990,12 @@ components:
           type: string
         dateValidStart:
           description: Start date of certificate validity.
-          format: date-time
-          type: string
+          format: int64
+          type: integer
         dateValidEnd:
           description: Expiration date of the certificate.
-          format: date-time
-          type: string
+          format: int64
+          type: integer
         status:
           description: "Current status (ISSUED, etc.)."
           type: string
@@ -1018,7 +1018,7 @@ components:
       example:
         totalCertificates: 0
         certificatesList:
-        - dateValidStart: 2000-01-23T04:56:07.000+00:00
+        - dateValidStart: 6
           certType: certType
           serialNumber: serialNumber
           isUsable: isUsable
@@ -1027,10 +1027,10 @@ components:
           certificate: certificate
           alias: alias
           signingId: signingId
-          dateValidEnd: 2000-01-23T04:56:07.000+00:00
+          dateValidEnd: 1
           issuer: issuer
           status: status
-        - dateValidStart: 2000-01-23T04:56:07.000+00:00
+        - dateValidStart: 6
           certType: certType
           serialNumber: serialNumber
           isUsable: isUsable
@@ -1039,7 +1039,7 @@ components:
           certificate: certificate
           alias: alias
           signingId: signingId
-          dateValidEnd: 2000-01-23T04:56:07.000+00:00
+          dateValidEnd: 1
           issuer: issuer
           status: status
       properties:
