@@ -364,7 +364,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             XadesSignatureRequest xades = new XadesSignatureRequest();
             if (fis.isUserRequiresTimeStamp()) {
-                xades.setSignLevel(XadesSignatureRequest.SignLevelEnum.LT);
+                xades.setSignLevel(XadesSignatureRequest.SignLevelEnum.LTA);
             } else {
                 xades.setSignLevel(XadesSignatureRequest.SignLevelEnum.B);
             }
@@ -507,10 +507,13 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         psr.setCertPin(pin);
 
         if (fis.isUserRequiresTimeStamp()) {
-            psr.setSignLevel(SignLevelEnum.LT);
+            System.out.println("\n\n ------------- LTA ------------- \n\n");
+            psr.setSignLevel(SignLevelEnum.LTA);
         } else {
             psr.setSignLevel(SignLevelEnum.B);
         }
+
+        
         psr.setDigestAlgorithm(convertSignAlgorithmToPadesDigestAlgorithmEnum(fis.getSignAlgorithm()));
 
         psr.setCertId(certId);
