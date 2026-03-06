@@ -43,6 +43,9 @@ import org.fundaciobit.vintegris.nebula.api.client.trustedapplications.v1.servic
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
+import javax.security.auth.x500.X500Principal;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ext.ContextResolver;
@@ -86,7 +89,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     public static final String IGNORE_CERTIFICATE_FILTER = NEBULA_BASE_PROPERTIES + "ignore_certificate_filter";
 
-    public static final DateFormat DATE_FORMATTER = SimpleDateFormat.getDateTimeInstance();
+    public static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
 
     // Constructors per defecte
 
@@ -305,10 +308,23 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                         log.error("Message: " + ae.getMessage());
                         log.error("Body: " + ae.getResponseBody());
 
-                        errorMsg = "Error realitzant la firma: " + ae.getMessage() + " (Code: " + ae.getCode()
+                        errorMsg = "Error d'API realitzant la firma: " + ae.getMessage() + " (Code: " + ae.getCode()
                                 + ", Body: " + ae.getResponseBody() + ")";
                     } else {
+
+                        log.error(" CLass ERROR: " + th.getClass().getName());
+
+                        String msg = th.getMessage();
+
+                        if (msg.contains("The PIN could has caused problems in the sign init process: [160]")) {
+
+                            request.getSession().setAttribute("nebulaerror", getTraduccio("pin.error", locale));
+
+                            return relativePluginRequestPath + "/" + SELECT_CERTIFICATE_GET_PAGE;
+                        }
+
                         errorMsg = "Error realitzant la firma: " + th.getMessage();
+
                     }
 
                     log.error(errorMsg, th);
@@ -513,7 +529,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             psr.setSignLevel(SignLevelEnum.B);
         }
 
-        
         psr.setDigestAlgorithm(convertSignAlgorithmToPadesDigestAlgorithmEnum(fis.getSignAlgorithm()));
 
         psr.setCertId(certId);
@@ -916,13 +931,23 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         }
 
+        String error = (String) request.getSession().getAttribute("nebulaerror");
+
+        if (error != null) {
+            out.println("<div class=\"alert alert-danger\" role=\"alert\">" + error + "</div>");
+            request.getSession().removeAttribute("nebulaerror");
+        }
+
         out.println("<form action=\"" + relativePluginRequestPath + "/" + SELECT_CERTIFICATE_POST_PAGE
-                + "\" method=\"post\" >"); // enctype=\"multipart/form-data\"
+                + "\" method=\"post\" >");
 
-        out.println("<table border=\"0\">");
+        // Afegir camp hidden amb nom "cert" 
+        out.println("<input type=\"hidden\" name=\"cert\" id=\"cert\" value=\"\" />");
 
+        
+        
+        
         int certificatsDisponibles = 0;
-        int count = 0;
 
         String filter = signaturesSet.getCommonInfoSignature().getFiltreCertificats();
 
@@ -967,16 +992,16 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                 continue;
             }
 
-            out.println("<tr>");
-            out.println("<td align=\"center\" width=\"50px\">");
-            //if (passFilter) {
+            /*
+            out.println("<table border=\"0\">");
+            
+            out.println("<td style=\"border: 1px solid gray; padding-top:1px;\">");
+            
             out.println("<input type=\"radio\" name=\"cert\" id=\"optionsRadios_" + certID + "\" value=\""
                     + cert.getCertificateId() + "\" " + ((count == 0) ? "checked" : "") + " >");
-
-            out.println("</td>");
-            out.println("<td style=\"border: 1px solid gray; padding-top:1px;\">");
-
+            
             out.println("<label class=\"radio\">");
+            */
 
             String nom = null;
             if (cert.getAlias() != null && !cert.getAlias().trim().isEmpty()) {
@@ -991,14 +1016,21 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                         nom = cert.getSubject();
                     }
 
-                    String[] empresa;
-                    try {
-                        empresa = CertificateUtils.getEmpresaNIFNom(certX509);
-                        if (empresa != null) {
-                            nom += " (" + empresa[0] + " - " + empresa[1] + ")";
-                        }
-                    } catch (Exception e) {
+                    String organitzacio = getOrganization(certX509);
 
+                    if (organitzacio != null && !organitzacio.trim().isEmpty()) {
+                        nom += " - " + organitzacio;
+                    } else {
+
+                        String[] empresa;
+                        try {
+                            empresa = CertificateUtils.getEmpresaNIFNom(certX509);
+                            if (empresa != null) {
+                                nom += " (" + empresa[1] + ")";
+                            }
+                        } catch (Exception e) {
+
+                        }
                     }
 
                 }
@@ -1008,50 +1040,78 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             if (nom == null) {
                 nom = cert.getSubject();
             }
+            
+            
+            
+            Long dataFinal = cert.getDateValidEnd();
+            
+            if (dataFinal != null) {
+            
+               final String to = DATE_FORMATTER.format(new Timestamp(dataFinal));
+            
+              nom = nom + " (" + MessageFormat.format(getTraduccio("valid", locale), to) + ")";
+            }
+            
+
+            // Dibuixar div amb els cantons arrodonits i una mica de padding
+
+            out.println(
+                    "<div style=\"border: 2px solid gray; border-radius: 8px; padding: 10px; margin-bottom: 10px;\">");
 
             out.println("<p style=\"margin-bottom: 15px;\"><b>" + nom + "</b></p>");
+
+            /*
             out.println("<small>");
             out.println("<ul>");
             out.println("<li>Subject: " + cert.getSubject() + "</li>");
             out.println("<li>Issuer: " + cert.getIssuer() + " </li>");
-
+            
             // Afegir dates
-
+            
             //log.info("\n\nData inici: " + cert.getDateValidStart()+"Data fi: " + cert.getDateValidEnd() + "\n\n");
-
+            
             final String from = DATE_FORMATTER.format(new Timestamp(cert.getDateValidStart()));
+            
             final String to = DATE_FORMATTER.format(new Timestamp(cert.getDateValidEnd()));
-
-            out.println("<li>" + MessageFormat.format(getTraduccio("valid", locale), from, to) + "</li>");
-
+            
+            out.println("<li>" + MessageFormat.format(getTraduccio("valid", locale), to) + "</li>");
+            
             out.println("</ul>");
-
+            
             out.println("</small>");
-
+            
+            
             out.println("</label>");
+            
             out.println("</td>");
-
+            
             out.println("</td>");
+            
             out.println("<td style=\"border: 1px solid gray; padding-top:1px;\">");
+            */
 
-            if (isPinRequired(politica)) {
+            boolean pinRequired = isPinRequired(politica);
+            if (pinRequired) {
 
-                out.println(getTraduccio("pin", locale) + ":" + "<input type=\"password\" style=\"display: none;\" />"
-                        + "<input type=\"password\" id=\"" + FIELD_PIN + "_" + cert.getCertificateId() + "\" name=\""
-                        + FIELD_PIN + "_" + cert.getCertificateId() + "\" value=\"\" />");
+                out.println(getTraduccio("pin", locale) + ":");
+                out.println("<input type=\"password\" style=\"display: none;\" />" + "<input type=\"password\" id=\""
+                        + FIELD_PIN + "_" + cert.getCertificateId() + "\" name=\"" + FIELD_PIN + "_"
+                        + cert.getCertificateId() + "\" value=\"\" />");
+                // Boto bootstrap per posar al camp hidden cert el valor de "cert.getCertificateId()" i fer submit al formulari
+
             } else {
-                String noPinRequired = getTraduccio("nopinrequired", locale);
+                String noPinRequired = getTraduccio("pin.notrequired", locale);
                 out.println("<small>" + noPinRequired + "</small>");
             }
 
-            out.println("</td>");
+            out.println(
+                    "<button type=\"button\" class=\"btn btn-primary\" onclick=\"signWithCertificate('"+ cert.getCertificateId()+ "', " + pinRequired + ");\">"
+                            + getTraduccio("firmar", locale)
+                            + "</button>");
 
-            out.println("</tr>");
+            out.println("</div>");
 
-            count++;
         }
-
-        out.println("</table>");
 
         if (certificatsDisponibles == 0) {
             String warn = getTraduccio("warn.notecertificats", locale);
@@ -1066,25 +1126,66 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
 
         out.println("<script type=\"text/javascript\">");
+        
+        // Mètode per realitzar accions al pitjar el boto de signar amb aquest certificat:
+        //  (1) Assignar el valor del paràmetre certID al camp hidden "cert" del formulari
+        //  (2) El segon parametre es un boolea que indica si el pin és requerit
+        //  (3) Si el segon parametre és true llavors comprovar si el valor del pin està buit (input amb id FIELD_PIN + "_" + certID) i si està buit mostrar una alerta dient que el pin és obligatori i no submitar el formulari
+        //  (4) Submitar el formulari
+        out.println("function signWithCertificate(certID, pinRequired) {");
+        out.println("  document.getElementById('cert').value = certID;");
+        out.println("  if (pinRequired) {");
+        out.println("    var pinValue = document.getElementById('" + FIELD_PIN + "_' + certID).value;");
+        out.println("    if (!pinValue || pinValue.trim() === '') {");
+        out.println("      alert('" + getTraduccio("pin.requiredalert", locale) + "');");
+        out.println("      return;");
+        out.println("    }");
+        out.println("  }");
+        out.println("  document.forms[0].submit();");
+        out.println("}");
+        
 
         out.println("</script>");
 
         out.println("<br/><br/>");
 
-        out.println("<button class=\"btn\" type=\"button\" id=\"btnCancel\"  onclick=\"location.href='"
+        out.println("<button class=\"btn btn-warn\" type=\"button\" id=\"btnCancel\"  onclick=\"location.href='"
                 + relativePluginRequestPath + "/" + CANCEL_PAGE + "'\" >" + getTraduccio("cancel", locale)
                 + "</button>");
         out.println("&nbsp;&nbsp;");
-
+        /*
         if (certificatsDisponibles != 0) {
             int numFitxers = signaturesSet.getFileInfoSignatureArray().length;
             out.println(
                     "<button class=\"btn btn-primary\" type=\"submit\" onclick=\"document.body.style.cursor='wait'; document.getElementById('btnCancel').disabled=true; this.disabled=true; this.form.submit();\">"
                             + getTraduccio("firmardocument" + (numFitxers == 0 ? "" : ".plural"), locale)
                             + "</button>");
-
+        
         }
+        */
         out.println("</form>");
+    }
+
+    public String getOrganization(X509Certificate cert) {
+
+        if (cert == null) {
+            return null;
+        }
+
+        X500Principal principal = cert.getSubjectX500Principal();
+
+        try {
+            // Prova d'obtenir l'organització a través de la OID
+            for (Rdn rdn : new LdapName(principal.getName(X500Principal.RFC2253)).getRdns()) {
+                if ("O".equalsIgnoreCase(rdn.getType())) {
+                    return rdn.getValue().toString();
+                }
+            }
+        } catch (Exception e) {
+            // Si hi ha qualsevol error, es retorna null
+            log.warn("Error obtenint organització del certificat [" + cert.getSubjectDN() + "]: " + e.getMessage(), e);
+        }
+        return null;
     }
 
     private static final String SELECT_CERTIFICATE_POST_PAGE = "selectCertificatePost";
@@ -1189,7 +1290,13 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
      */
     @Override
     public boolean providesTimeStampGenerator(String signType) {
-        return true;
+        
+        if (isOnlyHashSignatures()) {
+            // Si el plugin només suporta signatures de hash, llavors no s'ofereix generador de segellat de temps
+            return false;
+        } else {     
+            return true;
+        }
     }
 
     @Override
@@ -1209,18 +1316,42 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     @Override
     public String[] getSupportedSignatureTypes() {
-        return new String[] { FileInfoSignature.SIGN_TYPE_PADES, FileInfoSignature.SIGN_TYPE_CADES,
+        
+        if (isOnlyHashSignatures()) {
+            // Si el plugin només suporta signatures de hash, llavors només s'ofereixen signatures de tipus PAdES
+            return new String[] { FileInfoSignature.SIGN_TYPE_PADES };
+        } else {
+        
+           return new String[] { FileInfoSignature.SIGN_TYPE_PADES, FileInfoSignature.SIGN_TYPE_CADES,
                 FileInfoSignature.SIGN_TYPE_XADES };
+        }
     }
 
     @Override
     public String[] getSupportedSignatureAlgorithms(String signType) {
-        if (FileInfoSignature.SIGN_TYPE_PADES.equals(signType) || FileInfoSignature.SIGN_TYPE_XADES.equals(signType)
+        
+        
+        if (signType == null || signType.trim().length() == 0) {
+            log.error("S'ha cridat a getSupportedSignatureAlgorithms amb un tipus de firma null o buit");
+            return null;
+        }
+        
+        if (isOnlyHashSignatures()) {
+            // Si el plugin només suporta signatures de hash, llavors només s'ofereixen algoritmes de hash per signatures PAdES
+            if (signType.equals(FileInfoSignature.SIGN_TYPE_PADES)) {
+                return new String[] { FileInfoSignature.SIGN_ALGORITHM_SHA256, FileInfoSignature.SIGN_ALGORITHM_SHA384,
+                        FileInfoSignature.SIGN_ALGORITHM_SHA512 };
+            } else {
+                // Per a altres tipus de firma (CAdES, XAdES) no s'ofereixen algoritmes si només es suporten signatures de hash
+                return null;
+            }
+        } else if (FileInfoSignature.SIGN_TYPE_PADES.equals(signType) || FileInfoSignature.SIGN_TYPE_XADES.equals(signType)
                 || FileInfoSignature.SIGN_TYPE_CADES.equals(signType)) {
             return new String[] { FileInfoSignature.SIGN_ALGORITHM_SHA256, FileInfoSignature.SIGN_ALGORITHM_SHA384,
                     FileInfoSignature.SIGN_ALGORITHM_SHA512 };
+        } else {
+           return null;
         }
-        return null;
     }
 
     @Override
@@ -1230,24 +1361,35 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             log.error("S'ha cridat a getSupportedSignatureModes amb un tipus de firma null o buit");
             return new int[0];
         }
-
-        switch (signType) {
-            case FileInfoSignature.SIGN_TYPE_PADES:
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
-
-            case FileInfoSignature.SIGN_TYPE_CADES:
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
-                        FileInfoSignature.SIGN_MODE_DETACHED };
-
-            case FileInfoSignature.SIGN_TYPE_XADES:
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
-                        FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED, FileInfoSignature.SIGN_MODE_DETACHED };
-
-            default:
-                log.error(
-                        "S'ha cridat a getSupportedSignatureModes amb un amb un tipus de firma desconegut o no suportat: ]"
-                                + signType + "[");
+        
+        if (isOnlyHashSignatures()) {
+            // Si el plugin només suporta signatures de hash, llavors no s'ofereixen modes de signatura
+            if (signType ==  FileInfoSignature.SIGN_TYPE_PADES) {
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
+            } else {
+                // Per a altres tipus de firma (CAdES, XAdES) no s'ofereixen modes de signatura si només es suporten signatures de hash
                 return new int[0];
+            }
+        } else {
+
+            switch (signType) {
+                case FileInfoSignature.SIGN_TYPE_PADES:
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
+    
+                case FileInfoSignature.SIGN_TYPE_CADES:
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
+                            FileInfoSignature.SIGN_MODE_DETACHED };
+    
+                case FileInfoSignature.SIGN_TYPE_XADES:
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
+                            FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED, FileInfoSignature.SIGN_MODE_DETACHED };
+    
+                default:
+                    log.error(
+                            "S'ha cridat a getSupportedSignatureModes amb un amb un tipus de firma desconegut o no suportat: ]"
+                                    + signType + "[");
+                    return new int[0];
+            }
         }
     }
 
@@ -1415,6 +1557,12 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     protected boolean isDebug() {
         return Boolean.parseBoolean(getProperty(NEBULA_BASE_PROPERTIES + "debug", "false"));
     }
+    
+    
+    protected boolean isOnlyHashSignatures() {
+        return Boolean.parseBoolean(getProperty(NEBULA_BASE_PROPERTIES + "onlyhashsignatures", "false"));
+    }
+    
 
     // ----------------------------------------------------
     // ----------------------------------------------------
@@ -1554,8 +1702,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             // En entorn de PRE de NEBULA els certificats no inclouen el NIF, per tant cal ignorar la seva validació
             // es.caib.sample.pluginsib.signatureweb.nebula.ignoreNifValidation=true
             PropertyInfo propIgnoreNifValidation = new PropertyInfo(NEBULA_BASE_PROPERTIES + "ignoreNifValidation",
-                    "Indica si s'ha d'ignorar la validació del NIF"
-                            + " (En entorn de PRE de NEBULA els certificats"
+                    "Indica si s'ha d'ignorar la validació del NIF" + " (En entorn de PRE de NEBULA els certificats"
                             + " no inclouen el NIF, per tant cal ignorar la seva validació)",
                     true, "false", new String[] { "true", "false" }, null);
             props.add(propIgnoreNifValidation);
@@ -1576,6 +1723,15 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                     "Indica si s'activa el mode debug, que mostra informació addicional als logs", true, "false",
                     new String[] { "true", "false" }, null);
             props.add(propDebug);
+        }
+        
+        
+        {
+            // es.caib.sample.pluginsib.signatureweb.nebula.debug=false
+            PropertyInfo onlyhashDebug = new PropertyInfo(NEBULA_BASE_PROPERTIES + "onlyhashsignatures",
+                    "Si val true indica que totes les signatures realitzades siguin emprant Hash", true, "false",
+                    new String[] { "true", "false" }, null);
+            props.add(onlyhashDebug);
         }
 
         return props;

@@ -11,4 +11,9 @@ es.caib.sample.pluginsib.signatureweb.nebula.accessKey=765c0DAC2c20dF623BA94B0a5
 # En entorn de PRE de NEBULA els certificats no inclouen el NIF, per tant cal ignorar la seva validació
 es.caib.sample.pluginsib.signatureweb.nebula.ignoreNifValidation=true
 
+# Si val true, llavors s'imprimeixen més logs
 es.caib.sample.pluginsib.signatureweb.nebula.debug=false
+
+
+# Si val true indica que totes les signatures es realitzin emprant Hash (o trifase)
+es.caib.sample.pluginsib.signatureweb.nebula.onlyhashsignatures=false
