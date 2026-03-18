@@ -50,3 +50,6 @@ nb-configuration.xml
 /nebula/pluginib-signatureweb-nebula/fnmt.p12
 /nebula/pluginib-signatureweb-nebula/nebula_anadal.cer
 /nebula/pluginib-signatureweb-nebula/nebula_anadal.cert
+/nebula/vintegris-nebula-api-client-v1
+/nebula/vintegris-nebula-api-server-digital-signature-v1
+/nebula/vintegris-nebula_apis_generator/pom - amb server.xml
