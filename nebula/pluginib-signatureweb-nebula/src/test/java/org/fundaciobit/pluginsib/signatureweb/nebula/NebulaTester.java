@@ -26,6 +26,7 @@ import org.fundaciobit.pluginsib.signatureweb.api.ISignatureWebPlugin;
 import org.fundaciobit.pluginsib.signatureweb.api.SignaturesSetWeb;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200ResponseCertificatesListInner;
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException;
+import org.jboss.logging.Logger;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,6 +36,8 @@ import org.junit.Test;
  * 16 dic 2025 8:03:13
  */
 public class NebulaTester {
+    
+    protected Logger log = Logger.getLogger(NebulaTester.class);
 
     public static final String TEST_RESULTS_FOLDER = "./results/";
     public static final String NEBULA_PROPERTIES_FILE = "nebula.properties";
@@ -112,7 +115,7 @@ public class NebulaTester {
             pluginInstance = (ISignatureWebPlugin) PluginsManager.instancePluginByClassName(className,
                     basePropertiesKey, properties);
 
-            System.out.println("Plugin instantiated: " + pluginInstance.getName(locale));
+            log.info("Plugin instantiated: " + pluginInstance.getName(locale));
         }
 
         return pluginInstance;
@@ -362,8 +365,19 @@ public class NebulaTester {
         String username = test.getProperty("username");
         String languageUI = test.getProperty("languageUI");
 
-        return doSignature(testName, nif, username, languageUI, fileToSignPath, mimeType, signType, signMode,
+        String error;
+        error = doSignature(testName, nif, username, languageUI, fileToSignPath, mimeType, signType, signMode,
                 userRequiresTimeStamp, pathSignedFile);
+        
+        if (error != null) {
+            System.err.println("============ Error en el test [" + testName + "] ===================================");
+            System.err.println(error);
+            System.err.println("===============================================================================");
+        } else {
+            System.out.println("Test " + testName + " realitzat correctament.");
+        }
+        
+        return error;
     }
 
     protected String doSignature(String testName, String nif, String username, String languageUI, String fileToSignPath,
@@ -394,7 +408,7 @@ public class NebulaTester {
         String returnURL = plugin.signDocuments(request, absolutePluginRequestPath, relativePluginRequestPath, ssw,
                 parameters);
 
-        System.out.println("Return URL: " + returnURL);
+        log.info("Return URL: " + returnURL);
 
         // Verificar Estat de la Signatura
         StatusSignaturesSet statusSignatureGlobal = ssw.getStatusSignaturesSet();
@@ -419,7 +433,7 @@ public class NebulaTester {
                             }
 
                             if (fis.getStatusSignature().getSignedData().renameTo(desti)) {
-                                ;
+                                
                                 System.out.println("\t - Fitxer signat guardat a: " + desti);
                             } else {
                                 System.err.println(

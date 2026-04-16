@@ -30,13 +30,20 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
     protected final GetMyCertificates200ResponseCertificatesListInner cert;
     
     protected final String pin;
+    
+    protected final String fileInfoSignAlgorithm;
+    
+    protected boolean isDebug;
 
     public NebulaTriphaseSigner(final DigitalCertificateApi api, final Properties params,
-            final GetMyCertificates200ResponseCertificatesListInner cert, String pin) {
+            final GetMyCertificates200ResponseCertificatesListInner cert, String pin, String fileInfoSignAlgorithm, 
+            boolean isDebug) {
         this.api = api;
         this.params = params;
         this.cert = cert;
         this.pin = pin;
+        this.fileInfoSignAlgorithm = fileInfoSignAlgorithm;
+        this.isDebug = isDebug;
     }
 
     @Override
@@ -68,40 +75,52 @@ public class NebulaTriphaseSigner extends AbstractTriFaseSigner {
          * 
          * 
          */
-        String algorithmID = null;
-        switch (algorithm) {
+        String algorithmNebulaID = null;
+        switch (fileInfoSignAlgorithm) {
             case FileInfoSignature.SIGN_ALGORITHM_SHA1:
-                algorithmID = "6";
+                algorithmNebulaID = "6";
             break;
             case FileInfoSignature.SIGN_ALGORITHM_SHA256:
-                algorithmID = "64";
+                algorithmNebulaID = "64";
             break;
             case FileInfoSignature.SIGN_ALGORITHM_SHA384:
-                algorithmID = "65";
+                algorithmNebulaID = "65";
             break;
             case FileInfoSignature.SIGN_ALGORITHM_SHA512:
-                algorithmID = "66";
+                algorithmNebulaID = "66";
             break;
             default:
-                throw new Exception("L'algorisme de signatura " + algorithm + " no està suportat");
+                throw new Exception("L'algorisme de signatura " + fileInfoSignAlgorithm + " no està suportat");
         }
         
-        log.info("XYZ ZZZ   ALGORITHM =   " + algorithm + "\n");
-        log.info("XYZ ZZZ   ALGORITHM ID =   " + algorithmID + "\n");
+        
 
-        request.setMechanism(algorithmID);
+        request.setMechanism(algorithmNebulaID);
         request.setObjId(cSession.getObjId());
         request.setSession(cSession.getSession());
         request.setSigndata(Base64.getEncoder().encodeToString(hashDocumentoParam));
+        
+        if (isDebug) {
+            log.info("CSignReqDTOV3.request => " + request);
+            log.info("XYZ ZZZ   ALGORITHM MINIAPPLET =   " + algorithm);
+            log.info("XYZ ZZZ   ALGORITHM FILEINFO =   " + this.fileInfoSignAlgorithm);
+            log.info("XYZ ZZZ   ALGORITHM NEBULA ID =   " + algorithmNebulaID);
+        }
 
         CSignDTO signed = api.signHashV3(request);
+        
+        
+        if (signed.getMessage() == null || !signed.getMessage().startsWith("Operation Success")) {
+            final String msg = "El procés de generació d'una firma trifàsica (amb HASH) ha fallat: " + signed.getMessage();
+            log.error("Signed STATUS: " + signed.getMessage(), new Exception(msg));
+            throw new Exception(msg);
+        }
 
         CSignCloseDTO signedClose = new CSignCloseDTO();
         signedClose.setSession(cSession.getSession());
 
         api.signCloseV2(signedClose);
 
-        //log.info("Signed: " + signed);
 
         byte[] signedHash = Base64.getDecoder().decode(signed.getSignedData());
         

@@ -187,15 +187,18 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             if (certs.size() != 1) {
 
+                // TODO FALTA  Revisar si tots estan habilitats per no demanar selecció de certificat
+
                 super.addSignaturesSet(signaturesSet);
 
                 // Redireccionam a la pàgina de selecció de certificat i pin
                 return relativePluginRequestPath + "/" + SELECT_CERTIFICATE_GET_PAGE;
-            }
+            } else {
 
-            // Hi ha un sol certificat, el seleccionam directament
-            selectedCertificate = new ArrayList<GetMyCertificates200ResponseCertificatesListInner>(certs.values())
-                    .get(0);
+                // Hi ha un sol certificat, el seleccionam directament
+                selectedCertificate = new ArrayList<GetMyCertificates200ResponseCertificatesListInner>(certs.values())
+                        .get(0);
+            }
 
             Map<String, Policy> politiques = info.getPoliciesByCertID();
 
@@ -523,7 +526,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         psr.setCertPin(pin);
 
         if (fis.isUserRequiresTimeStamp()) {
-            System.out.println("\n\n ------------- LTA ------------- \n\n");
+            if (isDebug()) {
+                log.info(
+                        "L'usuari ha indicat que vol que la firma PAdES contingui TimeStamp, per tant es realitzarà una firma de nivell LTA");
+            }
             psr.setSignLevel(SignLevelEnum.LTA);
         } else {
             psr.setSignLevel(SignLevelEnum.B);
@@ -602,7 +608,9 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         x509Cert = CertificateUtils
                 .decodeCertificate(new ByteArrayInputStream(Base64.getDecoder().decode(cert.getCertificate())));
 
-        final String algo = fileInfo.getSignAlgorithm();
+        final String fileInfoSignAlgorithm = fileInfo.getSignAlgorithm();
+        
+        String algorithmMiniapplet = MiniAppletUtils.convertAlgorithm(fileInfo);
 
         byte[] dataToSign = Files.readAllBytes(fileInfo.getFileToSign().toPath());
 
@@ -618,14 +626,14 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         }
 
-        NebulaTriphaseSigner nTriPhase = new NebulaTriphaseSigner(api, params, cert, pin);
+        NebulaTriphaseSigner nTriPhase = new NebulaTriphaseSigner(api, params, cert, pin, fileInfoSignAlgorithm, isDebug());
 
-        byte[] hashDocumento = nTriPhase.step1_PreSign(dataToSign, algo,
+        byte[] hashDocumento = nTriPhase.step1_PreSign(dataToSign, algorithmMiniapplet,
                 new java.security.cert.Certificate[] { x509Cert }, params);
 
-        byte[] signedHash = nTriPhase.step2_signHash(algo, hashDocumento);
+        byte[] signedHash = nTriPhase.step2_signHash(algorithmMiniapplet, hashDocumento);
 
-        byte[] signedData = nTriPhase.step3_PostSign(algo, new java.security.cert.Certificate[] { x509Cert }, params,
+        byte[] signedData = nTriPhase.step3_PostSign(algorithmMiniapplet, new java.security.cert.Certificate[] { x509Cert }, params,
                 signedHash);
 
         File signedFileData = File.createTempFile("nebula_", "_padestriphasesignedfile");
@@ -1586,7 +1594,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = new HashMap<>();
 
             for (GetMyCertificates200ResponseCertificatesListInner cert : certs) {
-
                 certificatesByCertID.put(cert.getCertificateId(), cert);
             }
 
