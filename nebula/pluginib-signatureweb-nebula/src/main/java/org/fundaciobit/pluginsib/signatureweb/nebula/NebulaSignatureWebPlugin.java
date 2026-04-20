@@ -12,7 +12,6 @@ import org.fundaciobit.pluginsib.signature.api.PolicyInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
-import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletSignInfo;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletUtils;
 import org.fundaciobit.pluginsib.signatureweb.api.AbstractSignatureWebPlugin;
 import org.fundaciobit.pluginsib.signatureweb.api.SignaturesSetWeb;
@@ -284,7 +283,11 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                         }
                     } else if (fis.getSignType().equals(FileInfoSignature.SIGN_TYPE_CADES)) {
 
-                        doSignatureCades(fis, selectedCertificate, nif);
+                        if (fis.isUserRequiresTimeStamp()) {
+                            doSignatureCades(fis, selectedCertificate, nif);
+                        } else {
+                            doSignatureTriphaseCades(commonInfoSignature, fis, selectedCertificate, pin);
+                        }
 
                     } else if (fis.getSignType().equals(FileInfoSignature.SIGN_TYPE_XADES)) {
 
@@ -598,9 +601,13 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
     }
 
-    protected void doSignatureTriphasePades(CommonInfoSignature commonInfo, FileInfoSignature fileInfo,
+    protected void doSignatureTriphaseCades(CommonInfoSignature commonInfo, FileInfoSignature fileInfo,
             GetMyCertificates200ResponseCertificatesListInner cert, String pin)
             throws ApiException, Exception, IOException, FileNotFoundException {
+
+        if (isDebug()) {
+            log.info("--------- Realitzant Firma CAdES en 3 fases... ----------");
+        }
 
         DigitalCertificateApi api = getDigitalCertificateApi(commonInfo.getAdministrationID());
 
@@ -608,33 +615,48 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         x509Cert = CertificateUtils
                 .decodeCertificate(new ByteArrayInputStream(Base64.getDecoder().decode(cert.getCertificate())));
 
-        final String fileInfoSignAlgorithm = fileInfo.getSignAlgorithm();
-        
-        String algorithmMiniapplet = MiniAppletUtils.convertAlgorithm(fileInfo);
+        final String timeStampURL = null;
 
-        byte[] dataToSign = Files.readAllBytes(fileInfo.getFileToSign().toPath());
+        NebulaCadesTriphaseSigner cadesTriPhase = new NebulaCadesTriphaseSigner(api, cert, pin, commonInfo, fileInfo,
+                x509Cert, timeStampURL);
 
-        Properties params;
-        {
+        byte[] signedData = cadesTriPhase.fullSign();
 
-            String timeStampUrl = null;
+        File signedFileData = File.createTempFile("nebula_", "_cadestriphasesignedfile");
 
-            MiniAppletSignInfo info;
-            info = MiniAppletUtils.convertLocalSignature(commonInfo, fileInfo, timeStampUrl, x509Cert);
+        FileOutputStream fos = new FileOutputStream(signedFileData);
+        fos.write(signedData);
+        fos.flush();
+        fos.close();
 
-            params = info.getProperties();
+        StatusSignature statusSignature = fileInfo.getStatusSignature();
+        statusSignature.setSignedData(signedFileData);
+        statusSignature.setStatus(StatusSignature.STATUS_FINAL_OK);
+        statusSignature.setErrorMsg(null);
 
+    }
+
+    protected void doSignatureTriphasePades(CommonInfoSignature commonInfo, FileInfoSignature fileInfo,
+            GetMyCertificates200ResponseCertificatesListInner nebulaCertificate, String pin)
+            throws ApiException, Exception, IOException, FileNotFoundException {
+
+        DigitalCertificateApi api = getDigitalCertificateApi(commonInfo.getAdministrationID());
+
+        X509Certificate x509Cert;
+        x509Cert = CertificateUtils.decodeCertificate(
+                new ByteArrayInputStream(Base64.getDecoder().decode(nebulaCertificate.getCertificate())));
+
+        if (isDebug()) {
+            log.info("---------- Realitzant Firma PAdES en 3 fases... ----------");
         }
 
-        NebulaTriphaseSigner nTriPhase = new NebulaTriphaseSigner(api, params, cert, pin, fileInfoSignAlgorithm, isDebug());
+        final String timeStampURL = null;
 
-        byte[] hashDocumento = nTriPhase.step1_PreSign(dataToSign, algorithmMiniapplet,
-                new java.security.cert.Certificate[] { x509Cert }, params);
+        NebulaPadesTriphaseSigner nTriPhase = new NebulaPadesTriphaseSigner(api, nebulaCertificate,
 
-        byte[] signedHash = nTriPhase.step2_signHash(algorithmMiniapplet, hashDocumento);
+                pin, commonInfo, fileInfo, x509Cert, timeStampURL);
 
-        byte[] signedData = nTriPhase.step3_PostSign(algorithmMiniapplet, new java.security.cert.Certificate[] { x509Cert }, params,
-                signedHash);
+        byte[] signedData = nTriPhase.fullSign();
 
         File signedFileData = File.createTempFile("nebula_", "_padestriphasesignedfile");
 
@@ -1316,7 +1338,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         if (isOnlyHashSignatures()) {
             // Si el plugin només suporta signatures de hash, llavors només s'ofereixen signatures de tipus PAdES
-            return new String[] { FileInfoSignature.SIGN_TYPE_PADES };
+            return new String[] { FileInfoSignature.SIGN_TYPE_PADES, FileInfoSignature.SIGN_TYPE_CADES };
         } else {
 
             return new String[] { FileInfoSignature.SIGN_TYPE_PADES, FileInfoSignature.SIGN_TYPE_CADES,
@@ -1334,7 +1356,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         if (isOnlyHashSignatures()) {
             // Si el plugin només suporta signatures de hash, llavors només s'ofereixen algoritmes de hash per signatures PAdES
-            if (signType.equals(FileInfoSignature.SIGN_TYPE_PADES)) {
+            if (signType.equals(FileInfoSignature.SIGN_TYPE_PADES)
+                    || signType.equals(FileInfoSignature.SIGN_TYPE_CADES)) {
                 return new String[] { FileInfoSignature.SIGN_ALGORITHM_SHA256, FileInfoSignature.SIGN_ALGORITHM_SHA384,
                         FileInfoSignature.SIGN_ALGORITHM_SHA512 };
             } else {
@@ -1361,11 +1384,18 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         if (isOnlyHashSignatures()) {
             // Si el plugin només suporta signatures de hash, llavors no s'ofereixen modes de signatura
-            if (signType == FileInfoSignature.SIGN_TYPE_PADES) {
-                return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
-            } else {
-                // Per a altres tipus de firma (CAdES, XAdES) no s'ofereixen modes de signatura si només es suporten signatures de hash
-                return new int[0];
+            switch (signType) {
+                case FileInfoSignature.SIGN_TYPE_PADES:
+
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED };
+
+                case FileInfoSignature.SIGN_TYPE_CADES:
+                    return new int[] { FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPING,
+                            FileInfoSignature.SIGN_MODE_DETACHED };
+
+                default:
+                    // Per a altres tipus de firma (CAdES, XAdES) no s'ofereixen modes de signatura si només es suporten signatures de hash
+                    return new int[0];
             }
         } else {
 
