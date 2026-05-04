@@ -865,6 +865,8 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
 
             // Plugin de FIRe no controla error amb codi 4: “Operación cancelada por el usuario”
             // https://github.com/GovernIB/portafib/issues/1155
+            // Codi 4 Operación cancelada por el usuario: ​
+            // El usuario pulsó alguno de los botones de cancelar que se muestran en las páginas de FIRe.
             if (transactionResult.getErrorCode() == 4) {
                 cancel(request, response, signaturesSet);
                 return;
