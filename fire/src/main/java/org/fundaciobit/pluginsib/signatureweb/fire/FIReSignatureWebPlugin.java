@@ -863,6 +863,13 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             log.error("signErrorPage():: transactionResult.getResultType() => " + transactionResult.getResultType());
             log.error("signErrorPage():: transactionResult.getState() => " + transactionResult.getState());
 
+            // Plugin de FIRe no controla error amb codi 4: “Operación cancelada por el usuario”
+            // https://github.com/GovernIB/portafib/issues/1155
+            if (transactionResult.getErrorCode() == 4) {
+                cancel(request, response, signaturesSet);
+                return;
+            }
+
             if (msgError != null && msgError.trim().length() != 0) {
 
                 if ("ca".equalsIgnoreCase(fireSignaturesSet.getLanguageUI())) {
@@ -876,6 +883,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                 //error.detail=(Codi Error: {0} - Proveïdor: {1} - Tipus Resultat: {2})
                 msg = msg + getTraduccio("error.detail", locale, transactionResult.getErrorCode(),
                         transactionResult.getProviderName(), transactionResult.getResultType());
+
             }
 
             log.error("\n\n\n\n");
