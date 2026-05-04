@@ -24,7 +24,6 @@ import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
-import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletConstants;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletUtils;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.SMIMEInputStream;
 import org.fundaciobit.pluginsib.signatureweb.afirmatriphaseserver.signresult.Signs;
@@ -2028,6 +2027,9 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                     e.printStackTrace();
                 }
             } else if (errorMsg.startsWith("Type: es.gob.afirma.core.AOCancelledOperationExceptionMessage")) {
+                cancel(request, response, signaturesSet);
+                return;
+            } else if (errorMsg.startsWith("Type: java.lang.ExceptionMessage: AI500001 - Operación cancelada por el usuario.")) {
                 cancel(request, response, signaturesSet);
                 return;
             }
