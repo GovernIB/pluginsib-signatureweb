@@ -11,7 +11,6 @@ import java.nio.file.Files;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
 
@@ -107,7 +106,7 @@ public class NebulaTester {
             Properties properties = new Properties();
             properties.load(new FileReader(NEBULA_PROPERTIES_FILE));
 
-            Locale locale = Locale.getDefault();
+            //Locale locale = Locale.getDefault();
 
             String className = NebulaSignatureWebPlugin.class.getName();
             String basePropertiesKey = "es.caib.sample.";
@@ -115,7 +114,7 @@ public class NebulaTester {
             pluginInstance = (ISignatureWebPlugin) PluginsManager.instancePluginByClassName(className,
                     basePropertiesKey, properties);
 
-            log.info("Plugin instantiated: " + pluginInstance.getName(locale));
+            //log.info("Plugin instantiated: " + pluginInstance.getName(locale));
         }
 
         return pluginInstance;
@@ -193,6 +192,9 @@ public class NebulaTester {
         long startTime = System.currentTimeMillis();
 
         String fileToSignPath = "./samplefiles/pdf_a_signar.pdf";
+        
+        //String fileToSignPath = "./samplefiles/Firma-PAdES-en-Servidor_signed_adaptat.pdf";
+        
         String mimeType = "application/pdf";
         int signMode = FileInfoSignature.SIGN_MODE_ATTACHED_ENVELOPED;
         String signType = FileInfoSignature.SIGN_TYPE_PADES;

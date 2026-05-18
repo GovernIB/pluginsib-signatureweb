@@ -139,6 +139,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             NebulaCacheInfo info = getNebulaCache(nif);
 
+            if (info == null) {
+                return "L'usuari amb nif " + nif + " no està donat d'alta a NEBULA.";
+            }
+
             // TODO ficar dins sessió el certificat !!!!!
             Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
 
@@ -173,6 +177,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         try {
 
             NebulaCacheInfo info = getNebulaCache(signaturesSet.getCommonInfoSignature().getAdministrationID());
+
+            if (info == null) {
+                throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
+            }
 
             Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
             if (certs == null || certs.size() == 0) {
@@ -944,6 +952,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             info = getNebulaCache(signaturesSet.getCommonInfoSignature().getAdministrationID());
 
+            if (info == null) {
+                throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
+            }
+
         } catch (Throwable th) {
 
             String errorMsg = th.getMessage();
@@ -1229,6 +1241,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             String nif = commonInfoSignature.getAdministrationID();
             NebulaCacheInfo info = getNebulaCache(nif);
 
+            if (info == null) {
+                throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
+            }
+
             Map<String, GetMyCertificates200ResponseCertificatesListInner> certs = info.getCertificatesByCertID();
             GetMyCertificates200ResponseCertificatesListInner selectedCertificate = certs.get(certID);
 
@@ -1420,7 +1436,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         }
     }
 
-    public DigitalCertificateApi getDigitalCertificateApi(String username) throws Exception {
+    public DigitalCertificateApi getDigitalCertificateApi(String username)
+            throws Exception, org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException {
 
         String url = getPropertyRequired(NEBULA_BASE_PROPERTIES + "url");
         String token = getApiToken(username);
@@ -1605,7 +1622,9 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         if (nci == null || nci.isExpired()) {
             nci = initCertificatesAndPolicies(new NebulaCacheInfo(nif));
-            cache.put(nif, nci);
+            if (nci != null) {
+                cache.put(nif, nci);
+            }
         } else {
             nci.sessionReset();
         }
@@ -1618,7 +1637,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         String nif = cacheInfo.getNif();
 
-        {
+        try {
             List<GetMyCertificates200ResponseCertificatesListInner> certs = getCertificatesOfUser(nif);
 
             Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = new HashMap<>();
@@ -1629,6 +1648,20 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             cacheInfo.setCertificatesByCertID(certificatesByCertID);
 
+        } catch (org.fundaciobit.vintegris.nebula.api.client.trustedapplications.v1.services.ApiException th) {
+
+            String msg = th.getMessage();
+
+            // responseBody='{
+            //    "code":"CODE_INVALID_REQUEST",
+            //    "message":"The user [43096844c] of tenant [8d65d72d-cf05-40ad-9493-260cc24294c1] doesn't exist"}'
+            // }
+
+            if (th.getCode() == 400 && msg != null && msg.contains("of tenant") && msg.contains("doesn't exist")) {
+                return null;
+            }
+
+            throw th;
         }
 
         {
