@@ -345,8 +345,6 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
                 }
             }
 
-            signaturesSet.getStatusSignaturesSet().setStatus(StatusSignaturesSet.STATUS_FINAL_OK);
-
         } catch (Throwable th) {
 
             log.error("Error Firmant: " + th.getMessage() + " [CLASS: " + th.getClass().getName() + "]", th);
