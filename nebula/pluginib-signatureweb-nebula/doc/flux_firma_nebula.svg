@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1560" width="1000" height="1560">
+  <!-- Estils -->
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#2e7d32"/>
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#c62828"/>
+    </marker>
+    <style>
+      .title { font: bold 20px sans-serif; fill: #1a1a1a; }
+      .subtitle { font: italic 13px sans-serif; fill: #555; }
+      .box-method { fill: #e3f2fd; stroke: #1565c0; stroke-width: 2; rx: 8; }
+      .box-decision { fill: #fff3e0; stroke: #e65100; stroke-width: 2; }
+      .box-action { fill: #e8f5e9; stroke: #2e7d32; stroke-width: 2; rx: 6; }
+      .box-ui { fill: #fce4ec; stroke: #c62828; stroke-width: 2; rx: 6; }
+      .box-sign { fill: #ede7f6; stroke: #4527a0; stroke-width: 2; rx: 8; }
+      .box-end { fill: #f1f8e9; stroke: #33691e; stroke-width: 2; rx: 10; }
+      .box-discard { fill: #ffebee; stroke: #c62828; stroke-width: 2; rx: 8; }
+      .label { font: bold 13px sans-serif; fill: #1a1a1a; text-anchor: middle; }
+      .label-small { font: 11px sans-serif; fill: #333; text-anchor: middle; }
+      .label-decision { font: 11px sans-serif; fill: #e65100; text-anchor: middle; }
+      .arrow { stroke: #333; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead); }
+      .arrow-yes { stroke: #2e7d32; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-green); }
+      .arrow-no { stroke: #c62828; stroke-width: 1.5; fill: none; marker-end: url(#arrowhead-red); }
+      .connector { stroke: #333; stroke-width: 1.5; fill: none; }
+      .connector-yes { stroke: #2e7d32; stroke-width: 1.5; fill: none; }
+      .connector-no { stroke: #c62828; stroke-width: 1.5; fill: none; }
+      .note-yes { font: bold 11px sans-serif; fill: #2e7d32; }
+      .note-no { font: bold 11px sans-serif; fill: #c62828; }
+      .note { font: 10px sans-serif; fill: #555; }
+    </style>
+  </defs>
+
+  <!-- Títol -->
+  <text x="450" y="35" class="title" text-anchor="middle">Flux de Firma amb Plugin Nebula (Vintegris)</text>
+  <text x="450" y="55" class="subtitle" text-anchor="middle">NebulaSignatureWebPlugin - Diagrama del procés de firma digital</text>
+
+  <!-- 1. filter() -->
+  <rect x="300" y="75" width="300" height="50" class="box-method"/>
+  <text x="450" y="97" class="label">1. filter()</text>
+  <text x="450" y="113" class="label-small">Validació inicial de l'usuari</text>
+
+  <line x1="450" y1="125" x2="450" y2="150" class="arrow"/>
+
+  <!-- Accions dins filter -->
+  <rect x="275" y="150" width="350" height="75" class="box-action"/>
+  <text x="450" y="170" class="label-small">getNebulaCache(nif): Login TrustedApp + Authorize</text>
+  <text x="450" y="186" class="label-small">(Usa usuari aplicació amb DIRECT_ACCESS)</text>
+  <text x="450" y="202" class="label-small">Carrega Certificats (getMyCertificates)</text>
+  <text x="450" y="218" class="label-small">Carrega Polítiques (getCertPolicies)</text>
+
+  <line x1="450" y1="225" x2="450" y2="255" class="arrow"/>
+
+  <!-- (3) Decisió: Passa filtre? -->
+  <polygon points="450,255 570,290 450,325 330,290" class="box-decision"/>
+  <text x="450" y="290" class="label-decision">Passa filtre?</text>
+
+  <!-- Branca NO filtre (dreta) - Descartada -->
+  <line x1="570" y1="290" x2="720" y2="290" class="arrow-no"/>
+  <text x="645" y="282" class="note-no">No</text>
+  <rect x="720" y="258" width="265" height="64" class="box-discard"/>
+  <text x="852" y="277" class="label-small">Firma NEBULA descartada</text>
+  <text x="852" y="293" class="label-small">(L'usuari no compleix requisits</text>
+  <text x="852" y="309" class="label-small">o requisits de firma no suportats)</text>
+
+  <!-- Branca SÍ filtre (avall) -->
+  <line x1="450" y1="325" x2="450" y2="360" class="arrow-yes"/>
+  <text x="470" y="345" class="note-yes">Sí</text>
+
+  <!-- 2. signDocuments() -->
+  <rect x="300" y="360" width="300" height="50" class="box-method"/>
+  <text x="450" y="382" class="label">2. signDocuments()</text>
+  <text x="450" y="398" class="label-small">Revisar Mètodes d'Autenticació</text>
+
+  <line x1="450" y1="410" x2="450" y2="440" class="arrow"/>
+
+  <!-- Decisió: Quants autenticadors? -->
+  <polygon points="450,440 580,480 450,520 320,480" class="box-decision"/>
+  <text x="450" y="477" class="label-decision">Més d'un</text>
+  <text x="450" y="491" class="label-decision">autenticador?</text>
+
+  <!-- Branca SÍ (esquerra) - Seleccionar autenticador -->
+  <line x1="320" y1="480" x2="200" y2="480" class="connector-yes"/>
+  <text x="260" y="472" class="note-yes">Sí</text>
+  <line x1="200" y1="480" x2="200" y2="525" class="connector-yes"/>
+  <line x1="200" y1="525" x2="200" y2="535" class="arrow-yes"/>
+
+  <rect x="80" y="535" width="240" height="50" class="box-ui"/>
+  <text x="200" y="557" class="label-small">Pàgina de selecció de</text>
+  <text x="200" y="573" class="label-small">Mètode Autenticador (UI)</text>
+
+  <!-- Colze cap a decisió tipus autenticador - arriba a la part alta del rombe -->
+  <line x1="320" y1="560" x2="450" y2="570" class="arrow"/>
+
+  <!-- Branca NO (avall) -->
+  <line x1="450" y1="520" x2="450" y2="570" class="arrow-no"/>
+  <text x="475" y="540" class="note-no">No (1 sol)</text>
+
+  <!-- Decisió: Quin tipus d'autenticador? -->
+  <polygon points="450,570 610,615 450,660 290,615" class="box-decision"/>
+  <text x="450" y="610" class="label-decision">Tipus</text>
+  <text x="450" y="625" class="label-decision">Autenticador?</text>
+
+  <!-- Branca DIRECT_ACCESS (centre, avall) - connecta directament al punt 3 -->
+  <line x1="450" y1="660" x2="450" y2="885" class="arrow"/>
+  <text x="450" y="678" class="note">DIRECT_ACCESS</text>
+
+  <!-- Branca SMS (esquerra) -->
+  <line x1="290" y1="615" x2="180" y2="615" class="arrow"/>
+  <text x="235" y="607" class="note">MOBILE_SMS</text>
+
+  <!-- Branca OTP (dreta) -->
+  <line x1="610" y1="615" x2="730" y2="615" class="arrow"/>
+  <text x="670" y="607" class="note">OTP</text>
+
+  <!-- SMS: Challenge + guardar token2 -->
+  <line x1="180" y1="615" x2="180" y2="675" class="connector"/>
+  <rect x="60" y="675" width="240" height="75" class="box-action"/>
+  <text x="180" y="690" class="label-small">Cridar challenge()</text>
+  <text x="180" y="705" class="label-small">Guardar token2 a sessió</text>
+  <text x="180" y="720" class="label-small">(NebulaCacheSessionInfo)</text>
+  <text x="180" y="733" class="label-small" style="font-style:italic;fill:#2e7d32">API: AuthenticationApi.getChallenge()</text>
+  <text x="180" y="746" class="label-small" style="font-style:italic;fill:#555">Usa token1</text>
+
+  <!-- OTP: Challenge + guardar token2 -->
+  <line x1="730" y1="615" x2="730" y2="675" class="connector"/>
+  <rect x="610" y="675" width="240" height="75" class="box-action"/>
+  <text x="730" y="690" class="label-small">Cridar challenge()</text>
+  <text x="730" y="705" class="label-small">Guardar token2 a sessió</text>
+  <text x="730" y="720" class="label-small">(NebulaCacheSessionInfo)</text>
+  <text x="730" y="733" class="label-small" style="font-style:italic;fill:#2e7d32">API: AuthenticationApi.getChallenge()</text>
+  <text x="730" y="746" class="label-small" style="font-style:italic;fill:#555">Usa token1</text>
+
+  <!-- Fletxa SMS a diàleg -->
+  <line x1="180" y1="750" x2="180" y2="775" class="arrow"/>
+  <line x1="730" y1="750" x2="730" y2="775" class="arrow"/>
+
+  <!-- Diàleg introducció codi -->
+  <rect x="60" y="775" width="240" height="45" class="box-ui"/>
+  <text x="180" y="795" class="label-small">Diàleg: Introduir codi SMS</text>
+  <text x="180" y="810" class="label-small">(enviat al mòbil)</text>
+
+  <rect x="610" y="775" width="240" height="45" class="box-ui"/>
+  <text x="730" y="795" class="label-small">Diàleg: Introduir codi OTP</text>
+  <text x="730" y="810" class="label-small">(App autenticadora)</text>
+
+  <!-- (2) Colzes cap a punt 3 - entren als laterals del box-method -->
+  <line x1="180" y1="820" x2="180" y2="910" class="connector"/>
+  <line x1="180" y1="910" x2="275" y2="910" class="arrow"/>
+  <line x1="730" y1="820" x2="730" y2="910" class="connector"/>
+  <line x1="730" y1="910" x2="625" y2="910" class="arrow"/>
+
+  <!-- Punt comú: Revisió de Certificats -->
+  <rect x="275" y="885" width="350" height="50" class="box-method"/>
+  <text x="450" y="907" class="label">3. checkCertificatesList()</text>
+  <text x="450" y="923" class="label-small">Revisió dels certificats de l'usuari</text>
+
+  <line x1="450" y1="935" x2="450" y2="970" class="arrow"/>
+
+  <!-- (1) Decisió unificada: Més d'un certificat i/o PIN requerit? -->
+  <polygon points="450,970 610,1015 450,1060 290,1015" class="box-decision"/>
+  <text x="450" y="1010" class="label-decision">Més d'un certificat</text>
+  <text x="450" y="1024" class="label-decision">i/o PIN requerit?</text>
+
+  <!-- Branca SÍ - Seleccionar certificat / PIN -->
+  <line x1="290" y1="1015" x2="200" y2="1015" class="connector-yes"/>
+  <text x="245" y="1007" class="note-yes">Sí</text>
+  <line x1="200" y1="1015" x2="200" y2="1050" class="arrow-yes"/>
+
+  <rect x="60" y="1050" width="280" height="50" class="box-ui"/>
+  <text x="200" y="1072" class="label-small">Pàgina de selecció de Certificat</text>
+  <text x="200" y="1088" class="label-small">i/o introducció de PIN (UI)</text>
+
+  <!-- Colze cap a signDocumentsDirect - entra al lateral esquerre -->
+  <line x1="200" y1="1100" x2="200" y2="1140" class="connector"/>
+  <line x1="200" y1="1140" x2="300" y2="1140" class="arrow"/>
+
+  <!-- Branca NO -->
+  <line x1="450" y1="1060" x2="450" y2="1115" class="arrow-no"/>
+  <text x="475" y="1085" class="note-no">No</text>
+
+  <!-- 4. signDocumentsDirect() -->
+  <rect x="300" y="1115" width="300" height="50" class="box-method"/>
+  <text x="450" y="1137" class="label">4. signDocumentsDirect()</text>
+  <text x="450" y="1153" class="label-small">Execució de la firma</text>
+
+  <line x1="450" y1="1165" x2="450" y2="1195" class="arrow"/>
+
+  <!-- Decisió: Tipus de firma (XAdES al centre) -->
+  <polygon points="450,1195 600,1240 450,1285 300,1240" class="box-decision"/>
+  <text x="450" y="1237" class="label-decision">Tipus de firma?</text>
+
+  <!-- Branca PAdES (esquerra) -->
+  <line x1="300" y1="1240" x2="160" y2="1240" class="arrow"/>
+  <text x="230" y="1232" class="note">PAdES</text>
+
+  <!-- Branca XAdES (centre, avall) -->
+  <line x1="450" y1="1285" x2="450" y2="1315" class="arrow"/>
+  <text x="465" y="1303" class="note">XAdES</text>
+
+  <!-- Branca CAdES (dreta) -->
+  <line x1="600" y1="1240" x2="740" y2="1240" class="arrow"/>
+  <text x="670" y="1232" class="note">CAdES</text>
+
+  <!-- Sub-decisió PAdES: Segell de temps? -->
+  <polygon points="160,1285 260,1315 160,1345 60,1315" class="box-decision"/>
+  <text x="160" y="1315" class="label-decision">Segell temps?</text>
+  <line x1="160" y1="1240" x2="160" y2="1285" class="connector"/>
+
+  <!-- PAdES amb segell de temps -->
+  <line x1="60" y1="1315" x2="20" y2="1315" class="connector-yes"/>
+  <text x="40" y="1307" class="note-yes">Sí</text>
+  <line x1="20" y1="1315" x2="20" y2="1355" class="connector-yes"/>
+  <rect x="10" y="1355" width="160" height="67" class="box-sign"/>
+  <text x="90" y="1370" class="label-small">doSignaturePades()</text>
+  <text x="90" y="1385" class="label-small">(PAdES LTA)</text>
+  <text x="90" y="1400" class="label-small" style="font-style:italic;fill:#4527a0">API: PadEsSignatureApi.signDocumentV1()</text>
+  <text x="90" y="1415" class="label-small" style="font-style:italic;fill:#555">Usa token2</text>
+
+  <!-- PAdES sense segell de temps -->
+  <line x1="260" y1="1315" x2="300" y2="1315" class="connector-no"/>
+  <text x="280" y="1307" class="note-no">No</text>
+  <line x1="300" y1="1315" x2="300" y2="1355" class="connector-no"/>
+  <rect x="175" y="1355" width="250" height="67" class="box-sign"/>
+  <text x="300" y="1370" class="label-small">doSignatureTriphasePades()</text>
+  <text x="300" y="1385" class="label-small">(PAdES B - Trifase)</text>
+  <text x="300" y="1400" class="label-small" style="font-style:italic;fill:#4527a0">API: DigitalCertificateApi.signHashV3()</text>
+  <text x="300" y="1415" class="label-small" style="font-style:italic;fill:#555">Usa token2</text>
+
+  <!-- XAdES (centre) -->
+  <rect x="350" y="1315" width="200" height="67" class="box-sign"/>
+  <text x="450" y="1330" class="label-small">doSignatureXades()</text>
+  <text x="450" y="1345" class="label-small">(XAdES B o LTA)</text>
+  <text x="450" y="1360" class="label-small" style="font-style:italic;fill:#4527a0">API: XadEsSignatureApi.xadesSign()</text>
+  <text x="450" y="1375" class="label-small" style="font-style:italic;fill:#555">Usa token2</text>
+
+  <!-- Sub-decisió CAdES: Segell de temps? -->
+  <polygon points="740,1285 840,1315 740,1345 640,1315" class="box-decision"/>
+  <text x="740" y="1315" class="label-decision">Segell temps?</text>
+  <line x1="740" y1="1240" x2="740" y2="1285" class="connector"/>
+
+  <!-- CAdES amb segell de temps -->
+  <line x1="640" y1="1315" x2="610" y2="1315" class="connector-yes"/>
+  <text x="625" y="1307" class="note-yes">Sí</text>
+  <line x1="610" y1="1315" x2="610" y2="1355" class="connector-yes"/>
+  <rect x="540" y="1355" width="170" height="67" class="box-sign"/>
+  <text x="625" y="1370" class="label-small">doSignatureCades()</text>
+  <text x="625" y="1385" class="label-small">(CAdES LTA)</text>
+  <text x="625" y="1400" class="label-small" style="font-style:italic;fill:#4527a0">API: CadEsSignatureApi.cadesSign()</text>
+  <text x="625" y="1415" class="label-small" style="font-style:italic;fill:#555">Usa token2</text>
+
+  <!-- CAdES sense segell de temps -->
+  <line x1="840" y1="1315" x2="870" y2="1315" class="connector-no"/>
+  <text x="855" y="1307" class="note-no">No</text>
+  <line x1="870" y1="1315" x2="870" y2="1355" class="connector-no"/>
+  <rect x="755" y="1355" width="230" height="67" class="box-sign"/>
+  <text x="870" y="1370" class="label-small">doSignatureTriphaseCades()</text>
+  <text x="870" y="1385" class="label-small">(CAdES B - Trifase)</text>
+  <text x="870" y="1400" class="label-small" style="font-style:italic;fill:#4527a0">API: DigitalCertificateApi.signHashV3()</text>
+  <text x="870" y="1415" class="label-small" style="font-style:italic;fill:#555">Usa token2</text>
+
+  <!-- (4) Convergir al final - PAdES i CAdES als laterals de la caixa 5 -->
+  <!-- PAdES LTA baixa i va al lateral esquerre -->
+  <line x1="90" y1="1422" x2="90" y2="1495" class="connector"/>
+  <line x1="90" y1="1495" x2="300" y2="1495" class="arrow"/>
+  <!-- PAdES Trifase baixa i va al lateral esquerre -->
+  <line x1="300" y1="1422" x2="300" y2="1465" class="connector"/>
+  <line x1="300" y1="1465" x2="300" y2="1480" class="arrow"/>
+
+  <!-- XAdES baixa al centre -->
+  <line x1="450" y1="1382" x2="450" y2="1480" class="arrow"/>
+
+  <!-- CAdES LTA baixa i va al lateral dret -->
+  <line x1="625" y1="1422" x2="625" y2="1465" class="connector"/>
+  <line x1="625" y1="1465" x2="600" y2="1480" class="arrow"/>
+  <!-- CAdES Trifase baixa i va al lateral dret -->
+  <line x1="870" y1="1422" x2="870" y2="1495" class="connector"/>
+  <line x1="870" y1="1495" x2="600" y2="1495" class="arrow"/>
+
+  <!-- Resultat final -->
+  <rect x="300" y="1480" width="300" height="50" class="box-end"/>
+  <text x="450" y="1502" class="label">5. Retorn urlFinal</text>
+  <text x="450" y="1518" class="label-small">Firma completada → Callback a l'aplicació</text>
+
+  <!-- Llegenda -->
+  <rect x="20" y="70" width="15" height="15" class="box-method"/>
+  <text x="40" y="82" class="note">Mètode principal</text>
+  <rect x="20" y="90" width="15" height="15" class="box-action"/>
+  <text x="40" y="102" class="note">Acció interna</text>
+  <rect x="20" y="110" width="15" height="15" class="box-ui"/>
+  <text x="40" y="122" class="note">Interacció amb l'usuari (UI)</text>
+  <rect x="20" y="130" width="15" height="15" class="box-sign"/>
+  <text x="40" y="142" class="note">Mètode de firma</text>
+  <polygon points="27,155 35,162 27,170 20,162" class="box-decision"/>
+  <text x="40" y="165" class="note">Decisió</text>
+</svg>

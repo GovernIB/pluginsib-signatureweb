@@ -15,6 +15,7 @@ import es.caib.evidenciesib.api.externa.client.evidencies.v1.api.EvidenciesApi;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.EvidenciaFile;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.EvidenciaStartRequest;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.EvidenciaStartResponse;
+import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.EvidenciaStatus;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.EvidenciaWs;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.model.RestExceptionInfo;
 import es.caib.evidenciesib.api.externa.client.evidencies.v1.services.ApiClient;
@@ -41,7 +42,6 @@ import java.util.Properties;
  */
 public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
-    public static final EvidenciaWs C = new EvidenciaWs();
 
     public static final String FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY
             + "firmanocriptografica.";
@@ -307,7 +307,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
             FileInfoSignature fileInfoSignature = fileInfoSignatureArray[0];
             StatusSignature statusSignature = fileInfoSignature.getStatusSignature();
 
-            if (C.getEVIDENCIAESTATCODISIGNAT().equals(evi.getEstatCodi())) {
+            if (EvidenciaStatus.EVIDENCIA_ESTAT_CODI_SIGNAT.getValue().equals(evi.getEstatCodi())) {
 
                 EvidenciaFile efile = evi.getFitxerSignat();
 
