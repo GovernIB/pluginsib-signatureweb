@@ -34,7 +34,6 @@ import org.jboss.logging.Logger;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assume.assumeTrue;
 
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -155,7 +154,7 @@ public abstract class AbstractTestSignatureWeb {
         assertNull("Error realitzant test " + testName + ": " + result, result);
     }
 
-    @BeforeClass
+    
     public void checkPropertiesFile() {
         File propFile = getPluginPropertiesFile();
 
