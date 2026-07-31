@@ -19,6 +19,7 @@
         <module>vintegris-nebula-api-client-digital-certificate-v1</module>
         <module>vintegris-nebula-api-client-digital-signature-v1</module>
         <module>vintegris-nebula-api-client-trusted-applications-v1</module>
+        <module>vintegris-nebula-api-client-authentication-v1</module>
         <module>pluginib-signatureweb-nebula</module>
     </modules>
 

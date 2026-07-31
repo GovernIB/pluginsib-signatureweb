@@ -139,6 +139,52 @@
                             </configOptions>
                         </configuration>
                     </execution>
+                    
+                    
+                    
+                   <execution>
+                        <id>openapi3</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+
+                            <inputSpec>
+                                ${project.basedir}/openapi/authentication.json</inputSpec>
+                            <generatorName>java</generatorName>
+                            <skipValidateSpec>false</skipValidateSpec>
+                            <library>resteasy</library>
+                            <!--    ** AMOLLA AJUDA D'AQUEST PLUGIN PER PANTALLA***  -->
+                            <!-- <configHelp>true</configHelp> -->
+                            <addCompileSourceRoot>false</addCompileSourceRoot>
+                            <!-- NOU -->
+                            <output>
+                                ${project.basedir}/../vintegris-nebula-api-client-authentication-v1</output>
+                            <apiPackage>
+                                ${client.default.package}.authentication.v1.api</apiPackage>
+                            <modelPackage>
+                                ${client.default.package}.authentication.v1.model</modelPackage>
+                            <invokerPackage>
+                                ${client.default.package}.authentication.v1.services</invokerPackage>
+                            <generateModelTests>false</generateModelTests>
+                            <configOptions>
+                                <groupId>org.fundaciobit.vintegris.nebula.api.client.authentication</groupId>
+                                <artifactId>vintegris-nebula-api-client-authentication-v1</artifactId>
+                                <artifactVersion>1.0-SNAPSHOT</artifactVersion>
+                                <artifactDescription>Vintegris - Nebula - Api Client - Authentication v1</artifactDescription>
+                                <dateLibrary>java8</dateLibrary>
+                                <useTags>true</useTags>
+                                <hideGenerationTimestamp>true</hideGenerationTimestamp>
+                                <java11>true</java11>
+                                <useJakartaEe>false</useJakartaEe>
+                                <usePrimitives>true</usePrimitives>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    
+                    
+                    
 
                     <execution>
                         <id>openapi4</id>

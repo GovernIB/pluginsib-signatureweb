@@ -622,7 +622,7 @@ paths:
       - nebulasuite: []
       summary: Validate permissions of a user in the trusted app
       tags:
-      - Authentication
+      - AuthenticationTrustedApp
       x-accepts:
       - '*/*'
   /trusted/app/login/second:
@@ -690,7 +690,7 @@ paths:
       - nebulasuite: []
       summary: Second factor login
       tags:
-      - Authentication
+      - AuthenticationTrustedApp
       x-accepts:
       - '*/*'
   /trusted/app/login/first:
@@ -758,7 +758,7 @@ paths:
       - nebulasuite: []
       summary: First factor login
       tags:
-      - Authentication
+      - AuthenticationTrustedApp
       x-accepts:
       - '*/*'
   /trusted/app/authorize:
@@ -817,7 +817,7 @@ paths:
       - nebulasuite: []
       summary: Authorize an trusted app
       tags:
-      - Authentication
+      - AuthenticationTrustedApp
       x-accepts:
       - '*/*'
   /trusted/apps:

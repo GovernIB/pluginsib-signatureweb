@@ -1,5 +1,6 @@
 package org.fundaciobit.pluginsib.signatureweb.nebula;
 
+import java.util.List;
 import java.util.Map;
 
 import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.GetMyCertificates200ResponseCertificatesListInner;
@@ -12,23 +13,27 @@ import org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.model.P
  */
 public class NebulaCacheInfo {
 
-    protected long expirationTime;
-
     protected final String nif;
+
+    protected final List<NebulaAuthenticatorType> authenticators;
+
+    private long expirationTime;
+
+    // TODO Ajuntar certificats i Policy en una classe !!!!!
 
     protected Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = null;
 
     protected Map<String, Policy> policiesByCertID = null;
 
-    protected String selectedCertificateID = null;
-
-    protected String pin;
-
-    public NebulaCacheInfo(String nif) {
+    public NebulaCacheInfo(String nif, List<NebulaAuthenticatorType> authenticators, String signaturesSetID) {
         super();
         this.nif = nif;
-        // 8 hores
-        this.expirationTime = System.currentTimeMillis() + 8 * 60 * 1000;
+        this.authenticators = authenticators;
+
+        NebulaCache.putNebulaCacheSessionInfo(signaturesSetID, authenticators);
+
+        // 10 hores
+        this.expirationTime = System.currentTimeMillis() + 10 * 60 * 1000;
     }
 
     public Map<String, GetMyCertificates200ResponseCertificatesListInner> getCertificatesByCertID() {
@@ -48,22 +53,6 @@ public class NebulaCacheInfo {
         this.policiesByCertID = policiesByCertID;
     }
 
-    public String getSelectedCertificateID() {
-        return selectedCertificateID;
-    }
-
-    public void setSelectedCertificateID(String selectedCertificateID) {
-        this.selectedCertificateID = selectedCertificateID;
-    }
-
-    public String getPin() {
-        return pin;
-    }
-
-    public void setPin(String pin) {
-        this.pin = pin;
-    }
-
     public long getExpirationTime() {
         return expirationTime;
     }
@@ -77,11 +66,8 @@ public class NebulaCacheInfo {
         return System.currentTimeMillis() > this.expirationTime;
     }
 
-    public void sessionReset() {
-        this.expirationTime = System.currentTimeMillis();
-
-        this.pin = null;
-        this.selectedCertificateID = null;
+    public List<NebulaAuthenticatorType> getAuthenticators() {
+        return authenticators;
     }
 
 }

@@ -28,9 +28,8 @@ public class NebulaTriphaseUtils {
     
     public static byte[] signHashUsingNebulaApi(final byte[] hashToSign, DigitalCertificateApi api,
             GetMyCertificates200ResponseCertificatesListInner nebulaCertificate,
-
             String pin, FileInfoSignature fileInfo,
-            X509Certificate certificate) throws ApiException, Exception {
+            X509Certificate certificate, boolean isDebug) throws ApiException, Exception {
         CLoginRequestDTO clogin = new CLoginRequestDTO();
         clogin.setPin(pin);
         clogin.setSigningId(nebulaCertificate.getSigningId());
@@ -81,7 +80,7 @@ public class NebulaTriphaseUtils {
         request.setSession(cSession.getSession());
         request.setSigndata(Base64.getEncoder().encodeToString(hashToSign));
 
-        {
+        if (isDebug) {
             log.info("CSignReqDTOV3.request => " + request);
             String algorithmMiniApplet = MiniAppletUtils.convertAlgorithm(fileInfo);
             log.info("XYZ ZZZ   ALGORITHM MINIAPPLET =   " + algorithmMiniApplet);

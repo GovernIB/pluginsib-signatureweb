@@ -25,23 +25,26 @@ public class NebulaPadesTriphaseSigner extends AbstractPadesTriPhaseSigner {
     protected final GetMyCertificates200ResponseCertificatesListInner nebulaCertificate;
 
     protected final String pin;
+    
+    protected final boolean isDebug;
 
     public NebulaPadesTriphaseSigner(DigitalCertificateApi api,
             GetMyCertificates200ResponseCertificatesListInner nebulaCertificate,
 
             String pin, CommonInfoSignature commonInfoSignature, FileInfoSignature fileInfo,
-            X509Certificate certificate, String timeStampURL) {
+            X509Certificate certificate, String timeStampURL, boolean isDebug) {
         super(commonInfoSignature, fileInfo, certificate, timeStampURL);
         this.api = api;
         this.nebulaCertificate = nebulaCertificate;
         this.pin = pin;
+        this.isDebug = isDebug;
     }
 
     @Override
     public byte[] step2_SignHash(final byte[] hashToSign) throws Exception {
 
         return NebulaTriphaseUtils.signHashUsingNebulaApi(hashToSign, api, nebulaCertificate, pin, fileInfo,
-                getCertificate());
+                getCertificate(), isDebug);
 
     }
 

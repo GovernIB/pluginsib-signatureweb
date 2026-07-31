@@ -804,7 +804,7 @@
         },
         "/trusted/app/validate": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": ["AuthenticationTrustedApp"],
                 "summary": "Validate permissions of a user in the trusted app",
                 "description": "Used to check if the user has the requested permissions from the trusted app",
                 "operationId": "validatePermission",
@@ -909,7 +909,7 @@
         },
         "/trusted/app/login/second": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": ["AuthenticationTrustedApp"],
                 "summary": "Second factor login",
                 "description": "It is used to obtain a robust nebulaSUITE token from the specified user",
                 "operationId": "appLoginSecond",
@@ -1003,7 +1003,7 @@
         },
         "/trusted/app/login/first": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": ["AuthenticationTrustedApp"],
                 "summary": "First factor login",
                 "description": "It is used to obtain a simple nebulaSUITE token from the specified user",
                 "operationId": "appLoginFirst",
@@ -1097,7 +1097,7 @@
         },
         "/trusted/app/authorize": {
             "post": {
-                "tags": ["Authentication"],
+                "tags": ["AuthenticationTrustedApp"],
                 "summary": "Authorize an trusted app",
                 "description": "It is used to obtain the token necessary for the trusted app to consume the permissions it has",
                 "operationId": "authorize",

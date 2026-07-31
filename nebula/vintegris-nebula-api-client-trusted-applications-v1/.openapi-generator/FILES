@@ -5,7 +5,7 @@ api/openapi.yaml
 build.gradle
 build.sbt
 docs/AccessGroupsViewModel.md
-docs/AuthenticationApi.md
+docs/AuthenticationTrustedAppApi.md
 docs/AuthorizeResponseViewModel.md
 docs/CreateTrustedAppViewModel.md
 docs/DetailedTrustedAppViewModel.md
@@ -34,7 +34,7 @@ gradlew
 gradlew.bat
 settings.gradle
 src/main/AndroidManifest.xml
-src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/AuthenticationApi.java
+src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/AuthenticationTrustedAppApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/ManageGroupsApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/ManageTrustedAppApi.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/ManageTrustedAppPermissionsApi.java
@@ -70,3 +70,4 @@ src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/services/auth/Authentication.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/services/auth/HttpBasicAuth.java
 src/main/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/services/auth/HttpBearerAuth.java
+src/test/java/org/fundaciobit/vintegris/nebula/api/client/trustedapplications/v1/api/AuthenticationTrustedAppApiTest.java
