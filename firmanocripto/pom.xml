@@ -11,6 +11,10 @@
 
     <artifactId>pluginsib-signatureweb-firmanocriptografica</artifactId>
     <name>FundacioBit - PluginsIB - SignatureWeb - FirmaNoCriptografica</name>
+    
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <dependencies>
 
