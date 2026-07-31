@@ -53,3 +53,25 @@ nb-configuration.xml
 /nebula/vintegris-nebula-api-client-v1
 /nebula/vintegris-nebula-api-server-digital-signature-v1
 /nebula/vintegris-nebula_apis_generator/pom - amb server.xml
+/nebula/vintegris-nebula_apis_generator/openapi/combined-api.json
+/nebula/vintegris-nebula_apis_generator/openapi/authentication - original.json
+/nebula_API_CENTRALITZADA
+/nebula/vintegris-nebula-api-client-authentication-v1/.github
+/nebula/vintegris-nebula-api-client-authentication-v1/gradle
+/nebula/vintegris-nebula-api-client-authentication-v1/.openapi-generator-ignore
+/nebula/vintegris-nebula-api-client-authentication-v1/.project
+/nebula/vintegris-nebula-api-client-authentication-v1/.travis.yml
+/nebula/vintegris-nebula-api-client-authentication-v1/build.gradle
+/nebula/vintegris-nebula-api-client-authentication-v1/build.sbt
+/nebula/vintegris-nebula-api-client-authentication-v1/git_push.sh
+/nebula/vintegris-nebula-api-client-authentication-v1/gradle.properties
+/nebula/vintegris-nebula-api-client-authentication-v1/gradlew
+/nebula/vintegris-nebula-api-client-authentication-v1/gradlew.bat
+/nebula/vintegris-nebula-api-client-authentication-v1/pom_backup.xml
+/nebula/vintegris-nebula-api-client-authentication-v1/README.md
+/nebula/vintegris-nebula-api-client-authentication-v1/settings.gradle
+/nebula/pluginib-signatureweb-nebula/2026-07-13 Primera firma amb Auth SMS pades_basic_signat.pdf
+/nebula/pluginib-signatureweb-nebula/Firma-PAdES-en-Servidor_signed_adaptat.pdf
+/nebula/pluginib-signatureweb-nebula/PINFO_Tresis_Formulari.pdf
+/firmanocripto/plugin.properties
+/firmanocripto/results
