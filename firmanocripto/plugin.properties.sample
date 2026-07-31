@@ -6,7 +6,7 @@
 
 # Class => org.fundaciobit.pluginsib.signatureweb.firmanocriptografica.FirmaNoCriptograficaSignatureWebPlugin
 
-es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.host=http://anadal:8888/evidenciesibapi/externa
+es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.host=http://host:port/evidenciesibapi/externa
 es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.username=appusername
 es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.evidencies.password=apppassword
 
