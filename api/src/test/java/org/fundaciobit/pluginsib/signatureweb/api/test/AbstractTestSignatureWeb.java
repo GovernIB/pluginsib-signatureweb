@@ -109,12 +109,12 @@ public abstract class AbstractTestSignatureWeb {
 
     @BeforeClass
     public void checkPropertiesFile() {
-        File nebulaPropertiesFile = getPluginPropertiesFile();
+        File propFile = getPluginPropertiesFile();
 
-        assumeTrue("El fitxer de propietats del plugin no pot ser null", nebulaPropertiesFile != null);
+        assumeTrue("El fitxer de propietats del plugin no pot ser null", propFile != null);
 
-        assumeTrue("ATENCIÓ: El fitxer '" + nebulaPropertiesFile.getAbsolutePath()
-                + "' no existeix. Els tests NO s'executaran.", nebulaPropertiesFile.exists());
+        assumeTrue("ATENCIÓ: El fitxer '" + propFile.getAbsolutePath()
+                + "' no existeix. Els tests NO s'executaran.", propFile.exists());
 
         File testPropertiesFile = getTestFile();
 
@@ -353,8 +353,20 @@ public abstract class AbstractTestSignatureWeb {
         test.load(new FileReader(getTestFile()));
 
         String nif = test.getProperty("nif");
+        if (nif == null || nif.trim().isEmpty()) {
+            throw new IllegalStateException("No s'ha trobat la propietat 'nif' al fitxer de test: "
+                    + getTestFile().getAbsolutePath());
+        }
         String username = test.getProperty("username");
+        if (username == null || username.trim().isEmpty()) {
+            throw new IllegalStateException("No s'ha trobat la propietat 'username' al fitxer de test: "
+                    + getTestFile().getAbsolutePath());
+        }
         String languageUI = test.getProperty("languageUI");
+        if (languageUI == null || languageUI.trim().isEmpty()) {
+            throw new IllegalStateException("No s'ha trobat la propietat 'languageUI' al fitxer de test: "
+                    + getTestFile().getAbsolutePath());
+        }
 
         String error;
         error = doSignature(testName, nif, username, languageUI, fileToSignPath, mimeType, signType, signMode,
@@ -395,7 +407,7 @@ public abstract class AbstractTestSignatureWeb {
         String host = "localhost";
         int port = 8888;
 
-        String relativePluginRequestPath = "/nebula/plugin";
+        String relativePluginRequestPath = "/" + getPluginClass().getSimpleName() + "/plugin";
         String absolutePluginRequestPath = "http://" + host + ":" + port + relativePluginRequestPath;
 
         String returnURL = plugin.signDocuments(request, absolutePluginRequestPath, relativePluginRequestPath, ssw,
@@ -546,14 +558,7 @@ public abstract class AbstractTestSignatureWeb {
                     }
 
                     // Aturar en un fil separat per evitar deadlock
-                    new Thread(() -> {
-                        try {
-                            Thread.sleep(2000); // Esperar 2 segons abans d'aturar el servidor
-                            server.stop();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }).start();
+                    stopServer(server);
 
                     response.setContentType("text/html; charset=utf-8");
                     try {
@@ -591,16 +596,33 @@ public abstract class AbstractTestSignatureWeb {
                         System.out.println("=====> query: " + query);
                     }
 
-                    if (isGet) {
-                        plugin.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
-                                signatureIndex, request, response);
-                    } else {
-                        plugin.requestPOST(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
-                                signatureIndex, request, response);
+                    try {
+                        if (isGet) {
+                            plugin.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
+                                    signatureIndex, request, response);
+                        } else {
+                            plugin.requestPOST(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
+                                    signatureIndex, request, response);
+                        }
+                    } catch (Throwable e) {
+                        e.printStackTrace();
+                        stopServer(server);
+                        response.setStatus(500);
                     }
                 }
 
                 baseRequest.setHandled(true);
+            }
+
+            protected void stopServer(Server server) {
+                new Thread(() -> {
+                    try {
+                        Thread.sleep(2000); // Esperar 2 segons abans d'aturar el servidor
+                        server.stop();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }).start();
             }
         });
 
@@ -629,9 +651,9 @@ public abstract class AbstractTestSignatureWeb {
             fis.setLocation("Esporles");
             fis.setMimeType(mimeType);
             fis.setName(fis.getFileToSign().getName());
-            fis.setReason("Prova de firmar amb Nebula");
+            fis.setReason("Prova de firmar amb " + getPluginClass().getSimpleName());
             fis.setSignAlgorithm(FileInfoSignature.SIGN_ALGORITHM_SHA256);
-            fis.setSignID("nebula_sign_" + System.nanoTime());
+            fis.setSignID(getPluginClass().getSimpleName() + "_sign_" + System.nanoTime());
             fis.setSignMode(signMode);
             fis.setSignNumber(1);
             fis.setSignOperation(FileInfoSignature.SIGN_OPERATION_SIGN);
@@ -645,7 +667,7 @@ public abstract class AbstractTestSignatureWeb {
             ssw.setCommonInfoSignature(commonInfo);
             ssw.setExpiryDate(new java.util.Date(System.currentTimeMillis() + 3600 * 1000));
             ssw.setFileInfoSignatureArray(new FileInfoSignature[] { fis });
-            ssw.setSignaturesSetID("nebula_ss_" + System.nanoTime());
+            ssw.setSignaturesSetID(this.getPluginClass().getSimpleName() +  "_SignatureSet_" + System.nanoTime());
             ssw.setStatusSignaturesSet(statusSignatureGlobal);
             ssw.setUrlFinal("/url/de/return/de/prova");
 

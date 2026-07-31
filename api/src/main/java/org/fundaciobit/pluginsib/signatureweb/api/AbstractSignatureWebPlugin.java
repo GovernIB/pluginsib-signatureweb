@@ -171,7 +171,9 @@ public abstract class AbstractSignatureWebPlugin extends
 
         } else {
 
-            Locale locale = new Locale(signaturesSet.getCommonInfoSignature().getLanguageUI());
+            String langUI = signaturesSet.getCommonInfoSignature().getLanguageUI();
+
+            Locale locale = new Locale(langUI);
 
             requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSet, signatureIndex,
                     request, response, locale);
