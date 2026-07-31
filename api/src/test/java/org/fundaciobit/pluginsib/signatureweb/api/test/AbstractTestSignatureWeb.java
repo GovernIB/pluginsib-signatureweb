@@ -3,8 +3,11 @@ package org.fundaciobit.pluginsib.signatureweb.api.test;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -86,6 +89,7 @@ public abstract class AbstractTestSignatureWeb {
         return null;
     }
 
+    /*
     protected File getResourceFile(String resourceName) throws URISyntaxException {
         // Cerca el recurs al classpath
         URL url = getClass().getClassLoader().getResource(resourceName);
@@ -94,6 +98,50 @@ public abstract class AbstractTestSignatureWeb {
         }
         // Converteix la URL en un File
         return new File(url.toURI());
+    }*/
+
+    protected File getResourceFile(String resourceName) {
+
+        // Cerca el recurs al classpath
+        URL url;
+        {
+            url = getClass().getClassLoader().getResource(resourceName);
+            if (url == null) {
+                throw new RuntimeException("No s'ha trobat el recurs al classpath: " + resourceName);
+            }
+
+            System.out.println("Recurs trobat al classpath: " + resourceName + " -> " + url);
+
+            // Converteix la URL en un File
+            //return new File(url.toURI());
+        }
+
+        System.out.println("Recurs trobat al classpath 2222: " + resourceName + " -> " + url);
+
+        //URL url = getClass().getResource(resourceName);
+
+        // URL url = getClass().getClassLoader().getResource(resourceName);
+
+        try {
+            return new File(url.toURI());
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            // El recurs està dins d'un JAR (URI no jeràrquic tipus jar:file:...!/...)
+            try (InputStream is = url.openStream()) {
+                if (is == null) {
+                    throw new RuntimeException("Recurs no trobat: " + resourceName);
+                }
+                String fileName = new File(resourceName).getName();
+                File tempFile = File.createTempFile("res-", "-" + fileName);
+                tempFile.deleteOnExit();
+                try (OutputStream os = new FileOutputStream(tempFile)) {
+                    is.transferTo(os);
+                }
+                tempFile.deleteOnExit();
+                return tempFile;
+            } catch (IOException ex) {
+                throw new RuntimeException("Error al crear el fitxer temporal per al recurs: " + resourceName, ex);
+            }
+        }
     }
 
     protected File getPathSignedFile(String testName, String fileName) {
@@ -113,8 +161,8 @@ public abstract class AbstractTestSignatureWeb {
 
         assumeTrue("El fitxer de propietats del plugin no pot ser null", propFile != null);
 
-        assumeTrue("ATENCIÓ: El fitxer '" + propFile.getAbsolutePath()
-                + "' no existeix. Els tests NO s'executaran.", propFile.exists());
+        assumeTrue("ATENCIÓ: El fitxer '" + propFile.getAbsolutePath() + "' no existeix. Els tests NO s'executaran.",
+                propFile.exists());
 
         File testPropertiesFile = getTestFile();
 
@@ -354,18 +402,18 @@ public abstract class AbstractTestSignatureWeb {
 
         String nif = test.getProperty("nif");
         if (nif == null || nif.trim().isEmpty()) {
-            throw new IllegalStateException("No s'ha trobat la propietat 'nif' al fitxer de test: "
-                    + getTestFile().getAbsolutePath());
+            throw new IllegalStateException(
+                    "No s'ha trobat la propietat 'nif' al fitxer de test: " + getTestFile().getAbsolutePath());
         }
         String username = test.getProperty("username");
         if (username == null || username.trim().isEmpty()) {
-            throw new IllegalStateException("No s'ha trobat la propietat 'username' al fitxer de test: "
-                    + getTestFile().getAbsolutePath());
+            throw new IllegalStateException(
+                    "No s'ha trobat la propietat 'username' al fitxer de test: " + getTestFile().getAbsolutePath());
         }
         String languageUI = test.getProperty("languageUI");
         if (languageUI == null || languageUI.trim().isEmpty()) {
-            throw new IllegalStateException("No s'ha trobat la propietat 'languageUI' al fitxer de test: "
-                    + getTestFile().getAbsolutePath());
+            throw new IllegalStateException(
+                    "No s'ha trobat la propietat 'languageUI' al fitxer de test: " + getTestFile().getAbsolutePath());
         }
 
         String error;
@@ -598,11 +646,11 @@ public abstract class AbstractTestSignatureWeb {
 
                     try {
                         if (isGet) {
-                            plugin.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
-                                    signatureIndex, request, response);
+                            plugin.requestGET(absolutePluginRequestPath, relativePluginRequestPath, query,
+                                    signaturesSetID, signatureIndex, request, response);
                         } else {
-                            plugin.requestPOST(absolutePluginRequestPath, relativePluginRequestPath, query, signaturesSetID,
-                                    signatureIndex, request, response);
+                            plugin.requestPOST(absolutePluginRequestPath, relativePluginRequestPath, query,
+                                    signaturesSetID, signatureIndex, request, response);
                         }
                     } catch (Throwable e) {
                         e.printStackTrace();
@@ -667,7 +715,7 @@ public abstract class AbstractTestSignatureWeb {
             ssw.setCommonInfoSignature(commonInfo);
             ssw.setExpiryDate(new java.util.Date(System.currentTimeMillis() + 3600 * 1000));
             ssw.setFileInfoSignatureArray(new FileInfoSignature[] { fis });
-            ssw.setSignaturesSetID(this.getPluginClass().getSimpleName() +  "_SignatureSet_" + System.nanoTime());
+            ssw.setSignaturesSetID(this.getPluginClass().getSimpleName() + "_SignatureSet_" + System.nanoTime());
             ssw.setStatusSignaturesSet(statusSignatureGlobal);
             ssw.setUrlFinal("/url/de/return/de/prova");
 
