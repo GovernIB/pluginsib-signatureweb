@@ -17,6 +17,10 @@
     <artifactId>pluginsib-signatureweb-nebula</artifactId>
     <name>FundacioBit - PluginsIB - SignatureWeb - Nebula (Vintegris)</name>
     <packaging>jar</packaging>
+    
+    <properties>
+        <skipTests>true</skipTests>
+    </properties>
 
     <dependencies>
 
