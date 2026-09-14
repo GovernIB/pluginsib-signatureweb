@@ -96,6 +96,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
     public static final DateFormat DATE_FORMATTER = new SimpleDateFormat("dd/MM/yyyy");
 
+    private final NebulaCache nebulaCache = new NebulaCache();
+
+    private long defaultExpirationTimeInMs = (10 * 60 * 60 * 1000); // 10 hores
+
     // Constructors per defecte
 
     public NebulaSignatureWebPlugin() {
@@ -162,16 +166,13 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                 return msg;
 
             }
-            
+
             List<NebulaAuthenticatorType> authenticatorsAvailable = info.getAuthenticators();
             if (authenticatorsAvailable == null || authenticatorsAvailable.size() == 0) {
                 String msg = "L'usuari amb nif " + nif + " no té cap mètode d'autenticació disponible a NEBULA.";
-                log.error(msg);
+                log.warn(msg);
                 return msg;
             }
-            
-            
-            
 
         } catch (Exception e) {
             String msg = "Error durant la connexio amb el servidor NEBULA: " + e.getMessage();
@@ -198,7 +199,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             Locale locale = new Locale(signaturesSet.getCommonInfoSignature().getLanguageUI());
 
             final String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
-            NebulaCacheInfo info = NebulaCache.getCacheInfo(nif);
+            NebulaCacheInfo info = nebulaCache.getCacheInfo(nif);
 
             if (info == null) {
                 throw new Exception(getTraduccio("error.filter.obligatori", locale));
@@ -207,15 +208,31 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             // Comprovar si tenim els Mètode d'autenticació
             List<NebulaAuthenticatorType> authenticatorsAvailable = info.getAuthenticators();
 
-            if (authenticatorsAvailable == null) {
+            if (authenticatorsAvailable == null || authenticatorsAvailable.size() == 0) {
                 throw new Exception(getTraduccio("error.autenticadors.nuls", locale));
             }
 
             // Comprovar si tenim mètode d'autenticació seleccionat            
-            NebulaCacheSessionInfo nebulaCacheSession = NebulaCache.getNebulaCacheSession(signatureSetID);
+            NebulaCacheSessionInfo nebulaCacheSession = nebulaCache.getNebulaCacheSession(signatureSetID);
 
             if (nebulaCacheSession == null) {
-                throw new Exception(getTraduccio("error.sessio.cache.noexisteix", locale, signatureSetID));
+
+                String msg = getTraduccio("error.sessio.cache.noexisteix", locale, signatureSetID);
+                log.warn(msg);
+                log.warn("Creant una nova sessió de NebulaCacheSessionInfo per a signatureSetID: " + signatureSetID);
+
+                nebulaCacheSession = new NebulaCacheSessionInfo();
+
+                // Si només hi ha un autenticador, seleccionar-lo automàticament
+                if (info.getAuthenticators().size() == 1) {
+                    nebulaCacheSession.setSelectedAuthenticator(info.getAuthenticators().get(0));
+                }
+
+                nebulaCache.putNebulaCacheSessionInfo(signatureSetID, nebulaCacheSession);
+
+                log.warn("NebulaCacheSessionInfo ha estat recuperada automàticament per a signatureSetID: "
+                        + signatureSetID);
+
             }
 
             NebulaAuthenticatorType selectedAuthenticator = nebulaCacheSession.getSelectedAuthenticator();
@@ -232,23 +249,10 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
                 switch (selectedAuthenticator) {
                     case DIRECT_ACCESS:
-                        
-                        
-                        // Calcular TOKEN 2
-                        String token2 = getApiToken2ForConsultaCertificats(nif);
-                        NebulaCache.getNebulaCacheSession(signatureSetID).setToken2(token2);
 
-                        // Passam al següent punt de comprovació de certificats
-                        CheckCertificateResult checkCertificateResult = checkCertificatesList(info,
-                                relativePluginRequestPath, signaturesSet);
-
-                        if (checkCertificateResult.returnURL != null) {
-                            return checkCertificateResult.returnURL;
-                        }
-
-                        final String pin = null;
-                        return signDocumentsDirect(request, relativePluginRequestPath, signaturesSet,
-                                checkCertificateResult.selectedCertificate, pin);
+                        // Calcular TOKEN 2 per DIRECT_ACCESS
+                        return computesToken2ForDirectAccess(request, relativePluginRequestPath, signaturesSet,
+                                signatureSetID, nif, info);
 
                     case ONE_TIME_PASSWORD_OTP:
 
@@ -282,6 +286,33 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         }
 
+    }
+
+    public String computesToken2ForDirectAccess(HttpServletRequest request, String relativePluginRequestPath,
+            SignaturesSetWeb signaturesSet, final String signatureSetID, final String nif, NebulaCacheInfo info)
+            throws Exception {
+
+        NebulaCacheSessionInfo nebulaCacheSession = nebulaCache.getNebulaCacheSession(signatureSetID);
+
+        if (nebulaCacheSession.getToken2() != null) {
+            log.warn(
+                    "Token2 ja existeix a la sessió de NebulaCacheSessionInfo per a signatureSetID: " + signatureSetID);
+        }
+
+        String token2 = getApiToken2ForConsultaCertificats(nif);
+        nebulaCacheSession.setToken2(token2);
+
+        // Passam al següent punt de comprovació de certificats
+        CheckCertificateResult checkCertificateResult = checkCertificatesList(info, relativePluginRequestPath,
+                signaturesSet);
+
+        if (checkCertificateResult.returnURL != null) {
+            return checkCertificateResult.returnURL;
+        }
+
+        final String pin = null;
+        return signDocumentsDirect(request, relativePluginRequestPath, signaturesSet,
+                checkCertificateResult.selectedCertificate, pin);
     }
 
     public static class CheckCertificateResult {
@@ -490,14 +521,14 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         apiClient.setBasePath(getPropertyRequired(NEBULA_BASE_PROPERTIES + "url"));
         HttpBearerAuth auth;
         auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
-        
+
         if (isDebug()) {
             log.info("doSignatureXades::signatureSetID: " + signatureSetID);
-            log.info("doSignatureXades::getNebulaCacheSession: " + NebulaCache.getNebulaCacheSession(signatureSetID));
-            log.info("doSignatureXades::Token2: " + NebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
-        }        
+            log.info("doSignatureXades::getNebulaCacheSession: " + nebulaCache.getNebulaCacheSession(signatureSetID));
+            log.info("doSignatureXades::Token2: " + nebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
+        }
 
-        auth.setBearerToken(NebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
+        auth.setBearerToken(nebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
 
         XadEsSignatureApi apiSign = new XadEsSignatureApi(apiClient);
         try {
@@ -728,7 +759,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             log.info("--------- Realitzant Firma CAdES en 3 fases... ----------");
         }
 
-        String token2 = NebulaCache.getNebulaCacheSession(signaturesSetID).getToken2();
+        String token2 = nebulaCache.getNebulaCacheSession(signaturesSetID).getToken2();
 
         DigitalCertificateApi api = getDigitalCertificateApiByToken2(token2);
 
@@ -761,7 +792,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             FileInfoSignature fileInfo, GetMyCertificates200ResponseCertificatesListInner nebulaCertificate, String pin)
             throws ApiException, Exception, IOException, FileNotFoundException {
 
-        NebulaCacheSessionInfo nebulaCacheSession = NebulaCache.getNebulaCacheSession(signaturesSetID);
+        NebulaCacheSessionInfo nebulaCacheSession = nebulaCache.getNebulaCacheSession(signaturesSetID);
 
         String token2 = nebulaCacheSession.getToken2();
 
@@ -773,8 +804,8 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         final String timeStampURL = null;
 
-        NebulaPadesTriphaseSigner nTriPhase = new NebulaPadesTriphaseSigner(api, nebulaCertificate,
-                pin, commonInfo, fileInfo, x509Cert, timeStampURL, isDebug());
+        NebulaPadesTriphaseSigner nTriPhase = new NebulaPadesTriphaseSigner(api, nebulaCertificate, pin, commonInfo,
+                fileInfo, x509Cert, timeStampURL, isDebug());
 
         byte[] signedData = nTriPhase.fullSign();
 
@@ -802,7 +833,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         apiClient.setBasePath(getPropertyRequired(NEBULA_BASE_PROPERTIES + "url"));
         HttpBearerAuth auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
-        auth.setBearerToken(NebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
+        auth.setBearerToken(nebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
 
         apiSign = new PadEsSignatureApi(apiClient);
         return apiSign;
@@ -823,7 +854,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         HttpBearerAuth auth;
         auth = (HttpBearerAuth) apiClient.getAuthentication("Authorization");
 
-        auth.setBearerToken(NebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
+        auth.setBearerToken(nebulaCache.getNebulaCacheSession(signatureSetID).getToken2());
 
         CadEsSignatureApi apiSign = new CadEsSignatureApi(apiClient);
         try {
@@ -1094,7 +1125,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         try {
 
-            info = NebulaCache.getCacheInfo(signaturesSet.getCommonInfoSignature().getAdministrationID());
+            info = nebulaCache.getCacheInfo(signaturesSet.getCommonInfoSignature().getAdministrationID());
 
             if (info == null) {
                 throw new Exception(getTraduccio("error.filter.obligatori", locale));
@@ -1159,23 +1190,55 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     public void selectAuthenticatorMethodPOST(String absolutePluginRequestPath, String relativePluginRequestPath,
             HttpServletRequest request, HttpServletResponse response, SignaturesSetWeb signaturesSet, Locale locale) {
 
-        String selectedAuthenticatorMethod = request.getParameter("authenticatorMethod");
+        final String selectedAuthenticatorMethod = request.getParameter("authenticatorMethod");
+        final String signatureSetID = signaturesSet.getSignaturesSetID();
 
         if (selectedAuthenticatorMethod == null || selectedAuthenticatorMethod.trim().isEmpty()) {
-            saveMessageError(signaturesSet.getSignaturesSetID(),
-                    getTraduccio("selectauthenticatormethod.error", locale));
+            saveMessageError(signatureSetID, getTraduccio("selectauthenticatormethod.error", locale));
             sendRedirect(response, relativePluginRequestPath + "/" + SELECT_AUTHENTICATOR_METHOD_GET_PAGE);
             return;
         }
 
         NebulaCacheSessionInfo info;
-
         try {
 
-            info = NebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
+            info = nebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
 
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
+            }
+
+
+            NebulaAuthenticatorType selectedAuthenticator = NebulaAuthenticatorType
+                    .valueOf(selectedAuthenticatorMethod);
+
+            info.setSelectedAuthenticator(selectedAuthenticator);
+
+            switch (selectedAuthenticator) {
+                case MOBILE_SMS:
+                    sendRedirect(response, relativePluginRequestPath + "/" + MOBILE_SMS_PASSWORD_GET_PAGE);
+                    return;
+
+                case ONE_TIME_PASSWORD_OTP:
+                    sendRedirect(response, relativePluginRequestPath + "/" + ONE_TIME_PASSWORD_OTP_GET_PAGE);
+                    return;
+
+                case DIRECT_ACCESS:
+
+                    final String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
+                    String url;
+                    //if (nebulaCache.getNebulaCacheSession(signatureSetID).getToken2() == null) {
+                    // Calcular TOKEN 2 per DIRECT_ACCESS
+                    url = computesToken2ForDirectAccess(request, relativePluginRequestPath, signaturesSet,
+                            signatureSetID, nif, nebulaCache.getCacheInfo(nif));
+                    sendRedirect(response, url);
+                    return;
+
+                default:
+                    saveMessageError(signaturesSet.getSignaturesSetID(),
+                            getTraduccio("selectauthenticatormethod.error", locale));
+                    sendRedirect(response, relativePluginRequestPath + "/" + SELECT_AUTHENTICATOR_METHOD_GET_PAGE);
+                    return;
             }
 
         } catch (Throwable th) {
@@ -1193,29 +1256,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             return;
 
-        }
-
-        NebulaAuthenticatorType selectedAuthenticator = NebulaAuthenticatorType.valueOf(selectedAuthenticatorMethod);
-
-        info.setSelectedAuthenticator(selectedAuthenticator);
-
-        switch (selectedAuthenticator) {
-            case MOBILE_SMS:
-                sendRedirect(response, relativePluginRequestPath + "/" + MOBILE_SMS_PASSWORD_GET_PAGE);
-                return;
-
-            case ONE_TIME_PASSWORD_OTP:
-                sendRedirect(response, relativePluginRequestPath + "/" + ONE_TIME_PASSWORD_OTP_GET_PAGE);
-                return;
-
-            case DIRECT_ACCESS:
-                sendRedirect(response, relativePluginRequestPath + "/" + SELECT_CERTIFICATE_GET_PAGE);
-                return;
-            default:
-                saveMessageError(signaturesSet.getSignaturesSetID(),
-                        getTraduccio("selectauthenticatormethod.error", locale));
-                sendRedirect(response, relativePluginRequestPath + "/" + SELECT_AUTHENTICATOR_METHOD_GET_PAGE);
-                return;
         }
 
     }
@@ -1236,11 +1276,11 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
 
-            callChallenge(nif, NebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID()));
+            callChallenge(nif, nebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID()));
 
             NebulaCacheInfo info;
 
-            info = NebulaCache.getCacheInfo(nif);
+            info = nebulaCache.getCacheInfo(nif);
 
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
@@ -1311,7 +1351,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             NebulaCacheSessionInfo info;
 
-            info = NebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
+            info = nebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
 
             if (info == null) {
                 throw new Exception(getTraduccio("error.filter.obligatori", locale));
@@ -1396,7 +1436,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             info.setToken2(token2);
 
-            NebulaCacheInfo cacheOK = NebulaCache.getCacheInfo(nif);
+            NebulaCacheInfo cacheOK = nebulaCache.getCacheInfo(nif);
 
             // Ja tenim el token2 i podem continuar amb la selecció de certificat
             CheckCertificateResult ccr = checkCertificatesList(cacheOK, relativePluginRequestPath, signaturesSet);
@@ -1457,11 +1497,11 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
         String nif = signaturesSet.getCommonInfoSignature().getAdministrationID();
         try {
 
-            callChallenge(nif, NebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID()));
+            callChallenge(nif, nebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID()));
 
             NebulaCacheInfo info;
 
-            info = NebulaCache.getCacheInfo(nif);
+            info = nebulaCache.getCacheInfo(nif);
 
             if (info == null) {
                 throw new Exception(getTraduccio("error.filter.obligatori", locale));
@@ -1602,7 +1642,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             NebulaCacheSessionInfo info;
 
-            info = NebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
+            info = nebulaCache.getNebulaCacheSession(signaturesSet.getSignaturesSetID());
 
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
@@ -1661,7 +1701,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
             }
 
-
             org.fundaciobit.vintegris.nebula.api.client.authentication.v1.model.NebulaResponseResponseCodeTokenWithLevelViewModel.CodeEnum code;
             code = twl.getCode();
 
@@ -1678,7 +1717,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             final String token2 = twl.getContent().getToken();
             info.setToken2(token2);
 
-            NebulaCacheInfo cacheOK = NebulaCache.getCacheInfo(nif);
+            NebulaCacheInfo cacheOK = nebulaCache.getCacheInfo(nif);
 
             // Ja tenim el token2 i podem continuar amb la selecció de certificat
             CheckCertificateResult ccr = checkCertificatesList(cacheOK, relativePluginRequestPath, signaturesSet);
@@ -1740,7 +1779,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         try {
 
-            info = NebulaCache.getCacheInfo(signaturesSet.getCommonInfoSignature().getAdministrationID());
+            info = nebulaCache.getCacheInfo(signaturesSet.getCommonInfoSignature().getAdministrationID());
 
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
@@ -2029,7 +2068,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             String pin = request.getParameter(FIELD_PIN + "_" + certID);
 
             String nif = commonInfoSignature.getAdministrationID();
-            NebulaCacheInfo info = NebulaCache.getCacheInfo(nif);
+            NebulaCacheInfo info = nebulaCache.getCacheInfo(nif);
 
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
@@ -2080,15 +2119,20 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     @Override
     public void resetAndClean(HttpServletRequest request) {
 
+        log.info("=================  Reset and clean plugin Nebula");
+
         internalResetAndClean(request);
-        NebulaCache.clear();
+        nebulaCache.clear();
     }
 
     @Override
     public void closeSignaturesSet(HttpServletRequest request, String id) {
+
+        log.info("=================  closeSignaturesSet(" + id + ") al plugin Nebula");
+
         super.closeSignaturesSet(request, id);
 
-        NebulaCache.cleanSessionInfo(id);
+        nebulaCache.cleanSessionInfo(id);
     }
 
     @Override
@@ -2432,28 +2476,41 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     }
 
     // Mètode per afegir nova cache
-    private NebulaCacheInfo getNebulaCache(String nif, String signaturesSetID, Locale locale) throws Exception {
+    private synchronized NebulaCacheInfo getNebulaCache(String nif, String signaturesSetID, Locale locale)
+            throws Exception {
 
-        NebulaCacheInfo nci = NebulaCache.getCacheInfo(nif);
+        NebulaCacheInfo nci = nebulaCache.getCacheInfo(nif);
 
         if (nci == null || nci.isExpired()) {
-            nci = initCertificatesAndPolicies(nif, signaturesSetID, locale);
+
             if (nci != null) {
-                NebulaCache.putCacheInfo(nif, nci);
+                log.info("NebulaCacheInfo per a NIF [" + nif + "] ha expirat. S'actualitzarà la cache.");
             }
-        } else {
-            
-            // Miram si existeix NebulaCacheSession
-            NebulaCacheSessionInfo ncsi = NebulaCache.getNebulaCacheSession(signaturesSetID);
-                    
-            if (ncsi == null) {
-            
-                // Actulitzar authenticators filtrats segons la configuració del plugin
-                List<NebulaAuthenticatorType> authenticatorsFiltered = getAuthenticationMethodsFiltered(nif, locale);
-                NebulaCache.putNebulaCacheSessionInfo(signaturesSetID, authenticatorsFiltered);
-            
+
+            nci = initCertificatesAndPolicies(nif, signaturesSetID, locale);
+
+            nebulaCache.putCacheInfo(nif, nci);
+            // Esborram la sessió per a que es torni a carregar.
+            nebulaCache.cleanSessionInfo(signaturesSetID);
+        }
+
+        // Miram si existeix NebulaCacheSession
+        NebulaCacheSessionInfo ncsi = nebulaCache.getNebulaCacheSession(signaturesSetID);
+
+        if (ncsi == null) {
+
+            // Actulitzar authenticators filtrats segons la configuració del plugin
+            List<NebulaAuthenticatorType> authenticators = nci.getAuthenticators(); //getAuthenticationMethodsFiltered(nif, locale);
+
+            ncsi = new NebulaCacheSessionInfo();
+
+            // Si només hi ha un autenticador, el seleccionem automàticament
+            if (authenticators != null && authenticators.size() == 1) {
+                ncsi.setSelectedAuthenticator(authenticators.get(0));
             }
-            
+
+            nebulaCache.putNebulaCacheSessionInfo(signaturesSetID, ncsi);
+
         }
 
         return nci;
@@ -2471,9 +2528,49 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         try {
 
-            List<NebulaAuthenticatorType> authenticatorsFiltered = getAuthenticationMethodsFiltered(nif, locale);
+            List<NebulaAuthenticatorType> authenticators = getAuthenticationMethodsFiltered(nif, locale);
 
-            return getCertificatesAndPoliciesByApi(nif, signaturesSetID, authenticatorsFiltered);
+            String token2 = getApiToken2ForConsultaCertificats(nif);
+
+            DigitalCertificateApi apiCert = getDigitalCertificateApiByToken2(token2);
+
+            Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = new HashMap<>();
+
+            {
+                List<GetMyCertificates200ResponseCertificatesListInner> certs = getCertificatesOfUser(apiCert);
+
+                for (GetMyCertificates200ResponseCertificatesListInner cert : certs) {
+                    certificatesByCertID.put(cert.getCertificateId(), cert);
+                }
+            }
+
+            Map<String, Policy> policiesByCertID = new HashMap<String, Policy>();
+            {
+                GetCertPolicies200Response allPolicies = apiCert.getCertPolicies(null, null, null);
+                for (Policy politica : allPolicies.getPolicyList()) {
+                    policiesByCertID.put(politica.getIdCert(), politica);
+                }
+            }
+
+            NebulaCacheInfo cacheInfo = nebulaCache.getCacheInfo(nif);
+            //final long expirationTime = System.currentTimeMillis() + (10 * 60 * 60 * 1000); // 10 hores
+            final long expirationTime = System.currentTimeMillis() + defaultExpirationTimeInMs;
+
+            if (cacheInfo == null) {
+
+                cacheInfo = new NebulaCacheInfo(nif, authenticators, signaturesSetID, expirationTime);
+
+                nebulaCache.putCacheInfo(nif, cacheInfo);
+            } else {
+                // 10 hores
+                cacheInfo.setExpirationTime(expirationTime);
+
+            }
+
+            cacheInfo.setPoliciesByCertID(policiesByCertID);
+            cacheInfo.setCertificatesByCertID(certificatesByCertID);
+
+            return cacheInfo;
 
         } catch (org.fundaciobit.vintegris.nebula.api.client.trustedapplications.v1.services.ApiException th) {
 
@@ -2527,45 +2624,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             authenticatorsFiltered = authenticators;
         }
         return authenticatorsFiltered;
-    }
-
-    protected NebulaCacheInfo getCertificatesAndPoliciesByApi(String nif, String signaturesSetID,
-            List<NebulaAuthenticatorType> authenticators)
-            throws org.fundaciobit.vintegris.nebula.api.client.digitalcertificate.v1.services.ApiException, Exception {
-
-        String token2 = getApiToken2ForConsultaCertificats(nif);
-
-        DigitalCertificateApi apiCert = getDigitalCertificateApiByToken2(token2);
-
-        Map<String, GetMyCertificates200ResponseCertificatesListInner> certificatesByCertID = new HashMap<>();
-
-        {
-            List<GetMyCertificates200ResponseCertificatesListInner> certs = getCertificatesOfUser(apiCert);
-
-            for (GetMyCertificates200ResponseCertificatesListInner cert : certs) {
-                certificatesByCertID.put(cert.getCertificateId(), cert);
-            }
-        }
-
-        Map<String, Policy> policiesByCertID = new HashMap<String, Policy>();
-        {
-            GetCertPolicies200Response allPolicies = apiCert.getCertPolicies(null, null, null);
-            for (Policy politica : allPolicies.getPolicyList()) {
-                policiesByCertID.put(politica.getIdCert(), politica);
-            }
-        }
-
-        NebulaCacheInfo cacheInfo = NebulaCache.getCacheInfo(nif);
-
-        if (cacheInfo == null) {
-
-            cacheInfo = new NebulaCacheInfo(nif, authenticators, signaturesSetID);
-        }
-
-        cacheInfo.setPoliciesByCertID(policiesByCertID);
-        cacheInfo.setCertificatesByCertID(certificatesByCertID);
-
-        return cacheInfo;
     }
 
     public List<NebulaAuthenticatorType> getAllAuthenticationMethods(String nif) throws Exception {
@@ -2811,6 +2869,14 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
 
         out.println("</div>");
 
+    }
+
+    public long getDefaultExpirationTimeInMs() {
+        return defaultExpirationTimeInMs;
+    }
+
+    public void setDefaultExpirationTimeInMs(long defaultExpirationTimeInMs) {
+        this.defaultExpirationTimeInMs = defaultExpirationTimeInMs;
     }
 
 }

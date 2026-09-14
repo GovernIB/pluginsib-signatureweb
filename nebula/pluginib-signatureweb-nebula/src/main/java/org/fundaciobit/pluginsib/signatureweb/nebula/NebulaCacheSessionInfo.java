@@ -20,11 +20,6 @@ public class NebulaCacheSessionInfo {
         super();
     }
 
-    public NebulaCacheSessionInfo(NebulaAuthenticatorType selectedAuthenticator) {
-        super();
-        this.selectedAuthenticator = selectedAuthenticator;
-    }
-
     public NebulaAuthenticatorType getSelectedAuthenticator() {
         return selectedAuthenticator;
     }

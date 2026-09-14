@@ -25,15 +25,13 @@ public class NebulaCacheInfo {
 
     protected Map<String, Policy> policiesByCertID = null;
 
-    public NebulaCacheInfo(String nif, List<NebulaAuthenticatorType> authenticators, String signaturesSetID) {
+    public NebulaCacheInfo(String nif, List<NebulaAuthenticatorType> authenticators, String signaturesSetID,
+            long expirationTime) {
         super();
         this.nif = nif;
         this.authenticators = authenticators;
+        this.expirationTime = expirationTime;
 
-        NebulaCache.putNebulaCacheSessionInfo(signaturesSetID, authenticators);
-
-        // 10 hores
-        this.expirationTime = System.currentTimeMillis() + 10 * 60 * 1000;
     }
 
     public Map<String, GetMyCertificates200ResponseCertificatesListInner> getCertificatesByCertID() {
@@ -55,6 +53,10 @@ public class NebulaCacheInfo {
 
     public long getExpirationTime() {
         return expirationTime;
+    }
+
+    public void setExpirationTime(long expirationTime) {
+        this.expirationTime = expirationTime;
     }
 
     public String getNif() {

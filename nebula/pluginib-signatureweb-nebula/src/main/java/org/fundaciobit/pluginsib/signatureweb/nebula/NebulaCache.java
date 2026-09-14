@@ -1,7 +1,6 @@
 package org.fundaciobit.pluginsib.signatureweb.nebula;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -16,46 +15,33 @@ public class NebulaCache {
     // ------------------ CACHE -------------------
     // ----------------------------------------------------
 
-    public static Map<String, NebulaCacheInfo> cacheByNif = new HashMap<String, NebulaCacheInfo>();
+    protected Map<String, NebulaCacheInfo> cacheByNif = new HashMap<String, NebulaCacheInfo>();
 
-    protected static Map<String, NebulaCacheSessionInfo> sessionInfoBySignaturesSetID = new java.util.HashMap<>();
+    protected Map<String, NebulaCacheSessionInfo> sessionInfoBySignaturesSetID = new java.util.HashMap<>();
 
-    public static boolean testing = false;
-
-    public static NebulaCacheInfo getCacheInfo(String nif) {
+    public NebulaCacheInfo getCacheInfo(String nif) {
         return cacheByNif.get(nif);
     }
 
-    public static void putCacheInfo(String nif, NebulaCacheInfo cacheInfo) {
+    public void putCacheInfo(String nif, NebulaCacheInfo cacheInfo) {
         cacheByNif.put(nif, cacheInfo);
     }
 
-    public static void clear() {
+    public void clear() {
         cacheByNif.clear();
         sessionInfoBySignaturesSetID.clear();
     }
 
-    public static void putNebulaCacheSessionInfo(String signaturesSetID, NebulaCacheSessionInfo sessionInfo) {
+    public void putNebulaCacheSessionInfo(String signaturesSetID, NebulaCacheSessionInfo sessionInfo) {
         sessionInfoBySignaturesSetID.put(signaturesSetID, sessionInfo);
     }
 
-    public static void putNebulaCacheSessionInfo(String signaturesSetID, List<NebulaAuthenticatorType> authenticators) {
-        // Si només hi ha un autenticador, el seleccionem automàticament
-        NebulaCacheSessionInfo ncsi;
-        if (authenticators != null && authenticators.size() == 1) {
-            ncsi = new NebulaCacheSessionInfo(authenticators.get(0));
-        } else {
-            ncsi = new NebulaCacheSessionInfo();
-        }
-        sessionInfoBySignaturesSetID.put(signaturesSetID, ncsi);
-    }
-
-    public static NebulaCacheSessionInfo getNebulaCacheSession(String signaturesSetID) {
+    public NebulaCacheSessionInfo getNebulaCacheSession(String signaturesSetID) {
         NebulaCacheSessionInfo ncsi = sessionInfoBySignaturesSetID.get(signaturesSetID);
         return ncsi;
     }
 
-    public static void setSelectedAuthenticator(String signaturesSetID, NebulaAuthenticatorType selectedAuthenticator) {
+    public void setSelectedAuthenticator(String signaturesSetID, NebulaAuthenticatorType selectedAuthenticator) {
         NebulaCacheSessionInfo ncsi = sessionInfoBySignaturesSetID.get(signaturesSetID);
         if (ncsi == null) {
             ncsi = new NebulaCacheSessionInfo();
@@ -106,7 +92,7 @@ public class NebulaCache {
     }
     */
 
-    public static void cleanSessionInfo(String signaturesSetID) {
+    public void cleanSessionInfo(String signaturesSetID) {
         sessionInfoBySignaturesSetID.remove(signaturesSetID);
     }
 
