@@ -204,6 +204,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
             ss.setStatus(StatusSignature.STATUS_FINAL_ERROR);
             ss.setErrorException(th);
             ss.setErrorMsg(getTraduccio("error.firmantdocument", new Locale(common.getLanguageUI()), msg));
+            ss.setErrorCode("EVIDENCIESIB_01");
 
             final String url = signaturesSet.getUrlFinal();
 
@@ -333,6 +334,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
                 // Error de la Firma
                 statusSignature.setStatus(StatusSignature.STATUS_FINAL_ERROR);
                 statusSignature.setErrorMsg(evi.getEstatCodiDescripcio() + ": " + evi.getEstatError());
+                ss.setErrorCode("EVIDENCIESIB_02");
                 if (evi.getEstatExcepcio() != null) {
                     statusSignature.setErrorException(new Exception(evi.getEstatExcepcio()));
                 }
@@ -363,6 +365,7 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
             ss.setStatus(StatusSignature.STATUS_FINAL_ERROR);
             ss.setErrorException(th);
             ss.setErrorMsg(getTraduccio("error.firmantdocument", locale, msg));
+            ss.setErrorCode("EVIDENCIESIB_03");
         }
 
         // Estam en la finestra nova 
