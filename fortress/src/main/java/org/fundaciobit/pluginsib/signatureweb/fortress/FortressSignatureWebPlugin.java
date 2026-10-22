@@ -388,17 +388,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
 
             out.println("  function returnToMain() {\n");
             if (usesamewindow) {
-                //Codi anterior out.println("    document.location.href='" + url + "';\n");
-                //out.println("    window.location.replace('" + url + "');\n");
-                
-                out.println("        // Enviar mensaje a la página padre\r\n"
-                        + "    window.parent.postMessage({ \r\n"
-                        + "        type: 'FIRMA_COMPLETE', \r\n"
-                        + "        url: '" + url + "' // La URL a donde quieres volver\r\n"
-                        + "    }, 'http://anadal:8080');\r\n"
-                        + "");
-                
-                
+                out.println("    document.location.href='" + url + "';\n");
             } else {
                 out.println("    window.opener.location.href='" + url + "';\n");
                 out.println("    setTimeout(() => { window.close(); }, 1000);" + "\n");
@@ -411,7 +401,7 @@ public class FortressSignatureWebPlugin extends AbstractMiniAppletSignaturePlugi
             out.println("</script>" + "\n");
             out.println("<center>" + "\n");
             
-            out.println("<h1>555</h1>" + "\n");
+            out.println("<h1>rocessant Firmes. Esperi per favor ...</h1>" + "\n");
             out.println("<img onClick='returnToMain();' src=\"" + relativePluginRequestPath + "/" + WEBRESOURCE
                     + "/img/ajax-loader2.gif\" />" + "\n");
             out.println("</center>\n");
