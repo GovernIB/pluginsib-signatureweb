@@ -281,6 +281,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_08");
 
             return signaturesSet.getUrlFinal();
 
@@ -480,6 +481,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
                     sss.setErrorMsg(errorMsg);
                     sss.setErrorException(th);
                     sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+                    sss.setErrorCode("NEBULA_09");
 
                 }
 
@@ -498,6 +500,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_10");
 
         }
 
@@ -1168,6 +1171,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_04");
 
             log.error(errorMsg, th);
 
@@ -1249,6 +1253,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_05");
 
             log.error(errorMsg, th);
 
@@ -1318,6 +1323,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_03");
 
             log.error(errorMsg, th);
 
@@ -1471,6 +1477,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_04");
 
             log.error(errorMsg, th);
 
@@ -1552,6 +1559,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_01");
 
             log.error(errorMsg, th);
 
@@ -1752,6 +1760,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_02");
 
             log.error(errorMsg, th);
 
@@ -2010,6 +2019,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_06");
 
             log.error(errorMsg, th);
 
@@ -2094,6 +2104,7 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             sss.setErrorMsg(errorMsg);
             sss.setErrorException(th);
             sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+            sss.setErrorCode("NEBULA_07");
 
             sendRedirect(response, signaturesSet.getUrlFinal());
 
