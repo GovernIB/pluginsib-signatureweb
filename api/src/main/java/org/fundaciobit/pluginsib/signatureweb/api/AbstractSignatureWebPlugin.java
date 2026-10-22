@@ -277,8 +277,15 @@ public abstract class AbstractSignatureWebPlugin extends
      * @param th
      */
     @Override
-    public void finishWithError(HttpServletResponse response, SignaturesSetWeb signaturesSet, String errorMsg,
+    @Deprecated
+    public final void finishWithError(HttpServletResponse response, SignaturesSetWeb signaturesSet, String errorMsg,
             Throwable th) {
+        this.finishWithError(response, signaturesSet, errorMsg, th, null);
+    }
+
+    @Override
+    public final void finishWithError(HttpServletResponse response, SignaturesSetWeb signaturesSet, String errorMsg,
+            Throwable th, String errorCode) {
         if (th == null) {
             log.error(errorMsg);
         } else {
@@ -289,18 +296,27 @@ public abstract class AbstractSignatureWebPlugin extends
         sss.setErrorMsg(errorMsg);
         sss.setErrorException(th);
         sss.setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
+        sss.setErrorCode(errorCode);
 
         sendRedirect(response, signaturesSet.getUrlFinal());
 
     }
 
-    // --------------------------------------------------------------------------
     // -------------------------------------------------------------------------
-    // ---------------------------- E R R O R P A G E ----------------------
+    // -------------------------------------------------------------------------
+    // ---------------------------- E R R O R P A G E --------------------------
     // -------------------------------------------------------------------------
     // -------------------------------------------------------------------------
 
+    @Deprecated
     protected void errorPage(String errorMsg, Throwable th, String absolutePluginRequestPath,
+            String relativePluginRequestPath, HttpServletRequest request, HttpServletResponse response,
+            SignaturesSetWeb signaturesSet, Locale locale) {
+        errorPage(errorMsg, th, null, absolutePluginRequestPath, relativePluginRequestPath, request, response,
+                signaturesSet, locale);
+    }
+
+    protected void errorPage(String errorMsg, Throwable th, String errorCode, String absolutePluginRequestPath,
             String relativePluginRequestPath, HttpServletRequest request, HttpServletResponse response,
             SignaturesSetWeb signaturesSet, Locale locale) {
 
@@ -323,7 +339,7 @@ public abstract class AbstractSignatureWebPlugin extends
         signaturesSet.getStatusSignaturesSet().setStatus(StatusSignaturesSet.STATUS_FINAL_ERROR);
         signaturesSet.getStatusSignaturesSet().setErrorMsg(errorMsg);
         signaturesSet.getStatusSignaturesSet().setErrorException(th);
-
+        signaturesSet.getStatusSignaturesSet().setErrorCode(errorCode);
         SignIDAndIndex sai = new SignIDAndIndex(signaturesSet, -1);
 
         final String lang = signaturesSet.getCommonInfoSignature().getLanguageUI();

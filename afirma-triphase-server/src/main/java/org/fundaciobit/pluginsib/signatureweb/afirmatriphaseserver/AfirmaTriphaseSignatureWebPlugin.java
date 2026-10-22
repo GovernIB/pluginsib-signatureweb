@@ -67,6 +67,8 @@ import java.util.Scanner;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * 
@@ -726,7 +728,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             url = new URL(absolutePluginRequestPath);
         } catch (MalformedURLException e) {
             String errorMsg = "La ruta Absoluta [" + absolutePluginRequestPath + "] té un format incorrecte.";
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_01");
             return;
         }
 
@@ -756,7 +758,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                 // TODO traduir
                 String errorMsg = "Error desconegut intentant trobar quin algorisme "
                         + "és el més emprant en les firmes: " + e.getMessage();
-                finishWithError(response, signaturesSet, errorMsg, e);
+                finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_14");
                 return;
             }
         }
@@ -772,7 +774,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                         baseSignaturesSet, callbackhost, i, fis, algorithm);
             } catch (Exception e) {
                 String errorMsg = "Error generant les propietats per enviar a AutoFirma: " + e.getMessage();
-                finishWithError(response, signaturesSet, errorMsg, e);
+                finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_02");
                 return;
             }
 
@@ -808,7 +810,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         if (countNulls == fisArray.length) {
             // TODO Traduir
             final String errorMsg = "No s'ha aconseguit convertir les propietats de cap Firma.";
-            super.finishWithError(response, signaturesSet, errorMsg, null);
+            super.finishWithError(response, signaturesSet, errorMsg, null, "AUTOFIRMA_03");
             return;
         }
 
@@ -1106,7 +1108,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             url = new URL(absolutePluginRequestPath);
         } catch (MalformedURLException e) {
             String errorMsg = "La ruta Absoluta [" + absolutePluginRequestPath + "] té un format incorrecte.";
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_04");
             return;
         }
 
@@ -1137,7 +1139,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                         baseSignaturesSet, callbackhost, i, fis, null);
             } catch (Exception e) {
                 String errorMsg = "Error generant les propietats per enviar a Client-Mòbil: " + e.getMessage();
-                finishWithError(response, signaturesSet, errorMsg, e);
+                finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_05");
                 return;
             }
 
@@ -1182,7 +1184,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         if (countNulls == fisArray.length) {
             // TODO Traduir
             final String errorMsg = "No s'ha aconseguit convertir les propietats de cap Firma.";
-            super.finishWithError(response, signaturesSet, errorMsg, null);
+            super.finishWithError(response, signaturesSet, errorMsg, null, "AUTOFIRMA_06");
             return;
         }
 
@@ -1707,7 +1709,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         } catch (Exception e) {
             String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma [Client Mòbil] ("
                     + signaturesSet.getSignaturesSetID() + "): " + e.getMessage();
-            super.finishWithError(response, signaturesSet, errorMsg, e);
+            super.finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_07");
         }
     }
 
@@ -1739,7 +1741,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         if (resultXMLB64 == null || resultXMLB64.trim().length() == 0) {
             String errorMsg = getSimpleName() + "El client no ha enviat el resultat de la operació de firma ("
                     + signaturesSet.getSignaturesSetID() + ")";
-            super.finishWithError(response, signaturesSet, errorMsg, null);
+            super.finishWithError(response, signaturesSet, errorMsg, null, "AUTOFIRMA_07");
             return;
         }
 
@@ -1878,7 +1880,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         } catch (Exception e) {
             String errorMsg = getSimpleName() + "Error processant l´xml del resultat de la firma [Autofirm@] ("
                     + signaturesSet.getSignaturesSetID() + "): " + e.getMessage();
-            super.finishWithError(response, signaturesSet, errorMsg, e);
+            super.finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_08");
         }
     }
 
@@ -2016,6 +2018,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
                     status.setErrorMsg(msg);
                     status.setStatus(StatusSignature.STATUS_FINAL_ERROR);
+                    status.setErrorCode("TIMEOUT");
 
                     if (isDebug()) {
                         log.info("Temps expirat redireccionant a " + absolutePluginRequestPath + "/"
@@ -2033,6 +2036,17 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
                 cancel(request, response, signaturesSet);
                 return;
             }
+            
+            {
+                final List<String> codis = trobaCodis(errorMsg);
+                if (codis.isEmpty()) {
+                    log.warn("@firma AUTOFIRMA: S'ha de revisar si es possible extreure un errorCode:\n" + errorMsg);
+                    
+                } else {
+                    status.setErrorCode(codis.get(0));
+                }
+            }
+
         }
 
         status.setErrorMsg(getTraduccio("error.missatge", locale, errorMsg));
@@ -2044,6 +2058,54 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             e.printStackTrace();
         }
     }
+    
+    
+    /**
+     * Troba dins del text indicat tots els codis del tipus SAF_nn, aa401200, ai200000 o AI500001.
+     *
+     * El patro de codi es composa de dues lletres seguides d'un o mes grups de dues xifres
+     * amb valors entre 00 i 52 (inclosos). No es distingeix entre majuscules i minuscules.
+     *
+     * @param text Text on buscar els codis
+     * @return Llista de codis trobats sense duplicats, en l'ordre d'aparicio
+     */
+    public static List<String> trobaCodis(final String text) {
+
+        // Numero de dues xifres entre 00 i 52 (inclosos): 00-09, 10-49 o 50-52
+        final String nn = "(?:0[0-9]|[1-4][0-9]|5[0-2])";
+
+        // Codi SAF_nn (ex: SAF_00, SAF_37, SAF_52)
+        final String saf = "SAF_" + nn;
+
+        // Codi de dues lletres seguides de grups de xifres 00-52 (ex: AI500001, aa401200, ai200000)
+        final String codi = "[A-Za-z]{2}(?:" + nn + ")+";
+
+        // Delimitadors per evitar coincidencies parcials dins de tokens mes llargs
+        // (el guio baix tambe s'exclou per no detectar "AF52" dins de "SAF_52")
+        final String inici = "(?<![A-Za-z0-9_])";
+        final String fi = "(?![A-Za-z0-9_])";
+
+        // Patrons compilats (sense distincio entre majuscules i minuscules)
+        final Pattern patroTots = Pattern.compile(inici + "(?:" + saf + "|" + codi + ")" + fi,
+                Pattern.CASE_INSENSITIVE);
+
+        final List<String> codis = new ArrayList<String>();
+
+        if (text == null || text.trim().length() == 0) {
+            return codis;
+        }
+
+        // Busquem tots els codis d'una sola passada amb el patro global
+        final Matcher matcher = patroTots.matcher(text);
+        while (matcher.find()) {
+            codis.add(matcher.group());
+        }
+
+        return codis;
+    }
+    
+   
+
 
     // ----------------------------------------------------------------------------
     // ----------------------------------------------------------------------------
@@ -2175,7 +2237,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
             final String errorMsg = "Error desconegut processant storageService(): " + e.getMessage();
 
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_09");
         }
 
     }
@@ -2207,8 +2269,9 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         Map<?, ?> mapp = request.getParameterMap();
         if (mapp.size() == 0 || (mapp.size() == 1 && mapp.containsKey("restOfTheUrl"))) {
 
+            Scanner s = null;;
             try {
-                Scanner s = new Scanner(request.getInputStream()).useDelimiter("\\A");
+                s = new Scanner(request.getInputStream()).useDelimiter("\\A");
                 String query = s.hasNext() ? s.next() : "";
                 Map<String, String> query_pairs = new HashMap<String, String>();
 
@@ -2224,6 +2287,14 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             } catch (IOException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
+            } finally {
+                if (s != null) {
+                    try {
+                        s.close();                        
+                    } catch (Throwable e) {
+                    }
+
+                }
             }
         }
 
@@ -2236,7 +2307,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
             final String errorMsg = "Error desconegut processant retrieveService(): " + e.getMessage();
 
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_10");
         }
     }
 
@@ -2289,7 +2360,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
             final String errorMsg = "Error desconegut processant batchPreSigner(): " + e.getMessage();
 
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_11");
         }
     }
 
@@ -2362,7 +2433,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
             final String errorMsg = "Error desconegut processant batchPreSigner(): " + e.getMessage();
 
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_12");
         }
     }
 
@@ -2406,7 +2477,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
             final String errorMsg = "Error desconegut processant signatureService(): " + e.getMessage();
 
-            finishWithError(response, signaturesSet, errorMsg, e);
+            finishWithError(response, signaturesSet, errorMsg, e, "AUTOFIRMA_13");
         }
 
     }
