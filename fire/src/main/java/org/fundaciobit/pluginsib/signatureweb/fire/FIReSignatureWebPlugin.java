@@ -446,7 +446,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             String msg = " Error desconegut preparant l'enviament dels documents al servidor de FIRe: "
                     + e.getMessage();
 
-            finishWithError(response, signaturesSet, msg, e);
+            finishWithError(response, signaturesSet, msg, e, "FIRE_01");
 
         }
     }
@@ -506,7 +506,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                 } catch (Exception e) {
                     // TODO tradudir XYZ ZZZ
                     final String msg = " Error processant filtre de certificats: " + e.getMessage();
-                    finishWithError(response, signaturesSet, msg, e);
+                    finishWithError(response, signaturesSet, msg, e, "FIRE_02");
                     return;
                 }
             }
@@ -600,7 +600,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             // String msg = getTraduccio("warn.nosuportamultiplesfirmes", locale,
             // this.getName(locale));
             final String msg = "S'ha produit un error al crear el lot de firmes: " + e.getMessage();
-            finishWithError(response, signaturesSet, msg, e);
+            finishWithError(response, signaturesSet, msg, e, "FIRE_03");
             return;
         }
 
@@ -764,7 +764,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             // String msg = getTraduccio("warn.nosuportamultiplesfirmes", locale,
             // this.getName(locale));
             final String msg = "S'ha produit un error al iniciar la firma del lot de firmes: " + e.getMessage();
-            finishWithError(response, signaturesSet, msg, e);
+            finishWithError(response, signaturesSet, msg, e, "FIRE_05");
             return;
         }
 
@@ -846,6 +846,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
         final String subjectId = fireSignaturesSet.getSubjectId();
 
         String msg = null;
+        String errorCode = null;
         try {
             FireClient fireClient = instantiateFireClient();
 
@@ -855,8 +856,9 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             TransactionResult transactionResult = fireClient.recoverErrorResult(transactionId, subjectId);
 
             String msgError = transactionResult.getErrorMessage();
+            errorCode = String.valueOf(transactionResult.getErrorCode());
 
-            log.error("signErrorPage():: transactionResult.getErrorCode() => " + transactionResult.getErrorCode());
+            log.error("signErrorPage():: transactionResult.getErrorCode() => " + errorCode);
             log.error("signErrorPage():: transactionResult.getErrorMessage() => " + msgError);
             log.error(
                     "signErrorPage():: transactionResult.getProviderName() => " + transactionResult.getProviderName());
@@ -901,7 +903,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             msg = getTraduccio("error.desconegut", locale);
         }
 
-        finishWithError(response, signaturesSet, msg, null);
+        finishWithError(response, signaturesSet, msg, null, errorCode);
     }
 
     // ----------------------------------------------------------------------------
@@ -1039,7 +1041,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                             ss.setErrorMsg(msg);
                             ss.setErrorException(e);
 
-                            finishWithError(response, signaturesSet, msg, e);
+                            finishWithError(response, signaturesSet, msg, e, "FIRE_06");
 
                             continue;
 
@@ -1120,7 +1122,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
             String msg = getTraduccio("error.procesdefirma", locale, e.getMessage());
             sss.setErrorMsg(msg);
 
-            finishWithError(response, signaturesSet, msg, e);
+            finishWithError(response, signaturesSet, msg, e, "FIRE_07");
 
         }
 
