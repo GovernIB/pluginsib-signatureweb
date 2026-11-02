@@ -2,9 +2,11 @@ package org.fundaciobit.pluginsib.signatureweb.api;
 
 import org.apache.commons.fileupload.FileItem;
 import org.fundaciobit.pluginsib.core.v3.utils.CertificateUtils;
+import org.fundaciobit.pluginsib.core.v3.utils.MetadataType;
+import org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.IRubricGenerator;
-import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
+
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.api.AbstractSignatureServerPlugin;
@@ -15,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -559,8 +562,57 @@ public abstract class AbstractSignatureWebPlugin extends
     }
 
     @Override
-    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+    @Deprecated
+    public List<org.fundaciobit.pluginsib.signature.api.PropertyInfo> getAvailableProperties(String propertyKeyBase) {
         return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public List<org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo> getAvailableProperties() {
+        List<org.fundaciobit.pluginsib.signature.api.PropertyInfo> oldProperties;
+        oldProperties = getAvailableProperties(getPropertyKeyBase());
+
+        if (oldProperties == null) {
+            return null;
+        }
+
+        List<PropertyInfo> propietats = new ArrayList<PropertyInfo>();
+
+        for (org.fundaciobit.pluginsib.signature.api.PropertyInfo old : oldProperties) {
+
+            Map<String, String> listOfAvailableValues;
+
+            if (old.getListOfAvailableValues() == null) {
+                listOfAvailableValues = null;
+            } else {
+                listOfAvailableValues = new HashMap<String, String>();
+                for (String value : old.getListOfAvailableValues()) {
+                    listOfAvailableValues.put(value, "No description of value " + value);
+                }
+            }
+
+            Map<String, String> exemples;
+
+            if (old.getExamples() == null) {
+                exemples = null;
+            } else {
+                exemples = new HashMap<String, String>();
+                for (String exemple : old.getExamples()) {
+                    exemples.put(exemple, "No description for this example");
+                }
+            }
+
+            final boolean obfuscate = false;
+            PropertyInfo newProp = new PropertyInfo(old.getKey(), old.getDescription(), MetadataType.STRING,
+                    !old.isOptional(), old.getDefaultValue(), listOfAvailableValues, exemples, old.getPattern(),
+                    obfuscate);
+
+            propietats.add(newProp);
+        }
+
+        return propietats;
+
     }
 
     @Override
@@ -571,6 +623,36 @@ public abstract class AbstractSignatureWebPlugin extends
     @Override
     public boolean willCanCheckIfSignedDocumentWasAlteredAfterSignature() {
         return true;
+    }
+    
+    
+    /**
+     * 
+     * @param availableValues
+     * @return
+     */
+    protected Map<String, String> availableValues2Map(String... availableValues) {
+        return example2Map(availableValues);
+    }
+
+    /**
+     * 
+     * @param exemples
+     * @return
+     */
+    protected Map<String, String> example2Map(String... exemples) {
+
+        if (exemples == null || exemples.length == 0) {
+            return null;
+        }
+
+        Map<String, String> examplesMap = new HashMap<String, String>();
+
+        for (String ex : exemples) {
+            examplesMap.put(ex, "");
+        }
+        return examplesMap;
+
     }
 
 }

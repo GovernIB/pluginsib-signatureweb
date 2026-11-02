@@ -17,10 +17,11 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.fundaciobit.pluginsib.core.v3.utils.CertificateUtils;
 import org.fundaciobit.pluginsib.core.v3.utils.FileUtils;
+import org.fundaciobit.pluginsib.core.v3.utils.MetadataType;
+import org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.IRubricGenerator;
 import org.fundaciobit.pluginsib.signature.api.PolicyInfoSignature;
-import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
@@ -137,45 +138,56 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
     public static final String URL_PATTERN = "https?:\\/\\/(www\\.)?[-a-zA-Z0-9@:%._\\+~#=]{1,256}\\.[a-zA-Z0-9()]{1,6}\\b([-a-zA-Z0-9()@:%_\\+.~#?&//=]*)";
 
     @Override
-    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
-        PropertyInfo debug = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "debug",
-                "Activa la depuració del PLugin", true, "false", new String[] { "false", "true" }, null);
-        PropertyInfo headless = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "headless",
-                "Per assegurar que Autofirma no mostri cap GUI", true, "false", new String[] { "false", "true" }, null);
+    public List<PropertyInfo> getAvailableProperties() {
 
-        PropertyInfo newcssurl = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "newcssurl",
-                "Url a un fitxer css per modificar l'aspecte de pàgina web", true, "null", URL_PATTERN, null);
+        final String propertyKeyBase = getPropertyKeyBase() + AUTOFIRMA_BASE_PROPERTIES;
 
-        PropertyInfo newjavascripturl = new PropertyInfo(
-                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "newjavascripturl",
-                "Url a un fitxer javascript per modificar el comportament de la pàgina web", true, "null", URL_PATTERN,
-                null);
+        // String key, String description, MetadataType type, boolean required, String defaultValue,
+        // Map<String, String> listOfAvailableValues, Map<String, String> examples, String valuePattern,
+        // boolean obfuscate
 
-        PropertyInfo missatgeesperaES = new PropertyInfo(
-                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "missatgeespera.es",
-                "Missatge en castellà que es mostrarà mentre es realitza la firma", true,
-                "Espere a que se ejecute la aplicación<br/>@firma Autofirma o Cliente @firma Móvil ...");
+        PropertyInfo debug = new PropertyInfo(propertyKeyBase + "debug", "Activa més logs del Plugin",
+                MetadataType.BOOLEAN, false, "false", availableValues2Map(new String[] { "false", "true" }), null, null,
+                false);
 
-        PropertyInfo missatgeesperaCA = new PropertyInfo(
-                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "missatgeespera.ca",
-                "Missatge en català que es mostrarà mentre es realitza la firma", true,
-                "Esperi a que s´executi l´aplicació<br/>@firma Autofirma o Client @firma Mòbil ...");
+        PropertyInfo headless = new PropertyInfo(propertyKeyBase + "headless",
+                "Per assegurar que Autofirma no mostri cap GUI", MetadataType.BOOLEAN, false, "false",
+                availableValues2Map(new String[] { "false", "true" }), null, null, false);
 
-        PropertyInfo timeoutbase = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "timeoutbase",
-                "Defineix el temps en segons de timeout quan el client no accepta la\r\n"
+        PropertyInfo newcssurl = new PropertyInfo(propertyKeyBase + "newcssurl",
+                "Url a un fitxer css per modificar l'aspecte de pàgina web", MetadataType.STRING, false, null, null,
+                null, URL_PATTERN, false);
+
+        PropertyInfo newjavascripturl = new PropertyInfo(propertyKeyBase + "newjavascripturl",
+                "Url a un fitxer javascript per modificar el comportament de la pàgina web", MetadataType.STRING, false,
+                null, null, null, URL_PATTERN, false);
+
+        PropertyInfo missatgeesperaES = new PropertyInfo(propertyKeyBase + "missatgeespera.es",
+                "Missatge en castellà que es mostrarà mentre es realitza la firma", MetadataType.STRING, false,
+                "Espere a que se ejecute la aplicación<br/>@firma Autofirma o Cliente @firma Móvil ...", null, null,
+                null, false);
+
+        PropertyInfo missatgeesperaCA = new PropertyInfo(propertyKeyBase + "missatgeespera.ca",
+                "Missatge en català que es mostrarà mentre es realitza la firma", MetadataType.STRING, false,
+                "Esperi a que s´executi l´aplicació<br/>@firma Autofirma o Client @firma Mòbil ...", null, null, null,
+                false);
+
+        PropertyInfo timeoutbase = new PropertyInfo(propertyKeyBase + "timeoutbase",
+                "Defineix el temps en segons de timeout quan el client no accepta la"
                         + " posada en marxa de Autofirma o quan aquesta no existeix. Unitats en segons. ",
-                true, "15");
+                MetadataType.INTEGER, false, "15", null, null, null, false);
 
-        PropertyInfo firefoxinwindowsuseoskeystore = new PropertyInfo(
-                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "firefoxinwindowsuseoskeystore",
-                "Si val true en en navegador Firefox enlloc de cercar certificats en el seu propi magatzem el cerca al magatzem del S.O.",
-                true, "false", new String[] { "true", "false" }, null);
+        PropertyInfo firefoxinwindowsuseoskeystore = new PropertyInfo(propertyKeyBase + "firefoxinwindowsuseoskeystore",
+                "Si val true en en navegador Firefox enlloc de cercar certificats en el seu propi magatzem "
+                + "el cerca al magatzem del S.O.",
+                MetadataType.BOOLEAN, false, "false", availableValues2Map(new String[] { "true", "false" }), null, null,
+                false);
 
-        PropertyInfo downloadforwindowsxp = new PropertyInfo(
-                propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "downloadforwindowsxp",
+        PropertyInfo downloadforwindowsxp = new PropertyInfo(propertyKeyBase + "downloadforwindowsxp",
                 "Si val true mostrarà en la llista de llocs on descarregar Autofirma "
                         + " un nou item per descarregar Autofirma per Windows XP",
-                true, "false", new String[] { "false", "true" }, null);
+                MetadataType.BOOLEAN, false, "false", availableValues2Map(new String[] { "false", "true" }), null, null,
+                false);
 
         List<PropertyInfo> list = new ArrayList<PropertyInfo>();
         list.add(debug);
@@ -191,7 +203,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         // String key, String description, boolean optional, String defaultValue, String[] listOfAvailableValues, String[] examples
         // PropertyInfo nom = new PropertyInfo(propertyKeyBase + AUTOFIRMA_BASE_PROPERTIES + "nom", "description", optional, "defaultValue", listOfAvailableValues | pattern,  examples);
 
-        return null;
+        return list;
     }
 
     @Override
@@ -576,7 +588,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             try {
                 response.sendError(404, e.getMessage());
             } catch (IOException e1) {
-                log.error("Error enviant sendError", e1 );
+                log.error("Error enviant sendError", e1);
             }
         }
     }
@@ -1445,16 +1457,9 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
                     return null;
                 }
-                
-                
-                
-       
+
                 //String base64Rubric = "/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAP//////+v//////////////////////////////////////////////////////////////////////////////2wBDAf//////////////////////////////////////////////////////////////////////////////////////wgARCABHAgADAREAAhEBAxEB/8QAFwABAQEBAAAAAAAAAAAAAAAAAAECA//EABQBAQAAAAAAAAAAAAAAAAAAAAD/2gAMAwEAAhADEAAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAABQAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACGAAAdAAAAAAAAAAAAAAAAAAAAAAAAAAAACEAABoAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA//xAAUEAEAAAAAAAAAAAAAAAAAAACQ/9oACAEBAAEFAhA//8QAFBEBAAAAAAAAAAAAAAAAAAAAkP/aAAgBAwEBPwEQP//EABQRAQAAAAAAAAAAAAAAAAAAAJD/2gAIAQIBAT8BED//xAAUEAEAAAAAAAAAAAAAAAAAAACQ/9oACAEBAAY/AhA//8QAGRAAAgMBAAAAAAAAAAAAAAAAEWAAATFw/9oACAEBAAE/IeCXiBeIF4gXiBeIIgggggdv/9oADAMBAAIAAwAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAASSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAACSSSAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/xAAUEQEAAAAAAAAAAAAAAAAAAACQ/9oACAEDAQE/EBA//8QAFBEBAAAAAAAAAAAAAAAAAAAAkP/aAAgBAgEBPxAQP//EACQQAAEBBwUBAQEAAAAAAAAAAAERADFQUYGRsSBhcaHRYCHw/9oACAEBAAE/EPhVExcMomLhlExcMomLhlExcMomLxp9TI1B45GY0+pkag8cjMafUyNQeORmNPqZGoPHIzGn1MjUHjkZjRChGTv14yd+vGTv14yd+vGTv14wEFf3+p9t/9k=";
                 //configProperties.setProperty(MiniAppletConstants.PROPERTY_SIGNATURE_RUBRIC_IMAGE, base64Rubric);
-                
-                
-                
-                
 
                 //        if (rubricUsingText()) {
                 //          // ========= IMATGE DE TEXT ===============
@@ -2032,16 +2037,17 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             } else if (errorMsg.startsWith("Type: es.gob.afirma.core.AOCancelledOperationExceptionMessage")) {
                 cancel(request, response, signaturesSet);
                 return;
-            } else if (errorMsg.startsWith("Type: java.lang.ExceptionMessage: AI500001 - Operación cancelada por el usuario.")) {
+            } else if (errorMsg
+                    .startsWith("Type: java.lang.ExceptionMessage: AI500001 - Operación cancelada por el usuario.")) {
                 cancel(request, response, signaturesSet);
                 return;
             }
-            
+
             {
                 final List<String> codis = trobaCodis(errorMsg);
                 if (codis.isEmpty()) {
                     log.warn("@firma AUTOFIRMA: S'ha de revisar si es possible extreure un errorCode:\n" + errorMsg);
-                    
+
                 } else {
                     status.setErrorCode(codis.get(0));
                 }
@@ -2058,8 +2064,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             e.printStackTrace();
         }
     }
-    
-    
+
     /**
      * Troba dins del text indicat tots els codis del tipus SAF_nn, aa401200, ai200000 o AI500001.
      *
@@ -2103,9 +2108,6 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
 
         return codis;
     }
-    
-   
-
 
     // ----------------------------------------------------------------------------
     // ----------------------------------------------------------------------------
@@ -2269,7 +2271,8 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
         Map<?, ?> mapp = request.getParameterMap();
         if (mapp.size() == 0 || (mapp.size() == 1 && mapp.containsKey("restOfTheUrl"))) {
 
-            Scanner s = null;;
+            Scanner s = null;
+            ;
             try {
                 s = new Scanner(request.getInputStream()).useDelimiter("\\A");
                 String query = s.hasNext() ? s.next() : "";
@@ -2290,7 +2293,7 @@ public class AfirmaTriphaseSignatureWebPlugin extends AbstractMiniAppletSignatur
             } finally {
                 if (s != null) {
                     try {
-                        s.close();                        
+                        s.close();
                     } catch (Throwable e) {
                     }
 

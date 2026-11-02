@@ -20,5 +20,5 @@ es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.debug=false
 # S'ha de consultar si el perfil que usa EvidenciesIB suporta segell de temps
 es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.providestimestampgenerator=false
 
-es.caib.portafib.pluginsib.signatureweb.firmanocriptografica.usesamewindow=false
+
 

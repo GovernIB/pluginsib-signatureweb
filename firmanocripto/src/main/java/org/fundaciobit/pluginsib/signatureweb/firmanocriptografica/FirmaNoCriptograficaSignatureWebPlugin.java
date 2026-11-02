@@ -1,9 +1,10 @@
 package org.fundaciobit.pluginsib.signatureweb.firmanocriptografica;
 
 import org.apache.commons.io.FileUtils;
+import org.fundaciobit.pluginsib.core.v3.utils.MetadataType;
+import org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.CommonInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
-import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureweb.api.AbstractSignatureWebPlugin;
@@ -41,7 +42,6 @@ import java.util.Properties;
  * 24 oct 2024 10:45:14
  */
 public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWebPlugin {
-
 
     public static final String FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES = PLUGINSIB_SIGNATUREWEB_BASE_PROPERTY
             + "firmanocriptografica.";
@@ -616,37 +616,113 @@ public class FirmaNoCriptograficaSignatureWebPlugin extends AbstractSignatureWeb
     }
 
     @Override
-    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+    public List<PropertyInfo> getAvailableProperties() {
 
-        if (propertyKeyBase == null) {
-            propertyKeyBase = super.getPropertyKeyBase();
-        }
+        String propertyKeyBase = super.getPropertyKeyBase() + FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES;
 
         List<PropertyInfo> list = new ArrayList<PropertyInfo>();
 
         {
-            PropertyInfo pi = new PropertyInfo();
-            pi.setKey(propertyKeyBase + FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "evidencies.host");
-            pi.setExamples(new String[] {});
+            PropertyInfo pi = new PropertyInfo(
+                    propertyKeyBase + "evidencies.host", "", // description,
+                    MetadataType.STRING, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    example2Map("https://dev.caib.es/evidenciesibapi/externa"), // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
             list.add(pi);
         }
         {
-            PropertyInfo pi = new PropertyInfo();
-            pi.setKey(propertyKeyBase + FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "evidencies.host");
-            pi.setExamples(new String[] {});
+
+            PropertyInfo pi = new PropertyInfo(
+
+                    propertyKeyBase + "evidencies.username", "", // description,
+                    MetadataType.STRING, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    null, // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
             list.add(pi);
         }
         {
-            PropertyInfo pi = new PropertyInfo();
-            pi.setKey(propertyKeyBase + FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "evidencies.username");
-            pi.setExamples(new String[] {});
+            PropertyInfo pi = new PropertyInfo(
+
+                    propertyKeyBase + "evidencies.password", "", // description,
+                    MetadataType.STRING, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    null, // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+            list.add(pi);
+        }
+
+        {
+            PropertyInfo pi = new PropertyInfo(
+                    propertyKeyBase + "evidencies.debug", "Afegir logs durant la cridada a EvidenciesIB", // description,
+                    MetadataType.BOOLEAN, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    example2Map("true", "false"), // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
+            list.add(pi);
+        }
+
+        {
+            PropertyInfo pi = new PropertyInfo(
+                    propertyKeyBase + "usesamewindow",
+                    "Si s'usa dins d'un iframe llavors ha de valer false, si s'utilitza dins pantalla completa llavors ha de valer true", // desc,
+                    MetadataType.BOOLEAN, true, // required,
+                    "false", // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    example2Map("true", "false"), // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
+            list.add(pi);
+        }
+
+        {
+            PropertyInfo pi = new PropertyInfo(
+
+                    propertyKeyBase + "debug", "Incrementar logs del Plugin", // description,
+                    MetadataType.BOOLEAN, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    example2Map("true", "false"), // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
             list.add(pi);
         }
         {
-            PropertyInfo pi = new PropertyInfo();
-            pi.setKey(propertyKeyBase + FIRMANOCRIPTOGRAFICA_BASE_PROPERTIES + "evidencies.password");
-            pi.setExamples(new String[] { "true", "false" });
+
+            PropertyInfo pi = new PropertyInfo(
+
+                    propertyKeyBase + "providestimestampgenerator",
+                    "S'ha de consultar si el perfil que usa EvidenciesIB suporta segell de temps i assignar-ho a aquesta propietat.", // description,
+                    MetadataType.BOOLEAN, true, // required,
+                    null, // defaultValue,
+                    null, // Map<String, String> listOfAvailableValues,
+                    null, // Map<String, String> examples,
+                    null, // valuePattern,
+                    false // obfuscate                    
+            );
+
             list.add(pi);
+
         }
 
         return list;

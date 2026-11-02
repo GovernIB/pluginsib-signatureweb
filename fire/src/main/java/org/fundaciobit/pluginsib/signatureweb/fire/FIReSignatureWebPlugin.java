@@ -25,9 +25,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.fundaciobit.pluginsib.core.v3.utils.FileUtils;
+import org.fundaciobit.pluginsib.core.v3.utils.MetadataType;
+import org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.CommonInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
-import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MIMEInputStream;
@@ -1397,21 +1398,26 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
     }
 
     @Override
-    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+    public List<PropertyInfo> getAvailableProperties() {
 
-        String b = propertyKeyBase + FIRE_BASE_PROPERTIES;
+        final String propertyKeyBase = getPropertyKeyBase() + FIRE_BASE_PROPERTIES;
 
         List<PropertyInfo> props = new ArrayList<PropertyInfo>();
 
+        // String key, String description, MetadataType type, boolean required, String defaultValue,
+        // Map<String, String> listOfAvailableValues, Map<String, String> examples, String valuePattern,
+        // boolean obfuscate
+
         PropertyInfo debug = new PropertyInfo(propertyKeyBase + PROPERTY_DEBUG,
-                "Per depuració durant el desenvolupament. Tipus booleà.", true, "false");
+                "Per depuració durant el desenvolupament. Tipus booleà.", MetadataType.BOOLEAN, false, "false",
+                availableValues2Map(new String[] { "true", "false" }), null, null, false);
 
         props.add(debug);
 
         PropertyInfo appid = new PropertyInfo(propertyKeyBase + PROPERTY_APPID,
                 "Identificador de la aplicacion, necesario para autenticarse contra el componente central."
                         + " Nos lo asigna el modulo de administracion al dar de alta la aplicacion",
-                false, null);
+                MetadataType.STRING, true, null, null, null, null, false);
         props.add(appid);
 
         PropertyInfo procedure = new PropertyInfo(propertyKeyBase + PROPERTY_PROCEDURE,
@@ -1420,7 +1426,7 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                         + " con objeto de obtener estadisticas. Solo se utiliza en produccion y nos"
                         + " lo debe entregar el administrador del componente central al dar de alta"
                         + " el procedimiento en los servicios de la GISS",
-                true, null);
+                MetadataType.STRING, false, null, null, null, null, false);
         props.add(procedure);
 
         PropertyInfo certOrigin = new PropertyInfo(propertyKeyBase + PROPERTY_CERT_ORIGIN,
@@ -1431,7 +1437,8 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                         + " Este parámetro es opcional. Si no se especifica o se deja en blanco se permitirá al"
                         + " usuario seleccionar el origen del certificado."
                         + " IMPORTANT: La taula de firmes només serà possible si aquest valor val 'clavefirma'.",
-                true, null);
+                MetadataType.STRING, false, null, availableValues2Map(new String[] { "local", "clavefirma" }), null,
+                null, false);
         props.add(certOrigin);
 
         PropertyInfo appName = new PropertyInfo(propertyKeyBase + PROPERTY_APP_NAME,
@@ -1439,39 +1446,41 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                 " Nombre de la aplicación. Este nombre se usará en las páginas del componente"
                         + " central para informar al usuario de la aplicación que solicita la operación"
                         + " de firma. Este parámetro es opcional.",
-                true, null);
+                MetadataType.STRING, false, null, null, null, null, false);
         props.add(appName);
 
         PropertyInfo fireURL = new PropertyInfo(propertyKeyBase + PROPERTY_FIRE_URL,
 
-                "URL del servicio del componente central.", true, null);
-        fireURL.setExamples(new String[] { "https://localhost:28443/fire-signature/fireService" });
+                "URL del servicio del componente central.", MetadataType.STRING, false, null, null,
+                example2Map("https://localhost:28443/fire-signature/fireService"), null, false);
+
         props.add(fireURL);
 
-        PropertyInfo keyStore = new PropertyInfo(b + "javax.net.ssl.keyStore",
+        PropertyInfo keyStore = new PropertyInfo(propertyKeyBase + "javax.net.ssl.keyStore",
                 "(Opcional) Ruta del almacén de claves para la autenticación mediante certificado"
                         + " con el componente central. Este certificado debe estar dado de alta en la base de"
                         + " datos del componente central, asignado al identificador de la aplicación cliente"
                         + " en la que se esté integrando el componente distribuido. Si se omite este parámetro"
                         + " se usará la configuración establecida a nivel global en la JRE.",
-                false, null);
-        keyStore.setExamples(new String[] { "D:\\pluginsib-signatureweb-4.1\\fire\\config\\fire.jks" });
+                MetadataType.STRING, true, null, null,
+                example2Map("D:\\pluginsib-signatureweb-4.1\\fire\\config\\fire.jks"), null, false);
+
         props.add(keyStore);
 
-        PropertyInfo keyStorePassword = new PropertyInfo(b + "javax.net.ssl.keyStorePassword",
-                "(Opcional) Contraseña del almacén de claves de autenticación SSL.", false, null);
+        PropertyInfo keyStorePassword = new PropertyInfo(propertyKeyBase + "javax.net.ssl.keyStorePassword",
+                "(Opcional) Contraseña del almacén de claves de autenticación SSL.", MetadataType.STRING, true, null,
+                null, null, null, true);
         props.add(keyStorePassword);
 
-        PropertyInfo keyStoreType = new PropertyInfo(b + "javax.net.ssl.keyStoreType",
+        PropertyInfo keyStoreType = new PropertyInfo(propertyKeyBase + "javax.net.ssl.keyStoreType",
 
                 " (Opcional) Tipo del almacén de claves del certificado de autenticación SSL:"
                         + "   “JKS” (almacén de Java) o “PKCS12” (almacén PKCS12/PFX). "
                         + " Por defecto, se considera que el almacén es de tipo JKS.",
-                true, "JKS");
-        keyStoreType.setListOfAvailableValues(new String[] { "JKS", "PKCS12" });
+                MetadataType.STRING, false, "JKS", availableValues2Map("JKS", "PKCS12"), null, null, false);
         props.add(keyStoreType);
 
-        PropertyInfo trustStore = new PropertyInfo(b + "javax.net.ssl.trustStore",
+        PropertyInfo trustStore = new PropertyInfo(propertyKeyBase + "javax.net.ssl.trustStore",
                 "(Opcional) Ruta del almacén de certificados de confianza SSL. Esto se usa cuando el "
                         + " certificado con el que se ha montado el SSL del componente central no está en el"
                         + " almacén de confianza de Java y se desea establecer un almacén de confianza alternativo."
@@ -1479,45 +1488,52 @@ public class FIReSignatureWebPlugin extends AbstractMiniAppletSignaturePlugin {
                         + " se puede configurar el valor “all”. Si se omite este parámetro se usará la"
                         + " configuración establecida a nivel global en la JRE. Por defecto, se confiará en los"
                         + " certificados dados de alta en el almacén “cacerts”.",
-                true, null);
-        keyStoreType.setListOfAvailableValues(new String[] { "[PATH]", "all" });
+                MetadataType.STRING, false, null, availableValues2Map("[PATH]", "all"), null, null, false);
         props.add(trustStore);
 
-        PropertyInfo trustStorePassword = new PropertyInfo(b + "javax.net.ssl.trustStorePassword",
-                "(Opcional) Contraseña del almacén de confianza.", true, null);
+        PropertyInfo trustStorePassword = new PropertyInfo(propertyKeyBase + "javax.net.ssl.trustStorePassword",
+                "(Opcional) Contraseña del almacén de confianza.", MetadataType.STRING, false, null, null, null, null,
+                false);
         props.add(trustStorePassword);
 
-        PropertyInfo trustStoreType = new PropertyInfo(b + "javax.net.ssl.trustStoreType",
+        PropertyInfo trustStoreType = new PropertyInfo(propertyKeyBase + "javax.net.ssl.trustStoreType",
                 "(Opcional) Tipo del almacén de confianza: “JKS” (almacén de Java) o"
                         + " “PKCS12” (almacén PKCS12/PFX).Por defecto, se considera que el almacén es de tipo JKS.",
-                true, null);
-        trustStoreType.setListOfAvailableValues(new String[] { "JKS", "PKCS12" });
+                MetadataType.STRING, false, null, availableValues2Map("JKS", "PKCS12"), null, null, false);
+
         props.add(trustStoreType);
 
-        PropertyInfo callbackhost = new PropertyInfo(b + "callbackhost", "CALLBAK HOST (opcional)", true, null);
-        callbackhost.setExamples(new String[] { "http://www.ibsalut.es/portafib" });
+        PropertyInfo callbackhost = new PropertyInfo(propertyKeyBase + "callbackhost", "CALLBAK HOST (opcional)",
+                MetadataType.STRING, false, null, null, example2Map("http://www.ibsalut.es/portafib"), null, false);
+
         props.add(callbackhost);
 
+        // String key, String description, MetadataType type, boolean required, String defaultValue,
+        // Map<String, String> listOfAvailableValues, Map<String, String> examples, String valuePattern,
+        // boolean obfuscate
+
         PropertyInfo mappingusers = new PropertyInfo(propertyKeyBase + PROPERTY_MAPPING_USERS_PATH,
-                "(opcional) Fitxer de properties de Mapeig d'usuaris de l'appicació i usuaris de FIRe", true, null);
-        callbackhost.setExamples(
-                new String[] { "D:\\pluginsib-signatureweb-4.1\\fire\\doc\\fire_mapping_test.properties" });
+                "(opcional) Fitxer de properties de Mapeig d'usuaris de l'appicació i usuaris de FIRe",
+                MetadataType.STRING, false, null, null,
+                example2Map("D:\\pluginsib-signatureweb-4.1\\fire\\doc\\fire_mapping_test.properties"), null, false);
+
         props.add(mappingusers);
 
         PropertyInfo users_pattern = new PropertyInfo(propertyKeyBase + PROPERTY_USERS_PATTERN,
                 "Patró de reemplaçament per convertir usurname i/o nif a usuari FIRe "
                         + "(veure https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html)."
                         + " Les variables de substitució disponibles són: {0} == username o {1} == administrationID (NIF)",
-                true, null);
-        users_pattern.setExamples(new String[] { "IBSALUT_{1}" });
+                MetadataType.STRING, false, null, null, example2Map("IBSALUT_{1}"), null, false);
         props.add(users_pattern);
 
-        PropertyInfo newjavascripturl = new PropertyInfo(b + "newjavascripturl",
-                "Opcional. Per afegir un nou fitxer de javascript (URL)", true, null);
+        PropertyInfo newjavascripturl = new PropertyInfo(propertyKeyBase + "newjavascripturl",
+                "Opcional. Per afegir un nou fitxer de javascript (URL)", MetadataType.STRING, false, null, null,
+                example2Map("https://www.ibsalut.es/portafib/js/fire.js"), null, false);
         props.add(newjavascripturl);
 
-        PropertyInfo newcssurl = new PropertyInfo(b + "newcssurl", "Opcional. Per afegir un nou fitxer de CSS (URL)",
-                true, null);
+        PropertyInfo newcssurl = new PropertyInfo(propertyKeyBase + "newcssurl",
+                "Opcional. Per afegir un nou fitxer de CSS (URL)", MetadataType.STRING, false, null, null,
+                example2Map("https://www.ibsalut.es/portafib/css/fire.css"), null, false);
         props.add(newcssurl);
 
         return props;

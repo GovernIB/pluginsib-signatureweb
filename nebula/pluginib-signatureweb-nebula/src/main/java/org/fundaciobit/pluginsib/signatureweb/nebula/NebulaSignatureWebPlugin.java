@@ -6,10 +6,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import org.fundaciobit.pluginsib.core.v3.utils.CertificateUtils;
+import org.fundaciobit.pluginsib.core.v3.utils.MetadataType;
 import org.fundaciobit.pluginsib.signature.api.CommonInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.FileInfoSignature;
 import org.fundaciobit.pluginsib.signature.api.PolicyInfoSignature;
-import org.fundaciobit.pluginsib.signature.api.PropertyInfo;
+import org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo;
 import org.fundaciobit.pluginsib.signature.api.StatusSignature;
 import org.fundaciobit.pluginsib.signature.api.StatusSignaturesSet;
 import org.fundaciobit.pluginsib.signatureserver.miniappletutils.MiniAppletUtils;
@@ -1211,7 +1212,6 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
             if (info == null) {
                 throw new Exception("Abans de cridar al mètode signDocuments() ha de cridar al mètode filter().");
             }
-
 
             NebulaAuthenticatorType selectedAuthenticator = NebulaAuthenticatorType
                     .valueOf(selectedAuthenticatorMethod);
@@ -2710,145 +2710,152 @@ public class NebulaSignatureWebPlugin extends AbstractSignatureWebPlugin {
     // ----------------------------------------------------
 
     @Override
-    public List<PropertyInfo> getAvailableProperties(String propertyKeyBase) {
+    public List<org.fundaciobit.pluginsib.core.v3.utils.PropertyInfo> getAvailableProperties() {
+
+        final String base = getPropertyKeyBase() + NEBULA_BASE_PROPERTIES;
 
         List<PropertyInfo> props = new ArrayList<>();
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.url=https://api-ansmt01.nebulaservice.net
-            PropertyInfo propUrl = new PropertyInfo(NEBULA_BASE_PROPERTIES + "url", "URL de la API de Nebula", false,
-                    "https://api-ansmt01.nebulaservice.net");
+            PropertyInfo propUrl = new PropertyInfo(base + "url", "URL de la API de Nebula", MetadataType.STRING, true,
+                    null, null, example2Map("https://api-ansmt01.nebulaservice.net"), null, false);
             props.add(propUrl);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.url_auth=https://api.nebulaservice.net/trustedapps/v1
-            PropertyInfo propUrlAuth = new PropertyInfo(NEBULA_BASE_PROPERTIES + "url_auth",
-                    "URL de autenticació de Nebula", false, "https://api.nebulaservice.net/trustedapps/v1");
+            PropertyInfo propUrlAuth = new PropertyInfo(base + "url_auth", "URL de autenticació de Nebula",
+                    MetadataType.STRING, true, null, null, example2Map("https://api.nebulaservice.net/trustedapps/v1"),
+                    null, false);
             props.add(propUrlAuth);
         }
 
         {
             //             es.caib.sample.pluginsib.signatureweb.nebula.applicationName=PORTAFIB
-            PropertyInfo propApplicationName = new PropertyInfo(NEBULA_BASE_PROPERTIES + "applicationName",
-                    "Nom de l'aplicació registrada a Nebula", false, null);
+            PropertyInfo propApplicationName = new PropertyInfo(base + "applicationName",
+                    "Nom de l'aplicació registrada a Nebula", MetadataType.STRING, true, null, null, null, null, false);
             props.add(propApplicationName);
         }
 
         {
             //  es.caib.sample.pluginsib.signatureweb.nebula.tenantId=2d-cf05-40ad-9493-XXXXXXXXXX
-            PropertyInfo propTenantId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "tenantId", "ID del tenant a Nebula",
-                    false, null);
+            PropertyInfo propTenantId = new PropertyInfo(base + "tenantId", "ID del tenant a Nebula",
+                    MetadataType.STRING, true, null, null, example2Map("2d-cf05-40ad-9493-XXXXXXXXXX"), null, false);
             props.add(propTenantId);
         }
 
         {
             //  es.caib.sample.pluginsib.signatureweb.nebula.appId=18-2235-47db-a2fd-XXXXXXXXXXXX
-            PropertyInfo propAppId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "appId",
-                    "ID de l'aplicació registrada a Nebula", false, null);
+            PropertyInfo propAppId = new PropertyInfo(base + "appId", "ID de l'aplicació registrada a Nebula",
+                    MetadataType.STRING, true, null, null, example2Map("18-2235-47db-a2fd-XXXXXXXXXXXX"), null, false);
             props.add(propAppId);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.accessKey=60dF623BA94B0a5acD80B39XXXXXXXXXXXXXXXXXX
-            PropertyInfo propAccessKey = new PropertyInfo(NEBULA_BASE_PROPERTIES + "accessKey",
-                    "Clau d'accés de l'aplicació registrada a Nebula", false, null);
+            PropertyInfo propAccessKey = new PropertyInfo(base + "accessKey",
+                    "Clau d'accés de l'aplicació registrada a Nebula", MetadataType.STRING, true, null, null,
+                    example2Map("60dF623BA94B0a5acD80B39XXXXXXXXXXXXXXXXXX"), null, false);
             props.add(propAccessKey);
         }
 
         {
             // En entorn de PRE de NEBULA els certificats no inclouen el NIF, per tant cal ignorar la seva validació
             // es.caib.sample.pluginsib.signatureweb.nebula.ignoreNifValidation=true
-            PropertyInfo propIgnoreNifValidation = new PropertyInfo(NEBULA_BASE_PROPERTIES + "ignoreNifValidation",
+            PropertyInfo propIgnoreNifValidation = new PropertyInfo(base + "ignoreNifValidation",
                     "Indica si s'ha d'ignorar la validació del NIF" + " (En entorn de PRE de NEBULA els certificats"
                             + " no inclouen el NIF, per tant cal ignorar la seva validació)",
-                    true, "false", new String[] { "true", "false" }, null);
+                    MetadataType.BOOLEAN, false, null, availableValues2Map("true", "false"), example2Map("false"), null,
+                    false);
             props.add(propIgnoreNifValidation);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.ignore_certificate_filter
-            PropertyInfo propIgnoreCertificateFilter = new PropertyInfo(
-                    NEBULA_BASE_PROPERTIES + "ignore_certificate_filter",
+            PropertyInfo propIgnoreCertificateFilter = new PropertyInfo(base + "ignore_certificate_filter",
                     "Indica si s'ha d'ignorar el filtre de certificats definit a l'Administració (filtreCertificats)",
-                    true, "false", new String[] { "true", "false" }, null);
+                    MetadataType.BOOLEAN, false, null, availableValues2Map("true", "false"), example2Map("false"), null,
+                    false);
             props.add(propIgnoreCertificateFilter);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.debug=false
-            PropertyInfo propDebug = new PropertyInfo(NEBULA_BASE_PROPERTIES + "debug",
-                    "Indica si s'activa el mode debug, que mostra informació addicional als logs", true, "false",
-                    new String[] { "true", "false" }, null);
+            PropertyInfo propDebug = new PropertyInfo(base + "debug",
+                    "Indica si s'activa el mode debug, que mostra informació addicional als logs", MetadataType.BOOLEAN,
+                    false, null, availableValues2Map("true", "false"), example2Map("false"), null, false);
             props.add(propDebug);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.debug=false
-            PropertyInfo onlyhashDebug = new PropertyInfo(NEBULA_BASE_PROPERTIES + "onlyhashsignatures",
-                    "Si val true indica que totes les signatures realitzades siguin emprant Hash", true, "false",
-                    new String[] { "true", "false" }, null);
+            PropertyInfo onlyhashDebug = new PropertyInfo(base + "onlyhashsignatures",
+                    "Si val true indica que totes les signatures realitzades siguin emprant Hash", MetadataType.BOOLEAN,
+                    false, null, availableValues2Map("true", "false"), example2Map("false"), null, false);
             props.add(onlyhashDebug);
         }
 
         {
             //             es.caib.sample.pluginsib.signatureweb.nebula.applicationName=CONSULTA_CERTIFICATS_PORTAFIB
-            PropertyInfo propApplicationName = new PropertyInfo(
-                    NEBULA_BASE_PROPERTIES + "consultacertificats.applicationName",
+            PropertyInfo propApplicationName = new PropertyInfo(base + "consultacertificats.applicationName",
                     "Nom de l'aplicació registrada a Nebula  per fer consultes de Certificats d'usuaris"
                             + " independenment dels mètodes d'autenticació que tengui",
-                    false, null);
+                    MetadataType.STRING, true, null, null, null, null, false);
             props.add(propApplicationName);
         }
 
         {
             //  es.caib.sample.pluginsib.signatureweb.nebula.consultacertificats.tenantId=2d-cf05-40ad-9493-XXXXXXXXXX
-            PropertyInfo propTenantId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "consultacertificats.tenantId",
+            PropertyInfo propTenantId = new PropertyInfo(base + "consultacertificats.tenantId",
                     "ID del tenant a Nebula per fer consultes de Certificats d'usuaris independenment"
                             + " dels mètodes d'autenticació que tengui",
-                    false, null);
+                    MetadataType.STRING, true, null, null, null, null, false);
             props.add(propTenantId);
         }
 
         {
             //  es.caib.sample.pluginsib.signatureweb.nebula.appId=18-2235-47db-a2fd-XXXXXXXXXXXX
-            PropertyInfo propAppId = new PropertyInfo(NEBULA_BASE_PROPERTIES + "consultacertificats.appId",
+            PropertyInfo propAppId = new PropertyInfo(base + "consultacertificats.appId",
                     "ID de l'aplicació registrada a Nebula per fer consultes de Certificats d'usuaris independenment"
                             + " dels mètodes d'autenticació que tengui",
-                    false, null);
+                    MetadataType.STRING, true, null, null, null, null, false);
             props.add(propAppId);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.accessKey=60dF623BA94B0a5acD80B39XXXXXXXXXXXXXXXXXX
-            PropertyInfo propAccessKey = new PropertyInfo(NEBULA_BASE_PROPERTIES + "consultacertificats.accessKey",
+            PropertyInfo propAccessKey = new PropertyInfo(base + "consultacertificats.accessKey",
                     "Clau d'accés de l'aplicació registrada a Nebula per fer consultes de Certificats"
                             + " d'usuaris independenment dels mètodes d'autenticació que tengui",
-                    false, null);
+                    MetadataType.STRING, true, null, null, null, null, false);
             props.add(propAccessKey);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.logoentitaturl
-            PropertyInfo propLogoEntitatUrl = new PropertyInfo(NEBULA_BASE_PROPERTIES + "logoentitaturl",
-                    "URL del logo de l'entitat que es mostrarà a la capçalera de pàgina", false, null);
+            PropertyInfo propLogoEntitatUrl = new PropertyInfo(base + "logoentitaturl",
+                    "URL del logo de l'entitat que es mostrarà a la capçalera de pàgina", MetadataType.STRING, false,
+                    null, null, null, null, false);
             props.add(propLogoEntitatUrl);
         }
 
         {
             // es.caib.sample.pluginsib.signatureweb.nebula.authenticationsmethodsallowed=ONE_TIME_PASSWORD_OTP
-            PropertyInfo propAuthenticationsMethodsAllowed = new PropertyInfo(
-                    NEBULA_BASE_PROPERTIES + "authenticationsmethodsallowed",
+            PropertyInfo propAuthenticationsMethodsAllowed = new PropertyInfo(base + "authenticationsmethodsallowed",
                     "Llista de mètodes d'autenticació permesos separats per coma. "
                             + "Si es volen permetre tots els mètodes, deixar el valor en blanc. "
                             + "Mètodes d'autenticació disponibles: ONE_TIME_PASSWORD_OTP, MOBILE_SMS, DIRECT_ACCESS",
-                    false, null);
+                    MetadataType.STRING, true, null,
+                    availableValues2Map("ONE_TIME_PASSWORD_OTP", "MOBILE_SMS", "DIRECT_ACCESS"), null, null, false);
             props.add(propAuthenticationsMethodsAllowed);
 
         }
 
         return props;
     }
+
+    
 
     public String getUrlToLogoEntitat() {
         return getProperty(NEBULA_BASE_PROPERTIES + "logoentitaturl");
